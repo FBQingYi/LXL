@@ -1,26 +1,34 @@
 var path = './plugins/CSInventory/'
-var version = '0.0.5'
+var version = '0.0.7'
 if (!File.exists(path)) {
-    let profile = { "玩家数据储存路径": "../PlayerData/Inventory/", "是否同步背包": "是", "是否同步末影箱": "是", "是否同步玩家属性": "是", "是否同步玩家BUFF": "是", "是否在控制台输出日志": "否", "另一服务器IP": "127.0.0.1", "另一服务器端口": 19132, "定时储存(分)": 5 }
+    let profile = { "玩家数据储存路径": "../PlayerData/Inventory/", "玩家llmoney和计分板数据储存路径": "../PlayerData/EconAndScore/", "是否同步背包": "是", "是否同步末影箱": "是", "是否同步玩家属性": "是", "是否同步玩家BUFF": "是", "是否同步LLmoney数据": "否", "是否同步玩家计分板": "否","是否同步玩家Tag标签":"否", "是否在控制台输出日志": "否", "另一服务器IP": "127.0.0.1", "另一服务器端口": 19132, "定时储存(分)": 5 }
     File.mkdir(path);
-    File.mkdir(path+'logs/');
+    File.mkdir(path + 'logs/');
     File.writeTo(path + 'profile.json', JSON.stringify(profile, null, "\t"));
     setTimeout(function () { log(`[ERRON] [跨服背包] 第一次开服，已生成配置文件，请修改后再次开服，路径${path}profile.json`) }, 1000 * 6)
 } else {
     var profile = JSON.parse(File.readFrom(path + 'profile.json'));
     var PIDataPath = profile["玩家数据储存路径"];
+    var PIESDataPath = profile["玩家llmoney和计分板数据储存路径"];
     var TimingData = profile["定时储存(分)"];
     var InventoryOption = profile["是否同步背包"] == "是";
     var EInventoryOption = profile["是否同步末影箱"] == "是";
     var AttributesOption = profile["是否同步玩家属性"] == "是";
     var ActiveEffectsOption = profile["是否同步玩家BUFF"] == "是";
+    var SetLLMoneyOption = profile["是否同步LLmoney数据"] == "是";
+    var SetScoreboardOption = profile["是否同步玩家计分板"] == "是";
+    var SetPlayerTagOption = profile["是否同步玩家Tag标签"] == "是";
     var ServerIp = profile["另一服务器IP"];
     var ServerPort = profile["另一服务器端口"];
-    if (!File.exists(PIDataPath)) {
+    if (!File.exists(PIDataPath) || !File.exists(PIESDataPath)) {
         File.mkdir(PIDataPath);
+        File.mkdir(PIESDataPath);
     }
     QingYiLxlTiming()
     logger.setConsole(profile["是否在控制台输出日志"] == "是");
+    mc.regPlayerCmd('tr', '跨服传送', QingYiLxlPlayerCmd)
+    mc.listen("onJoin", QingYiLxlItemTrsJoin)
+    mc.listen("onLeft", QingYiLxlItemTrsLeft)
     setTimeout(function () { log(`[INFO] [跨服背包] 载入成功！玩家数据储存路径为：${PIDataPath}`); log(`[INFO] [跨服背包] 当前版本：${version}`) }, 1000 * 6)
 }
 
@@ -29,6 +37,37 @@ function QingYiLxlItemTrsLeft(Player) {
     let playerXuid = Player.xuid;
     let playerName = Player.name;
     WritePlayerBNbt(playerName, playerXuid, playerNbt)
+    WritePlayerLLmoneyAndScoreboard(Player, playerXuid)
+}
+
+function QingYiLxlTiming() {
+    setTimeout(function () {
+        QingYiLxlTiming();
+        let playerList = mc.getOnlinePlayers();
+        if (playerList != []) {
+            for (let i in playerList) {
+                let Player = playerList[i];
+                let playerNbt = Player.getNbt();
+                let playerXuid = Player.xuid;
+                let playerName = Player.name;
+                WritePlayerBNbt(playerName, playerXuid, playerNbt)
+                WritePlayerLLmoneyAndScoreboard(Player, playerXuid)
+            }
+        }
+    }, 60000 * TimingData);
+}
+
+function WritePlayerLLmoneyAndScoreboard(player, xuid) {
+    let WESpath = PIESDataPath + xuid;
+    let scoreList = mc.getAllScoreObjectives();
+    let ESJson = {};
+    ESJson.LLmoney = money.get(xuid);
+    ESJson.score = {};
+    for (let i in scoreList) {
+        let scoreName = scoreList[i].name;
+        ESJson.score[scoreName] = player.getScore(scoreName);
+    }
+    File.writeTo(WESpath, JSON.stringify(ESJson, null, "\t"))
 }
 
 function WritePlayerBNbt(name, xuid, playerNbt) {
@@ -40,6 +79,7 @@ function WritePlayerBNbt(name, xuid, playerNbt) {
     NNbt.setTag("Armor", playerNbt.getTag("Armor"));
     NNbt.setTag("Offhand", playerNbt.getTag("Offhand"));
     NNbt.setTag("Attributes", playerNbt.getTag("Attributes"));
+    NNbt.setTag("Tags", playerNbt.getTag("Tags"));
     if (Effects != undefined) {
         NNbt.setTag("ActiveEffects", playerNbt.getTag("ActiveEffects"));
     }
@@ -64,6 +104,7 @@ function QingYiLxlItemTrsJoin(Player) {
     let name = Player.name;
     let playernbt = Player.getNbt();
     let Rpath = PIDataPath + xuid;
+    let RESpath = PIESDataPath + xuid;
     if (File.exists(Rpath)) {
         let fl = new File(Rpath, file.ReadMode, true);
         let PlayerBNbt = fl.readAllSync();
@@ -85,6 +126,9 @@ function QingYiLxlItemTrsJoin(Player) {
             if (Effects != undefined && ActiveEffectsOption) {
                 playernbt.setTag("ActiveEffects", Pnbt.getTag("ActiveEffects"));
             }
+            if(SetPlayerTagOption){
+                playernbt.setTag("Tags", Pnbt.getTag("Tags"));
+            }
             if (Player.setNbt(playernbt)) {
                 playernbt.destroy();
                 Pnbt.destroy();
@@ -99,23 +143,29 @@ function QingYiLxlItemTrsJoin(Player) {
         logger.log(logg);
         QingYiLxlLogWrite(logg);
     }
-
-}
-
-function QingYiLxlTiming() {
-    setTimeout(function () {
-        QingYiLxlTiming();
-        let playerList = mc.getOnlinePlayers();
-        if (playerList != []) {
-            for (let i in playerList) {
-                let Player = playerList[i];
-                let playerNbt = Player.getNbt();
-                let playerXuid = Player.xuid;
-                let playerName = Player.name;
-                WritePlayerBNbt(playerName, playerXuid, playerNbt)
+    if (File.exists(RESpath)) {
+        let EconAndScore = JSON.parse(File.readFrom(RESpath));
+        if (SetLLMoneyOption) {
+            money.set(xuid, EconAndScore.LLmoney);
+        }
+        if (SetScoreboardOption && EconAndScore.score != []) {
+            let ScoreboardList = EconAndScore.score;
+            for (let i in ScoreboardList) {
+                if(mc.getScoreObjective(i) == undefined){
+                    mc.newScoreObjective(i,i)
+                }
+                Player.setScore(i, ScoreboardList[i]);
             }
         }
-    }, 60000 * TimingData);
+        let logg = `[${system.getTimeStr()} 跨服背包] 玩家 ${name} 计分板和llmoney经济数据同步成功！`;
+        logger.log(logg);
+        QingYiLxlLogWrite(logg);
+    } else {
+        let logg = `[${system.getTimeStr()} 跨服背包] 玩家 ${name} 计分板和llmoney经济数据同步成功！`;
+        logger.log(logg);
+        QingYiLxlLogWrite(logg);
+    }
+
 }
 
 function QingYiLxlLogWrite(text) {
@@ -126,7 +176,3 @@ function QingYiLxlLogWrite(text) {
 function QingYiLxlPlayerCmd(player, args) {
     player.transServer(ServerIp, ServerPort);
 }
-
-mc.regPlayerCmd('tr', '跨服传送', QingYiLxlPlayerCmd)
-mc.listen("onJoin", QingYiLxlItemTrsJoin)
-mc.listen("onLeft", QingYiLxlItemTrsLeft)
