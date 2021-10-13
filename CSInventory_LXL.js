@@ -1,5 +1,5 @@
 var path = './plugins/CSInventory/'
-var version = '0.0.7'
+var version = '0.0.8'
 if (!File.exists(path)) {
     let profile = { "玩家数据储存路径": "../PlayerData/Inventory/", "玩家llmoney和计分板数据储存路径": "../PlayerData/EconAndScore/", "是否同步背包": "是", "是否同步末影箱": "是", "是否同步玩家属性": "是", "是否同步玩家BUFF": "是", "是否同步LLmoney数据": "否", "是否同步玩家计分板": "否","是否同步玩家Tag标签":"否", "是否在控制台输出日志": "否", "另一服务器IP": "127.0.0.1", "另一服务器端口": 19132, "定时储存(分)": 5 }
     File.mkdir(path);
@@ -80,6 +80,8 @@ function WritePlayerBNbt(name, xuid, playerNbt) {
     NNbt.setTag("Offhand", playerNbt.getTag("Offhand"));
     NNbt.setTag("Attributes", playerNbt.getTag("Attributes"));
     NNbt.setTag("Tags", playerNbt.getTag("Tags"));
+    NNbt.setTag("PlayerLevel", playerNbt.getTag("PlayerLevel"));
+    NNbt.setTag("PlayerLevelProgress", playerNbt.getTag("PlayerLevelProgress"));
     if (Effects != undefined) {
         NNbt.setTag("ActiveEffects", playerNbt.getTag("ActiveEffects"));
     }
@@ -122,6 +124,8 @@ function QingYiLxlItemTrsJoin(Player) {
             }
             if (AttributesOption) {
                 playernbt.setTag("Attributes", Pnbt.getTag("Attributes"));
+                playernbt.setTag("PlayerLevel", Pnbt.getTag("PlayerLevel"));
+                playernbt.setTag("PlayerLevelProgress", Pnbt.getTag("PlayerLevelProgress"));
             }
             if (Effects != undefined && ActiveEffectsOption) {
                 playernbt.setTag("ActiveEffects", Pnbt.getTag("ActiveEffects"));
