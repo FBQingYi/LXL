@@ -1,5 +1,5 @@
 var path = './plugins/CSInventory/'
-var version = '0.0.9'
+var version = '0.0.10'
 if (!File.exists(path)) {
     let profile = { "玩家数据储存路径": "../PlayerData/Inventory/", "玩家llmoney和计分板数据储存路径": "../PlayerData/EconAndScore/", "是否同步背包": "是", "是否同步末影箱": "是", "是否同步玩家属性": "是", "是否同步玩家BUFF": "是", "是否同步LLmoney数据": "否", "是否同步玩家计分板": "否", "是否同步玩家Tag标签": "否", "是否在控制台输出日志": "否", "另一服务器IP": "127.0.0.1", "另一服务器端口": 19132, "定时储存(分)": 5 }
     File.mkdir(path);
@@ -64,7 +64,9 @@ function WritePlayerLLmoneyAndScoreboard(player, xuid) {
     let WESpath = PIESDataPath + xuid;
     let scoreList = mc.getAllScoreObjectives();
     let ESJson = {};
-    ESJson.LLmoney = money.get(xuid);
+    if(SetLLMoneyOption){
+        ESJson.LLmoney = money.get(xuid);
+    }
     ESJson.score = {};
     for (let i in scoreList) {
         let scoreName = scoreList[i].name;
@@ -168,7 +170,7 @@ function QingYiLxlItemTrsJoin(Player) {
         logger.log(logg);
         QingYiLxlLogWrite(logg);
     } else {
-        let logg = `[${system.getTimeStr()} 跨服背包] 玩家 ${name} 计分板和llmoney经济数据同步成功！`;
+        let logg = `[${system.getTimeStr()} 跨服背包] 玩家 ${name} 计分板和llmoney经济数据同步失败！`;
         logger.log(logg);
         QingYiLxlLogWrite(logg);
     }
