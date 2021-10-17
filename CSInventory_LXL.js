@@ -1,13 +1,13 @@
 var path = './plugins/CSInventory/'
-var version = '0.0.8'
+var version = '0.0.9'
 if (!File.exists(path)) {
-    let profile = { "玩家数据储存路径": "../PlayerData/Inventory/", "玩家llmoney和计分板数据储存路径": "../PlayerData/EconAndScore/", "是否同步背包": "是", "是否同步末影箱": "是", "是否同步玩家属性": "是", "是否同步玩家BUFF": "是", "是否同步LLmoney数据": "否", "是否同步玩家计分板": "否","是否同步玩家Tag标签":"否", "是否在控制台输出日志": "否", "另一服务器IP": "127.0.0.1", "另一服务器端口": 19132, "定时储存(分)": 5 }
+    let profile = { "玩家数据储存路径": "../PlayerData/Inventory/", "玩家llmoney和计分板数据储存路径": "../PlayerData/EconAndScore/", "是否同步背包": "是", "是否同步末影箱": "是", "是否同步玩家属性": "是", "是否同步玩家BUFF": "是", "是否同步LLmoney数据": "否", "是否同步玩家计分板": "否", "是否同步玩家Tag标签": "否", "是否在控制台输出日志": "否", "另一服务器IP": "127.0.0.1", "另一服务器端口": 19132, "定时储存(分)": 5 }
     File.mkdir(path);
     File.mkdir(path + 'logs/');
     File.writeTo(path + 'profile.json', JSON.stringify(profile, null, "\t"));
     setTimeout(function () { log(`[ERRON] [跨服背包] 第一次开服，已生成配置文件，请修改后再次开服，路径${path}profile.json`) }, 1000 * 6)
 } else {
-    var profile = JSON.parse(File.readFrom(path + 'profile.json'));
+    let profile = JSON.parse(File.readFrom(path + 'profile.json'));
     var PIDataPath = profile["玩家数据储存路径"];
     var PIESDataPath = profile["玩家llmoney和计分板数据储存路径"];
     var TimingData = profile["定时储存(分)"];
@@ -44,7 +44,10 @@ function QingYiLxlTiming() {
     setTimeout(function () {
         QingYiLxlTiming();
         let playerList = mc.getOnlinePlayers();
-        if (playerList != []) {
+        if (JSON.stringify(playerList) != "[]") {
+            let logg = `[${system.getTimeStr()} 跨服背包] [INFO] 开始启动定时保存功能！`;
+            logger.log(logg);
+            QingYiLxlLogWrite(logg);
             for (let i in playerList) {
                 let Player = playerList[i];
                 let playerNbt = Player.getNbt();
@@ -130,7 +133,7 @@ function QingYiLxlItemTrsJoin(Player) {
             if (Effects != undefined && ActiveEffectsOption) {
                 playernbt.setTag("ActiveEffects", Pnbt.getTag("ActiveEffects"));
             }
-            if(SetPlayerTagOption){
+            if (SetPlayerTagOption) {
                 playernbt.setTag("Tags", Pnbt.getTag("Tags"));
             }
             if (Player.setNbt(playernbt)) {
@@ -155,8 +158,8 @@ function QingYiLxlItemTrsJoin(Player) {
         if (SetScoreboardOption && EconAndScore.score != []) {
             let ScoreboardList = EconAndScore.score;
             for (let i in ScoreboardList) {
-                if(mc.getScoreObjective(i) == undefined){
-                    mc.newScoreObjective(i,i)
+                if (mc.getScoreObjective(i) == undefined) {
+                    mc.newScoreObjective(i, i)
                 }
                 Player.setScore(i, ScoreboardList[i]);
             }
