@@ -1,7 +1,7 @@
 //--------------基础信息定义--------------
 const pluginName = 'TaskSystem';
 const pluginDescribe = '任务系统';
-const pluginVersion = [0, 0, 6];
+const pluginVersion = [0, 0, 8];
 const pluginOther = { "作者": "清漪花开" };
 const pluginConfigPath = './plugins/TaskSystem/';
 
@@ -24,6 +24,7 @@ let ServerTaskData = JSON.parse(File.readFrom(pluginConfigPath + 'Data/ServerTas
 let EntityList = JSON.parse(File.readFrom(pluginConfigPath + 'Data/EntityList.json'));
 let PlayerTaskReceiving = JSON.parse(File.readFrom(pluginConfigPath + 'Data/PlayerTaskReceiving.json'));
 let TimeReset = false;
+let pid = 0;
 
 mc.regPlayerCmd(basicProfile.cmd, basicProfile.CmdDescription, (player, args) => {
     if (JSON.stringify(PlayerTaskData[player.xuid]) == JSON.stringify(JudgmentExample)) {
@@ -108,6 +109,8 @@ mc.listen("onPlayerDie", (player, source) => {
 mc.listen("onLeft", (player) => {
     if (ServerTaskData["逃杀任务"] != undefined && JSON.stringify(ServerTaskData["逃杀任务"]) != '{}') {
         if (ServerTaskData["逃杀任务"][player.name] != undefined) {
+            delete ServerTaskData["逃杀任务"][player.name];
+            File.writeTo(pluginConfigPath + 'Data/ServerTaskData.json', JSON.stringify(ServerTaskData, null, "\t"));
             DeletePlayerTaskData(ServerTaskData["逃杀任务"][player.name].id, "逃杀任务")
             mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因玩家下线导致任务失效！，\n[任务中心]>>任务ID: ${ServerTaskData["逃杀任务"][player.name].id} \n[任务中心]>>目前任务已结束，将清理各位玩家的接取数据！`)
         }
@@ -138,6 +141,12 @@ mc.listen("onAttackEntity", (player, entity) => {
             player.tell('该生物已设置！')
         }
         return false;
+    }
+})
+//后台指令监听
+mc.listen("onConsoleCmd", (cmd) => {
+    if (cmd == 'll reload TaskSystem.js' || cmd == 'll reload TaskSystem' || cmd == 'll reload' && pid != 0) {
+        clearInterval(pid);
     }
 })
 
@@ -706,12 +715,14 @@ function TaskForm_0(player) {
 
 //计时器
 function timer() {
-    setInterval(function () {
+    pid = setInterval(function () {
         for (let name in ServerTaskData["逃杀任务"]) {
             if (ServerTaskData["逃杀任务"][name].StopTime - 1 == 0) {
                 DeletePlayerTaskData(ServerTaskData["逃杀任务"][name].id, "逃杀任务")
                 mc.broadcast(`[任务中心]>>逃杀任务 中的 ${name} 任务因倒计时结束被删除，\n[任务中心]>>任务ID: ${ServerTaskData["逃杀任务"][name].id} \n[任务中心]>>目前任务已结束，将清理各位玩家的接取数据！`)
-                money.add(mc.getPlayer(name).xuid, ServerTaskData["逃杀任务"][name].Money);
+                if (mc.getPlayer(name) != undefined) {
+                    money.add(mc.getPlayer(name).xuid, ServerTaskData["逃杀任务"][name].Money);
+                }
             } else {
                 ServerTaskData["逃杀任务"][name].StopTime -= 1;
             }
