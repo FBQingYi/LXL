@@ -1,8 +1,8 @@
 //--------------基础信息定义--------------
 const pluginName = 'TaskSystem';
 const pluginDescribe = '任务系统';
-const pluginVersion = [0, 0, 9];
-const pluginOther = { "作者": "清漪花开" };
+const pluginVersion = [0, 1, 1];
+const pluginOther = { "作者": "清漪花开", "版权归属": "Axis empire", "QQ": "1364850375" };
 const pluginConfigPath = './plugins/TaskSystem/';
 
 //--------------基础配置文件--------------
@@ -91,18 +91,20 @@ mc.listen("onPlayerDie", (player, source) => {
     if (ServerTaskData["逃杀任务"][player.name] != undefined) {
         if (source == undefined || !source.isPlayer()) {
             DeletePlayerTaskData(ServerTaskData["逃杀任务"][player.name].id, "逃杀任务")
-            mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因玩家非击杀死亡，任务结束！，\n[任务中心]>>任务ID: ${ServerTaskData["逃杀任务"][player.name].id} \n[任务中心]>>目前任务已结束，将清理各位玩家的接取数据！`)
+            mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因玩家非击杀死亡，任务结束！`)
         } else if (source.isPlayer()) {
             let player2 = source.toPlayer();
             if (PlayerTaskData[player2.xuid]["逃杀任务"][player.name] == undefined) {
-                DeletePlayerTaskData(PlayerTaskData[player2.xuid]["逃杀任务"][player.name].id, "逃杀任务")
-                mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因非任务玩家击杀死亡，任务结束！，\n[任务中心]>>任务ID: ${ServerTaskData["逃杀任务"][player.name].id} \n[任务中心]>>目前任务已结束，将清理各位玩家的接取数据！`)
+                DeletePlayerTaskData(ServerTaskData["逃杀任务"][player.name].id, "逃杀任务")
+                mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因非任务玩家击杀死亡，任务结束！`)
             } else {
                 money.add(player2.xuid, PlayerTaskData[player2.xuid]["逃杀任务"][player.name].Money);
                 DeletePlayerTaskData(PlayerTaskData[player2.xuid]["逃杀任务"][player.name].id, "逃杀任务")
-                mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 已被${player2.name}击杀，任务结束！，\n[任务中心]>>任务ID: ${ServerTaskData["逃杀任务"][player.name].id} \n[任务中心]>>目前任务已结束，将清理各位玩家的接取数据！`)
+                mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 已被${player2.name}击杀，任务结束！`)
             }
         }
+        delete ServerTaskData["逃杀任务"][player.name];
+        File.writeTo(pluginConfigPath + 'Data/ServerTaskData.json', JSON.stringify(ServerTaskData, null, "\t"));
     }
 })
 //玩家下线
@@ -112,7 +114,7 @@ mc.listen("onLeft", (player) => {
             delete ServerTaskData["逃杀任务"][player.name];
             File.writeTo(pluginConfigPath + 'Data/ServerTaskData.json', JSON.stringify(ServerTaskData, null, "\t"));
             DeletePlayerTaskData(ServerTaskData["逃杀任务"][player.name].id, "逃杀任务")
-            mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因玩家下线导致任务失效！，\n[任务中心]>>任务ID: ${ServerTaskData["逃杀任务"][player.name].id} \n[任务中心]>>目前任务已结束，将清理各位玩家的接取数据！`)
+            mc.broadcast(`[任务中心]>> 逃杀任务 中的 ${player.name} 任务因玩家下线导致任务失效！`)
         }
     }
 })
@@ -723,6 +725,8 @@ function timer() {
                 if (mc.getPlayer(name) != undefined) {
                     money.add(mc.getPlayer(name).xuid, ServerTaskData["逃杀任务"][name].Money);
                 }
+                delete ServerTaskData["逃杀任务"][name];
+                File.writeTo(pluginConfigPath + 'Data/ServerTaskData.json', JSON.stringify(ServerTaskData, null, "\t"));
             } else {
                 ServerTaskData["逃杀任务"][name].StopTime -= 1;
             }
