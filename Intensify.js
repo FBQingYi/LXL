@@ -1,9 +1,67 @@
+//-----基础信息定义
+const StrengthenItemsJson = { "weapon": ["minecraft:wooden_sword", "minecraft:stone_sword", "minecraft:iron_sword", "minecraft:golden_sword", "minecraft:diamond_sword", "minecraft:netherite_sword"], "armor": ["minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:chainmail_helmet", "minecraft:chainmail_chestplate", "minecraft:chainmail_leggings", "minecraft:chainmail_boots", "minecraft:iron_helmet", "minecraft:iron_chestplate", "minecraft:iron_leggings", "minecraft:iron_boots", "minecraft:golden_helmet", "minecraft:golden_chestplate", "minecraft:golden_leggings", "minecraft:golden_boots", "minecraft:diamond_helmet", "minecraft:diamond_chestplate", "minecraft:diamond_leggings", "minecraft:diamond_boots", "minecraft:netherite_helmet", "minecraft:netherite_chestplate", "minecraft:netherite_leggings", "minecraft:netherite_boots"] };
+const ComparisonTable = [{}, { "name": "Ⅰ", "Weapon": 1, "Armor": 1, "exp": 1 }, { "name": "Ⅱ", "Weapon": 2, "Armor": 3, "exp": 2 }, { "name": "Ⅲ", "Weapon": 3, "Armor": 5, "exp": 4 }, { "name": "Ⅳ", "Weapon": 4, "Armor": 10, "exp": 6 }, { "name": "∞", "Weapon": 5, "Armor": 20, "exp": 8 }];
+const pluginName = "Intensify";
+const PluginsIntroduction = '强化你的装备!';
+const pluginPath = "./plugins/Intensify/";
+const PluginsVersion = [0, 0, 2];
+const PluginsOtherInformation = { "插件作者": "清漪花开" };
+
+//------插件信息注册
+ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherInformation)
+
+//------插件数据库加载及删除语言文件
+let db = new KVDatabase(pluginPath + "db")
+if (File.exists(pluginPath + "language/language.json")) {
+    File.delete(pluginPath + "language");
+}
+
+/**
+ * 语言文件写入及加载.
+ */
+i18n.load(pluginPath + "language/language.json", "en", {
+    "zh_CN": {
+        "StrengtheningReel1": "§3一级强化卷轴",
+        "StrengtheningReel1explain": JSON.stringify(["§2-------介绍-------", "§3一级强化卷轴", "可用于:原始装备", "§6使用效果:装备变为一阶", "-------====-------", "§3一阶装备:", "§2护甲类装备:+1 生命", "§4攻击类武器:+1 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
+        "StrengtheningReel2": "§9二级强化卷轴",
+        "StrengtheningReel2explain": JSON.stringify(["§2-------介绍-------", "§9二级强化卷轴", "可用于:一阶装备", "§6使用效果:装备变为二阶", "-------====-------", "§9二阶装备:", "§2护甲类装备:+3 生命", "§4攻击类武器:+2 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
+        "StrengtheningReel3": "§1三级强化卷轴",
+        "StrengtheningReel3explain": JSON.stringify(["§2-------介绍-------", "§1三级强化卷轴", "可用于:二阶装备", "§6使用效果:装备变为三阶", "-------====-------", "§1三阶装备:", "§2护甲类装备:+5 生命", "§4攻击类武器:+3 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
+        "StrengtheningReel4": "§4四级强化卷轴",
+        "StrengtheningReel4explain": JSON.stringify(["§2-------介绍-------", "§4四级强化卷轴", "可用于:三阶装备", "§6使用效果:装备变为四阶", "-------====-------", "§4四阶装备:", "§2护甲类装备:+10 生命", "§4攻击类武器:+4 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
+        "StrengtheningReel5": "§6终极强化卷轴",
+        "StrengtheningReel5explain": JSON.stringify(["§2-------介绍-------", "§6终极强化卷轴", "可用于:四阶装备", "§6使用效果:装备变为终极", "-------====-------", "§6终极装备:", "§2护甲类装备:+20 生命", "§4攻击类武器:+5 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
+        "EquipmentWeapon": JSON.stringify(["§2-------==属性==-------", "§3{0} 阶武器", "§4额外伤害:+{1}", "§6其他效果:伤害全部变为真实伤害!", "-------锻造信息-------", "锻造玩家:{2}", "锻造时间:{3}"]),
+        "EquipmentArmor": JSON.stringify(["§2-------==属性==-------", "§3{0} 阶护具", "§4生命上限:+{1}", "§1额外经验+{4}", "-------锻造信息-------", "锻造玩家:{2}", "锻造时间:{3}"])
+    },
+    "en": {
+        "StrengtheningReel1": "§3Primary strengthening reel",
+        "StrengtheningReel1explain": JSON.stringify(["§2-------=introduce=-------", "§3Primary strengthening reel", "Available for: original equipment", "§6Use effect: equipment becomes first level", "-------====-------", "§3First level equipment:", "§2Armor equipment:+1 HP", "§4Attack weapons:+1 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
+        "StrengtheningReel2": "§9Secondary strengthening reel",
+        "StrengtheningReel2explain": JSON.stringify(["§2-------=introduce=-------", "§9Secondary strengthening reel", "Can be used for: Level 1 equipment", "§6Use effect: equipment becomes second level", "-------====-------", "§9Second level equipment:", "§2Armor equipment:+3 HP", "§4Attack weapons:+2 attack", "PS: Adding an attack means to cause extra real damage\n to the target when attacking!"]),
+        "StrengtheningReel3": "§1Three level strengthening reel",
+        "StrengtheningReel3explain": JSON.stringify(["§2-------=introduce=-------", "§1Three level strengthening reel", "Can be used for: second level equipment", "§6Use effect: equipment becomes three Level", "-------====-------", "§1Third level equipment:", "§2Armor equipment:+5 HP", "§4Attack weapons:+3 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
+        "StrengtheningReel4": "§4Four level strengthening reel",
+        "StrengtheningReel4explain": JSON.stringify(["§2-------=introduce=-------", "§4Four level strengthening reel", "Can be used for: three level equipment", "§6Use effect: equipment becomes four Level", "-------====-------", "§4Fourth level equipment:", "§2Armor equipment:+10 HP", "§4Attack weapons:+4 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
+        "StrengtheningReel5": "§6Ultimate strengthening scroll",
+        "StrengtheningReel5explain": JSON.stringify(["§2-------=introduce=-------", "§6Ultimate strengthening scroll", "Can be used for: four level equipment", "§6Use effect: equipment becomes the ultimate", "-------====-------", "§6THE ULTIMATE GEAR:", "§2Armor equipment:+20 HP", "§4Attack weapons:+5 attack", "PS: Adding an attack means to cause extra real damage\n to the target when attacking!"]),
+        "EquipmentWeapon": JSON.stringify(["§2-------==attribute==-------", "§3{0} stratum arms", "§4Additional damage:+{1}", "§6Other effects: all the damage becomes real damage!", "-------Forging information-------", "Forging Players:{2}", "Forging time:{3}"]),
+        "EquipmentArmor": JSON.stringify(["§2-------==attribute==-------", "§3{0} stratum protective clothing", "§4Maximum Life:+{1}", "§1Additional EXP+{4}", "-------Forging information-------", "Forging Players:{2}", "Forging time:{3}"])
+    }
+});
+
+/**
+ * 玩家输入指令事件监听.
+ * 前期用于处理玩家血量异常及调试.
+ * 后期将开启OP直接获得隐藏强化卷及部分设置.
+ */
 mc.listen("onPlayerCmd", (player1, cmd) => {
     if (player1.isOP() && cmd == 'ireset') {
         /*let item = player1.getHand();
-        let nbt = item.getNbt();
-        //log(nbt.toString())
-        log(item.type)*/
+       let nbt = item.getNbt();
+       log(nbt.toString())
+       //log(item.type)
+      */
         let onlinePlayerList = mc.getOnlinePlayers();
         onlinePlayerList.forEach(player => {
             let playerNbt = player.getNbt();
@@ -19,53 +77,6 @@ mc.listen("onPlayerCmd", (player1, cmd) => {
             }
             player.setNbt(playerNbt);
         });
-    }
-});
-
-const StrengthenItemsJson = {
-    "weapon": [
-        "minecraft:wooden_sword",
-        "minecraft:stone_sword",
-        "minecraft:iron_sword",
-        "minecraft:golden_sword",
-        "minecraft:diamond_sword",
-        "minecraft:netherite_sword"
-    ],
-    "armor": ["minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:chainmail_helmet", "minecraft:chainmail_chestplate", "minecraft:chainmail_leggings", "minecraft:chainmail_boots", "minecraft:iron_helmet", "minecraft:iron_chestplate", "minecraft:iron_leggings", "minecraft:iron_boots", "minecraft:golden_helmet", "minecraft:golden_chestplate", "minecraft:golden_leggings", "minecraft:golden_boots", "minecraft:diamond_helmet", "minecraft:diamond_chestplate", "minecraft:diamond_leggings", "minecraft:diamond_boots", "minecraft:netherite_helmet", "minecraft:netherite_chestplate", "minecraft:netherite_leggings", "minecraft:netherite_boots"]
-};
-const ComparisonTable = [{}, { "name": "Ⅰ", "Weapon": 1, "Armor": 1 }, { "name": "Ⅱ", "Weapon": 2, "Armor": 3 }, { "name": "Ⅲ", "Weapon": 3, "Armor": 5 }, { "name": "Ⅳ", "Weapon": 4, "Armor": 10 }, { "name": "终极", "Weapon": 5, "Armor": 20 }];
-const pluginName = "Intensify";
-const pluginPath = "./plugins/Intensify/";
-let db = new KVDatabase(pluginPath + "db")
-
-i18n.load(pluginPath + "language/language.json", "en", {
-    "zh_CN": {
-        "StrengtheningReel1": "§3一级强化卷轴",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------介绍-------", "§3一级强化卷轴", "可用于:原始装备", "§6使用效果:装备变为一阶", "-------====-------", "§3一阶装备:", "§2护甲类装备:+1 生命", "§4攻击类武器:+1 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel2": "§9二级强化卷轴",
-        "StrengtheningReel2explain": JSON.stringify(["§2-------介绍-------", "§9二级强化卷轴", "可用于:一阶装备", "§6使用效果:装备变为二阶", "-------====-------", "§9二阶装备:", "§2护甲类装备:+3 生命", "§4攻击类武器:+2 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel3": "§1三级强化卷轴",
-        "StrengtheningReel3explain": JSON.stringify(["§2-------介绍-------", "§1三级强化卷轴", "可用于:二阶装备", "§6使用效果:装备变为三阶", "-------====-------", "§1三阶装备:", "§2护甲类装备:+5 生命", "§4攻击类武器:+3 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel4": "§4四级强化卷轴",
-        "StrengtheningReel4explain": JSON.stringify(["§2-------介绍-------", "§4四级强化卷轴", "可用于:三阶装备", "§6使用效果:装备变为四阶", "-------====-------", "§4四阶装备:", "§2护甲类装备:+10 生命", "§4攻击类武器:+4 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel5": "§6终极强化卷轴",
-        "StrengtheningReel5explain": JSON.stringify(["§2-------介绍-------", "§6终极强化卷轴", "可用于:四阶装备", "§6使用效果:装备变为终极", "-------====-------", "§6终极装备:", "§2护甲类装备:+20 生命", "§4攻击类武器:+5 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "EquipmentWeapon": JSON.stringify(["§2-------==属性==-------", "§3{0} 阶武器", "§4额外伤害:+{1}", "§6其他效果:伤害全部变为真实伤害!", "-------锻造信息-------", "锻造玩家:{2}", "锻造时间:{3}"]),
-        "EquipmentArmor": JSON.stringify(["§2-------==属性==-------", "§3{0} 阶护具", "§4生命上限:+{1}", "-------锻造信息-------", "锻造玩家:{2}", "锻造时间:{3}"])
-    },
-    "en": {
-        "StrengtheningReel1": "§3Primary strengthening reel",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------=introduce=-------", "§3Primary strengthening reel", "Available for: original equipment", "§6Use effect: equipment becomes first level", "-------====-------", "§3First level equipment:", "§2Armor equipment:+1 HP", "§4Attack weapons:+1 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "StrengtheningReel2": "§9Secondary strengthening reel",
-        "StrengtheningReel2explain": JSON.stringify(["§2-------=introduce=-------", "§9Secondary strengthening reel", "Can be used for: Level 1 equipment", "§6Use effect: equipment becomes second level", "-------====-------", "§9Second level equipment:", "§2Armor equipment:+3 HP", "§4Attack weapons:+2 attack", "PS: Adding an attack means to cause extra real damage\n to the target when attacking!"]),
-        "StrengtheningReel3": "§1Three level strengthening reel",
-        "StrengtheningReel3explain": JSON.stringify(["§2-------=introduce=-------", "§1Three level strengthening reel", "Can be used for: second level equipment", "§6Use effect: equipment becomes three Level", "-------====-------", "§1Third level equipment:", "§2Armor equipment:+5 HP", "§4Attack weapons:+3 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "StrengtheningReel4": "§4Four level strengthening reel",
-        "StrengtheningReel4explain": JSON.stringify(["§2-------=introduce=-------", "§4Four level strengthening reel", "Can be used for: three level equipment", "§6Use effect: equipment becomes four Level", "-------====-------", "§4Fourth level equipment:", "§2Armor equipment:+10 HP", "§4Attack weapons:+4 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "StrengtheningReel5": "§6Ultimate strengthening scroll",
-        "StrengtheningReel5explain": JSON.stringify(["§2-------=introduce=-------", "§6Ultimate strengthening scroll", "Can be used for: four level equipment", "§6Use effect: equipment becomes the ultimate", "-------====-------", "§6THE ULTIMATE GEAR:", "§2Armor equipment:+20 HP", "§4Attack weapons:+5 attack", "PS: Adding an attack means to cause extra real damage\n to the target when attacking!"]),
-        "EquipmentWeapon": JSON.stringify(["§2-------==attribute==-------", "§3{0} stratum arms", "§4Additional damage:+{1}", "§6Other effects: all the damage becomes real damage!", "-------Forging information-------", "Forging Players:{2}", "Forging time:{3}"]),
-        "EquipmentArmor": JSON.stringify(["§2-------==attribute==-------", "§3{0} stratum protective clothing", "§4Maximum Life:+{1}", "-------Forging information-------", "Forging Players:{2}", "Forging time:{3}"])
     }
 });
 
@@ -161,10 +172,31 @@ mc.listen("onServerStarted", () => {
                     setPlayerHP(player, HP - playerHPData, "add");
                     db.set(player.xuid, HP)
                 }
+                equipmentDescriptionCorrection(player);
             });
         }
     }, 1000);
 });
+
+/**
+ * 玩家获得经验事件监听.
+ * 主要用来处理护甲中的额外经验效果.
+ * 给玩家经验接口并未使用addExperience，因其会再次触发次事件.
+ */
+mc.listen("onExperienceAdd", (player, _exp) => {
+    let armorContainer = player.getArmor();
+    let containerAllList = armorContainer.getAllItems();
+    let EXP = 0;
+    containerAllList.forEach(item => {
+        if (item.name != "") {
+            let itemInformation = upgradeItem(item);
+            if (itemInformation.boolean) {
+                EXP += ComparisonTable[parseInt(itemInformation.lvl)].exp;
+            }
+        }
+    });
+    player.setCurrentExperience(player.getCurrentExperience() + EXP);
+})
 
 /**
  * 判断是否是升级物品
@@ -282,7 +314,7 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
                     DescriptionText = i18n.trl(player.langCode, "EquipmentWeapon", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Weapon, player.name, system.getTimeStr());
                     nbt = setEquipmentNbt(item, "Weapon", TargetLevel);
                 } else if (StrengthenItemsJson.armor.indexOf(item.type) != -1) {
-                    DescriptionText = i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.name, system.getTimeStr());
+                    DescriptionText = i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.name, system.getTimeStr(), ComparisonTable[TargetLevel].exp);
                     nbt = setEquipmentNbt(item, "Armor", TargetLevel);
                 }
                 let newItem = mc.newItem(nbt);
@@ -300,7 +332,7 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
                 if (StrengthenItemsJson.weapon.indexOf(item.type) != -1) {
                     DescriptionText = i18n.trl(player.langCode, "EquipmentWeapon", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Weapon, player.name, system.getTimeStr());
                 } else if (StrengthenItemsJson.armor.indexOf(item.type) != -1) {
-                    DescriptionText = i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.name, system.getTimeStr());
+                    DescriptionText = i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.name, system.getTimeStr(), ComparisonTable[TargetLevel].exp);
                 }
                 nbt.getTag("tag").getTag("addon").setInt("lvl", TargetLevel);
                 newItem = mc.newItem(nbt);
@@ -358,4 +390,36 @@ function setPlayerHP(player, HP, pattern) {
         }
     }
     player.setNbt(playerNbt);
+}
+
+/**
+ * 版本0.0.2更新玩家护甲显示数据.
+ * 新增额外经验显示.
+ * @param {Player} player 玩家对象
+ */
+function equipmentDescriptionCorrection(player) {
+    let armorContainer = player.getArmor();
+    let containerAllList = armorContainer.getAllItems();
+    let refreshItemsPlayer = false;
+    containerAllList.forEach(item => {
+        if (item.name != "") {
+            let itemInformation = upgradeItem(item);
+            if (itemInformation.boolean) {
+                if (itemInformation.type == "Armor") {
+                    let TargetLevel = itemInformation.lvl;
+                    let DescriptionText = i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.name, system.getTimeStr(), ComparisonTable[TargetLevel].exp);
+                    let itemNbt = JSON.parse(item.getNbt().toString());
+                    let Lore1 = JSON.parse(DescriptionText);
+                    let Lore2 = itemNbt.tag.display.Lore;
+                    if (Lore2[3] != Lore1[3]) {
+                        item.setLore(Lore1);
+                        refreshItemsPlayer = true;
+                    }
+                }
+            }
+        }
+    });
+    if (refreshItemsPlayer) {
+        player.refreshItems();
+    }
 }
