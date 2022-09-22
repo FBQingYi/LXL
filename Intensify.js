@@ -4,13 +4,14 @@ const itemGemTable = [
     {},
     { "gemName": "MovingGem", "gemExplain": "MovingGemExplain", "maxLvl": 2, "lvl": [0, 0.08, 0.13], "AvailableTypes": "armor" },
     { "gemName": "PowerGem", "gemExplain": "PowerGemExplain", "maxLvl": 2, "lvl": [0, 1, 2], "AvailableTypes": "weapon" },
-    { "gemName": "DurableGem", "gemExplain": "DurableGemExplain", "maxLvl": 1, "lvl": ["∞"] }
+    { "gemName": "DurableGem", "gemExplain": "DurableGemExplain", "maxLvl": 1, "lvl": [0, "∞"] }
 ]
 const ComparisonTable = [{}, { "name": "Ⅰ", "Weapon": 1, "Armor": 1, "exp": 1, "probability": 1 }, { "name": "Ⅱ", "Weapon": 2, "Armor": 3, "exp": 2, "probability": 2 }, { "name": "Ⅲ", "Weapon": 3, "Armor": 5, "exp": 4, "probability": 4 }, { "name": "Ⅳ", "Weapon": 4, "Armor": 10, "exp": 6, "probability": 6 }, { "name": "∞", "Weapon": 5, "Armor": 20, "exp": 8, "probability": 8 }];
+const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 1, 4];
+const PluginsVersion = [0, 1, 5];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -53,7 +54,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "TessellationTipsErr4": "§4没找到强化信息，请先使用强化卷轴强化后再镶嵌宝石！",
         "gemLore1": JSON.stringify(["§1-------==宝石==-------", "§2移速宝石", "§3可镶嵌在鞋子上", "§7成功几率：10%", "§6效果:增加移速"]),
         "gemLore2": JSON.stringify(["§1-------==宝石==-------", "§4暴击宝石", "§3可镶嵌在武器上", "§7成功几率：10%", "§6效果:增加伤害"]),
-        "gemLore3": JSON.stringify(["§1-------==宝石==-------", "§6耐久宝石", "§3可镶嵌在任何装备上", "§7成功几率：10%", "§6效果:物品无限耐久"])
+        "gemLore3": JSON.stringify(["§1-------==宝石==-------", "§6耐久宝石", "§3可镶嵌在任何装备上", "§7成功几率：10%", "§6效果:物品无限耐久"]),
+        "Command": "强化你的装备把OP指令!"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -82,38 +84,21 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "TessellationTipsErr4": "§4No enhancement information found. Please use the enhancement scroll to strengthen before inlaying gems!",
         "gemLore1": JSON.stringify(["§1-------==Gem==-------", "§2Speed shifting gem", "§3Can be inlaid on shoes", "§7Success probability: 10%", "Effect: increase movement speed"]),
         "gemLore2": JSON.stringify(["§1-------==Gem==-------", "§4Critical Hit Gem", "§3Embedded in weapons", "§7Success probability: 10%", "Effect: increase damage"]),
-        "gemLore3": JSON.stringify(["§1-------==Gem==-------", "§6Durable gemstone", "§3Embedded on any equipment", "§7Success probability: 10%", "Effect: unlimited durability"])
+        "gemLore3": JSON.stringify(["§1-------==Gem==-------", "§6Durable gemstone", "§3Embedded on any equipment", "§7Success probability: 10%", "Effect: unlimited durability"]),
+        "Command": "Strengthen your equipment to put OP command!"
     }
 });
 
 /**
  * 玩家输入指令事件监听.
- * 前期用于处理玩家血量异常及调试.
- * 后期将开启OP直接获得隐藏强化卷及部分设置.
+ * 异常及调试使用.
  */
 mc.listen("onPlayerCmd", (player1, cmd) => {
-    if (player1.isOP() && cmd == 'ireset') {
-        /*
+    if (player1.isOP() && cmd == 'cc') {
         let item = player1.getHand();
         let nbt = item.getNbt();
         log(nbt.toString())
         //log(item.type)
-        */
-        let onlinePlayerList = mc.getOnlinePlayers();
-        onlinePlayerList.forEach(player => {
-            let playerNbt = player.getNbt();
-            let playerNbtAttributes = playerNbt.getTag("Attributes");
-            for (let i = 0; i < playerNbtAttributes.getSize(); i++) {
-                let playerNbtAttributesObj = playerNbtAttributes.getTag(i);
-                if (playerNbtAttributesObj.getTag("Name") == "minecraft:health") {
-                    playerNbtAttributesObj.setFloat("Base", 20);
-                    playerNbtAttributesObj.setFloat("Current", 20);
-                    playerNbtAttributesObj.setFloat("DefaultMax", 20);
-                    playerNbtAttributesObj.setFloat("Max", 20);
-                }
-            }
-            player.setNbt(playerNbt);
-        });
     }
 });
 
@@ -124,7 +109,7 @@ mc.listen("onPlayerCmd", (player1, cmd) => {
  */
 mc.listen("onDestroyBlock", (player, block) => {
     if (block.type == "minecraft:stone") {
-        if (specifiedRangeRandomNumber(0, 100) == 56) {
+        if (specifiedRangeRandomNumber(0, 100) == 59) {
             let pos = block.pos;
             newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
             newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
@@ -255,6 +240,7 @@ mc.listen("onServerStarted", () => {
             });
         }
     }, 1000);
+    setCommand();
 });
 
 /**
@@ -327,6 +313,35 @@ mc.listen("onMobDie", (mob, source, _cause) => {
         }
     }
 })
+
+/**
+ * 注册命令函数，服务器启动时调用.
+ */
+function setCommand() {
+    let Command = mc.newCommand("intensify", i18n.tr("Command",), PermType.GameMasters);
+    Command.setEnum("ChangeAction", ["give", "reset"]);
+    Command.mandatory("pattern", ParamType.Enum, "ChangeAction", 1);
+    Command.mandatory("Player", ParamType.Player);
+    Command.overload(["pattern", "Player"]);
+    Command.setCallback((_cmd, _origin, output, results) => {
+        let playerList = results.Player;
+        let playerName = "";
+        for (let i in playerList) {
+            let player = playerList[i];
+            if (results.pattern == "reset") {
+                setPlayerHP(player, 20, "set");
+            } else if (results.pattern == "give") {
+                let newItem = mc.newItem(generateNewGemNbt(3, 1, player));
+                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
+                player.giveItem(newItem);
+                player.refreshItems();
+            }
+            playerName += `${player.name} `;
+        }
+        output.success(`${playerName} ok`)
+    })
+    Command.setup();
+}
 
 /**
  * 判断是否是升级物品
@@ -453,6 +468,7 @@ function synthesisGenerate(Container, item1, player, index1, index2, lvl, langua
                     newItem.setLore(JSON.parse(i18n.trl(player.langCode, language2,)))
                     Container.setItem(0, newItem);
                 }, 100);
+                playSound(player, 0)
             }
         }
     }
@@ -483,6 +499,7 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
                 Container.removeItem(2, 1);
                 Container.setItem(0, newItem);
             }, 100);
+            playSound(player, 0)
         }
     } else if (item1.boolean && item2.boolean && item2.type != "intensify") {
         if (item1.lvl == TargetLevel && item2.lvl == TargetLevel - 1) {
@@ -495,6 +512,7 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
                 Container.removeItem(2, 1);
                 Container.setItem(0, newItem);
             }, 100);
+            playSound(player, 0)
         }
     }
 }
@@ -534,8 +552,10 @@ function GemEnhancement(player, item1, Container) {
                             Container.removeItem(0, 1);
                             Container.removeItem(2, 1);
                             Container.setItem(0, newItem);
+                            playSound(player, 0)
                         } else {
                             Container.removeItem(0, 1);
+                            playSound(player, 1)
                             sengTell(player, "TessellationTipsErr1", [], 0);
                         }
                     } else {
@@ -561,6 +581,12 @@ function GemEnhancement(player, item1, Container) {
  * @returns 新的物品nbt
  */
 function setEquipmentNbt(item, type, lvl) {
+    let nbt2 = new NbtCompound({
+        "type": new NbtString(type),
+        "lvl": new NbtInt(lvl),
+        "gemtype": new NbtInt(0),
+        "gemlvl": new NbtInt(0)
+    })
     let nbt1 = new NbtCompound({
         "addon": new NbtCompound({
             "type": new NbtString(type),
@@ -570,7 +596,11 @@ function setEquipmentNbt(item, type, lvl) {
         })
     })
     let nbt = item.getNbt();
-    nbt.setTag("tag", nbt1)
+    if (nbt.getTag('tag') != undefined) {
+        nbt.getTag('tag').setTag("addon", nbt2);
+    } else {
+        nbt.setTag("tag", nbt1);
+    }
     return nbt;
 }
 
@@ -587,6 +617,8 @@ function setPlayerHP(player, HP, pattern) {
         HP = playerMaxHealth + HP;
     } else if (pattern == "remove") {
         HP = playerMaxHealth - HP;
+    } else if (pattern == "set") {
+        HP = 20;
     }
     if (HP <= 0) {
         HP = 2
@@ -704,6 +736,22 @@ function amend(num1, num2, symbol) {
 }
 
 /**
+ * 判断重置物品耐久
+ * @param {Item} item 物品对象
+ * @param {Player} player 玩家对象
+ */
+function itemDurableRepair(item, player) {
+    if (item.damage < 50) {
+        item.setDamage(100);
+        player.refreshItems();
+    }
+}
+
+function playSound(player, Sound) {
+    mc.runcmdEx(`playsound ${SoundList[Sound]} ${player.realName}`);
+}
+
+/**
  * 版本更新时修改物品的显示数据.
  * @param {Player} player 玩家对象
  */
@@ -717,6 +765,9 @@ function equipmentDescriptionCorrection(player) {
             let itemInformation = upgradeItem(item);
             if (itemInformation.boolean) {
                 if (itemInformation.type == "Armor") {
+                    if (parseInt(itemInformation.gemtype) == 3) {
+                        itemDurableRepair(item, player);
+                    }
                     let DescriptionText = ReturnToNormalLore(item, player);
                     let itemNbt = JSON.parse(item.getNbt().toString());
                     let Lore2 = itemNbt.tag.display.Lore;
@@ -736,6 +787,9 @@ function equipmentDescriptionCorrection(player) {
         let playerHandInformation = upgradeItem(playerHand);
         if (playerHandInformation.boolean) {
             if (playerHandInformation.type == "Weapon") {
+                if (parseInt(playerHandInformation.gemtype) == 3) {
+                    itemDurableRepair(playerHand, player);
+                }
                 let DescriptionText = ReturnToNormalLore(playerHand, player);
                 let itemNbt = JSON.parse(playerHand.getNbt().toString());
                 let Lore2 = itemNbt.tag.display.Lore;
@@ -754,3 +808,19 @@ function equipmentDescriptionCorrection(player) {
         player.refreshItems();
     }
 }
+
+
+/**
+ * 更新记录
+ * 002:
+ * *修改终极武器名称，方便匹配多语言.
+ * *护具类新增获得额外经验效果，修改装备描述.
+ * 003:
+ * *修改武器伤害为额外伤害是真实伤害，修改武器描述.
+ * *增加武器技能.
+ * 004:
+ * *新增宝石系统.
+ * 015：
+ * *修复附魔装备强化被清除附魔.
+ * *新增耐久宝石，完善指令系统.
+ */
