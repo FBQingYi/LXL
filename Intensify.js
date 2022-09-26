@@ -1,5 +1,5 @@
 //-----基础信息定义
-const StrengthenItemsJson = { "weapon": ["minecraft:wooden_sword", "minecraft:stone_sword", "minecraft:iron_sword", "minecraft:golden_sword", "minecraft:diamond_sword", "minecraft:netherite_sword"], "armor": ["minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:chainmail_helmet", "minecraft:chainmail_chestplate", "minecraft:chainmail_leggings", "minecraft:chainmail_boots", "minecraft:iron_helmet", "minecraft:iron_chestplate", "minecraft:iron_leggings", "minecraft:iron_boots", "minecraft:golden_helmet", "minecraft:golden_chestplate", "minecraft:golden_leggings", "minecraft:golden_boots", "minecraft:diamond_helmet", "minecraft:diamond_chestplate", "minecraft:diamond_leggings", "minecraft:diamond_boots", "minecraft:netherite_helmet", "minecraft:netherite_chestplate", "minecraft:netherite_leggings", "minecraft:netherite_boots"] };
+const StrengthenItemsDefaultJson = { "weapon": ["minecraft:wooden_sword", "minecraft:stone_sword", "minecraft:iron_sword", "minecraft:golden_sword", "minecraft:diamond_sword", "minecraft:netherite_sword"], "armor": ["minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:chainmail_helmet", "minecraft:chainmail_chestplate", "minecraft:chainmail_leggings", "minecraft:chainmail_boots", "minecraft:iron_helmet", "minecraft:iron_chestplate", "minecraft:iron_leggings", "minecraft:iron_boots", "minecraft:golden_helmet", "minecraft:golden_chestplate", "minecraft:golden_leggings", "minecraft:golden_boots", "minecraft:diamond_helmet", "minecraft:diamond_chestplate", "minecraft:diamond_leggings", "minecraft:diamond_boots", "minecraft:netherite_helmet", "minecraft:netherite_chestplate", "minecraft:netherite_leggings", "minecraft:netherite_boots"] };
 const itemGemTable = [
     {},
     { "gemName": "MovingGem", "gemExplain": "MovingGemExplain", "maxLvl": 2, "lvl": [0, 0.08, 0.13], "AvailableTypes": "armor" },
@@ -17,11 +17,22 @@ const PluginsOtherInformation = { "插件作者": "清漪花开" };
 //------插件信息注册
 ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherInformation)
 
-//------插件数据库加载及删除语言文件
+/**
+ * 插件数据库加载及删除语言文件.
+ * 读取各项配置文件.
+ */
 let db = new KVDatabase(pluginPath + "db")
 if (File.exists(pluginPath + "language/language.json")) {
     File.delete(pluginPath + "language");
 }
+if (!File.exists(pluginPath + "data/EquipmentData.json")) {
+    File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson));
+}
+if (!File.exists(pluginPath + "Config.json")) {
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": "1", "GProbability": "1", "PSuccess": "10" }));
+}
+let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
+let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 
 /**
  * 语言文件写入及加载.
@@ -55,7 +66,11 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "gemLore1": JSON.stringify(["§1-------==宝石==-------", "§2移速宝石", "§3可镶嵌在鞋子上", "§7成功几率：10%", "§6效果:增加移速"]),
         "gemLore2": JSON.stringify(["§1-------==宝石==-------", "§4暴击宝石", "§3可镶嵌在武器上", "§7成功几率：10%", "§6效果:增加伤害"]),
         "gemLore3": JSON.stringify(["§1-------==宝石==-------", "§6耐久宝石", "§3可镶嵌在任何装备上", "§7成功几率：10%", "§6效果:物品无限耐久"]),
-        "Command": "强化你的装备把OP指令!"
+        "Command": "强化你的装备把OP指令!",
+        "formtitle1": "强化武器-OP",
+        "formcontent1": "请选择你要添加的类型",
+        "formarms1": "武器",
+        "formprotective1": "防具",
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -85,7 +100,11 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "gemLore1": JSON.stringify(["§1-------==Gem==-------", "§2Speed shifting gem", "§3Can be inlaid on shoes", "§7Success probability: 10%", "Effect: increase movement speed"]),
         "gemLore2": JSON.stringify(["§1-------==Gem==-------", "§4Critical Hit Gem", "§3Embedded in weapons", "§7Success probability: 10%", "Effect: increase damage"]),
         "gemLore3": JSON.stringify(["§1-------==Gem==-------", "§6Durable gemstone", "§3Embedded on any equipment", "§7Success probability: 10%", "Effect: unlimited durability"]),
-        "Command": "Strengthen your equipment to put OP command!"
+        "Command": "Strengthen your equipment to put OP command!",
+        "formtitle1": "Strengthening weapons-OP",
+        "formcontent1": "Please choose the type you want to add",
+        "formarms1": "arms",
+        "formprotective1": "Armor",
     }
 });
 
@@ -109,7 +128,7 @@ mc.listen("onPlayerCmd", (player1, cmd) => {
  */
 mc.listen("onDestroyBlock", (player, block) => {
     if (block.type == "minecraft:stone") {
-        if (specifiedRangeRandomNumber(0, 100) == 59) {
+        if (specifiedRangeRandomNumber(0, 100) < ConfigJson.SProbability) {
             let pos = block.pos;
             newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
             newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
@@ -295,7 +314,7 @@ mc.listen("onJoin", (player) => {
  */
 mc.listen("onMobDie", (mob, source, _cause) => {
     if (source != undefined && source.isPlayer()) {
-        if (specifiedRangeRandomNumber(0, 100) == 83) {
+        if (specifiedRangeRandomNumber(0, 100) < ConfigJson.GProbability) {
             let player = source.toPlayer();
             let gemtype = specifiedRangeRandomNumber(1, 3);
             let newItem = mc.newItem(generateNewGemNbt(gemtype, 1, player))
@@ -319,11 +338,12 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  */
 function setCommand() {
     let Command = mc.newCommand("intensify", i18n.tr("Command",), PermType.GameMasters);
-    Command.setEnum("ChangeAction", ["give", "reset"]);
+    Command.setEnum("ChangeAction", ["give", "reset", "op"]);
     Command.mandatory("pattern", ParamType.Enum, "ChangeAction", 1);
     Command.mandatory("Player", ParamType.Player);
     Command.overload(["pattern", "Player"]);
-    Command.setCallback((_cmd, _origin, output, results) => {
+    Command.overload(["pattern"]);
+    Command.setCallback((_cmd, origin, output, results) => {
         let playerList = results.Player;
         let playerName = "";
         for (let i in playerList) {
@@ -335,6 +355,8 @@ function setCommand() {
                 newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
                 player.giveItem(newItem);
                 player.refreshItems();
+            } else if (results.pattern == "op") {
+                openOPForm(origin.player);
             }
             playerName += `${player.name} `;
         }
@@ -344,7 +366,32 @@ function setCommand() {
 }
 
 /**
- * 判断是否是升级物品
+ * OP添加物品窗口.
+ * @param {Player} player 玩家对象
+ */
+function openOPForm(player) {
+    if (player != undefined) {
+        let fm = mc.newSimpleForm()
+            .setTitle(i18n.trl(player.langCode, "formtitle1",))
+            .setContent(i18n.trl(player.langCode, "formcontent1",))
+            .addButton(i18n.trl(player.langCode, "formarms1",))
+            .addButton(i18n.trl(player.langCode, "formprotective1",));
+        player.sendForm(fm, (player, id) => {
+            if (id == undefined) {
+                return;
+            } else {
+                if (id == 0) {
+
+                } else if (id == 1) {
+
+                }
+            }
+        })
+    }
+}
+
+/**
+ * 判断是否是升级物品.
  * @param {item} item 物品对象
  * @returns 物品是否是升级物品及相关信息
  */
@@ -545,7 +592,7 @@ function GemEnhancement(player, item1, Container) {
                 }
                 if (item1.gemtype == item2.gemtype) {
                     if (parseInt(item2.gemlvl) < itemGemTable[parseInt(item2.gemtype)].maxLvl) {
-                        if (specifiedRangeRandomNumber(0, 100) <= 10) {
+                        if (specifiedRangeRandomNumber(0, 100) < ConfigJson.PSuccess) {
                             nbt.getTag("tag").getTag("addon").setInt("gemlvl", parseInt(item2.gemlvl) + 1);
                             newItem = mc.newItem(nbt);
                             SetLore(newItem, player);
