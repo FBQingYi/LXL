@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 1, 5];
+const PluginsVersion = [0, 1, 6];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -33,6 +33,8 @@ if (!File.exists(pluginPath + "Config.json")) {
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
+let ConfigItemWeapon = StrengthenItemsJson.weapon;
+let ConfigItemArmor = StrengthenItemsJson.armor;
 
 /**
  * 语言文件写入及加载.
@@ -71,6 +73,7 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "formcontent1": "请选择你要添加的类型",
         "formarms1": "武器",
         "formprotective1": "防具",
+        "formcontent2": "请选择你要添加的物品"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -105,6 +108,7 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "formcontent1": "Please choose the type you want to add",
         "formarms1": "arms",
         "formprotective1": "Armor",
+        "formcontent2": "Please select the item you want to add"
     }
 });
 
@@ -370,7 +374,7 @@ function setCommand() {
  * @param {Player} player 玩家对象
  */
 function openOPForm(player) {
-    if (player != undefined) {
+    if (player != undefined && player.isOP()) {
         let fm = mc.newSimpleForm()
             .setTitle(i18n.trl(player.langCode, "formtitle1",))
             .setContent(i18n.trl(player.langCode, "formcontent1",))
@@ -380,14 +384,45 @@ function openOPForm(player) {
             if (id == undefined) {
                 return;
             } else {
-                if (id == 0) {
-
-                } else if (id == 1) {
-
-                }
+                let getPlayerInventoryList = player.getInventory();
+                let playerInventory = [];
+                getPlayerInventoryList.forEach(item => {
+                    if (item.name != "") {
+                        playerInventory[playerInventory.length] = item.type;
+                    }
+                });
+                OPSetItemForm(player, playerInventory, id);
             }
         })
     }
+}
+
+/**
+ * 玩家选择类型后弹窗选择物品.
+ * @param {Player} player 玩家对象
+ * @param {list} itemList 物品type名称列表
+ * @param {int} type 添加类型
+ */
+function OPSetItemForm(player, itemList, type) {
+    let fm = mc.newSimpleForm()
+        .setTitle(i18n.trl(player.langCode, "formtitle1",))
+        .setContent(i18n.trl(player.langCode, "formcontent2",));
+    itemList.forEach(itemType => {
+        fm.addButton(itemType);
+    });
+    player.sendForm(fm, (player, id) => {
+        if (id == undefined) {
+            return false;
+        } else {
+            let addItemType = itemList[id];
+            if (type == 0) {
+                ConfigItemWeapon[ConfigItemWeapon.length] = addItemType;
+            } else if (type == 1) {
+                ConfigItemArmor[ConfigItemArmor.length] = addItemType;
+            }
+            File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsJson));
+        }
+    });
 }
 
 /**
@@ -870,4 +905,7 @@ function equipmentDescriptionCorrection(player) {
  * 015：
  * *修复附魔装备强化被清除附魔.
  * *新增耐久宝石，完善指令系统.
+ * 016:
+ * 增加配置文件，可修改各种几率以及可强化物品.
+ * 新增OP指令，可在游戏内添加可强化物品.
  */
