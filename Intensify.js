@@ -29,7 +29,7 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
     File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": "1", "GProbability": "1", "PSuccess": "10" }, null, "\t"));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10 }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
@@ -911,5 +911,5 @@ function equipmentDescriptionCorrection(player) {
  * *新增耐久宝石，完善指令系统.
  * 016:
  * 增加配置文件，可修改各种几率以及可强化物品.
- * 新增open指令，可在游戏内添加可强化物品.
+ * 新增OP指令，可在游戏内添加可强化物品.
  */
