@@ -26,10 +26,10 @@ if (File.exists(pluginPath + "language/language.json")) {
     File.delete(pluginPath + "language");
 }
 if (!File.exists(pluginPath + "data/EquipmentData.json")) {
-    File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson));
+    File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": "1", "GProbability": "1", "PSuccess": "10" }));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": "1", "GProbability": "1", "PSuccess": "10" }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
@@ -342,7 +342,7 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  */
 function setCommand() {
     let Command = mc.newCommand("intensify", i18n.tr("Command",), PermType.GameMasters);
-    Command.setEnum("ChangeAction", ["give", "reset", "op"]);
+    Command.setEnum("ChangeAction", ["give", "reset", "open"]);
     Command.mandatory("pattern", ParamType.Enum, "ChangeAction", 1);
     Command.mandatory("Player", ParamType.Player);
     Command.overload(["pattern", "Player"]);
@@ -350,19 +350,21 @@ function setCommand() {
     Command.setCallback((_cmd, origin, output, results) => {
         let playerList = results.Player;
         let playerName = "";
-        for (let i in playerList) {
-            let player = playerList[i];
-            if (results.pattern == "reset") {
-                setPlayerHP(player, 20, "set");
-            } else if (results.pattern == "give") {
-                let newItem = mc.newItem(generateNewGemNbt(3, 1, player));
-                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
-                player.giveItem(newItem);
-                player.refreshItems();
-            } else if (results.pattern == "op") {
-                openOPForm(origin.player);
+        if (results.pattern == "open") {
+            openOPForm(origin.player);
+        } else {
+            for (let i in playerList) {
+                let player = playerList[i];
+                if (results.pattern == "reset") {
+                    setPlayerHP(player, 20, "set");
+                } else if (results.pattern == "give") {
+                    let newItem = mc.newItem(generateNewGemNbt(3, 1, player));
+                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
+                    player.giveItem(newItem);
+                    player.refreshItems();
+                }
+                playerName += `${player.name} `;
             }
-            playerName += `${player.name} `;
         }
         output.success(`${playerName} ok`)
     })
@@ -384,14 +386,16 @@ function openOPForm(player) {
             if (id == undefined) {
                 return;
             } else {
-                let getPlayerInventoryList = player.getInventory();
+                let getPlayerInventoryList = player.getInventory().getAllItems();
                 let playerInventory = [];
                 getPlayerInventoryList.forEach(item => {
                     if (item.name != "") {
                         playerInventory[playerInventory.length] = item.type;
                     }
                 });
-                OPSetItemForm(player, playerInventory, id);
+                if (playerInventory != []) {
+                    OPSetItemForm(player, playerInventory, id);
+                }
             }
         })
     }
@@ -420,7 +424,7 @@ function OPSetItemForm(player, itemList, type) {
             } else if (type == 1) {
                 ConfigItemArmor[ConfigItemArmor.length] = addItemType;
             }
-            File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsJson));
+            File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsJson, null, "\t"));
         }
     });
 }
@@ -907,5 +911,5 @@ function equipmentDescriptionCorrection(player) {
  * *新增耐久宝石，完善指令系统.
  * 016:
  * 增加配置文件，可修改各种几率以及可强化物品.
- * 新增OP指令，可在游戏内添加可强化物品.
+ * 新增open指令，可在游戏内添加可强化物品.
  */
