@@ -120,7 +120,7 @@ mc.listen("onPlayerCmd", (player1, cmd) => {
     if (player1.isOP() && cmd == 'cc') {
         let item = player1.getHand();
         let nbt = item.getNbt();
-        log(nbt.toString())
+        log(nbt.toSNBT())
         //log(item.type)
     }
 });
@@ -321,7 +321,7 @@ mc.listen("onMobDie", (mob, source, _cause) => {
         if (specifiedRangeRandomNumber(0, 100) < ConfigJson.GProbability) {
             let player = source.toPlayer();
             let gemtype = specifiedRangeRandomNumber(1, 3);
-            let newItem = mc.newItem(generateNewGemNbt(gemtype, 1, player))
+            let newItem = mc.newItem(generateNewGemNbt(gemtype, 1, 1, player))
             let pos = mob.pos;
             if (gemtype == 1) {
                 newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore1",)));
@@ -342,31 +342,72 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  */
 function setCommand() {
     let Command = mc.newCommand("intensify", i18n.tr("Command",), PermType.GameMasters);
-    Command.setEnum("ChangeAction", ["give", "reset", "open"]);
-    Command.mandatory("pattern", ParamType.Enum, "ChangeAction", 1);
+    Command.setEnum("openAction", ["open"]);
+    Command.setEnum("resetAction", ["reset"]);
+    Command.setEnum("giveAction", ["give"]);
+    Command.setEnum("intensifyAction", ["intensify"]);
+    Command.setEnum("GemStoneAction", ["movinggem", "powergem", "durablegem"]);
+    Command.mandatory("pattern", ParamType.Enum, "openAction", 1);
+    Command.mandatory("pattern", ParamType.Enum, "resetAction", 1);
+    Command.mandatory("pattern", ParamType.Enum, "giveAction", 1);
+    Command.mandatory("GiveVolume", ParamType.Enum, "intensifyAction", 0);
+    Command.mandatory("GemStone", ParamType.Enum, "GemStoneAction", 0);
     Command.mandatory("Player", ParamType.Player);
-    Command.overload(["pattern", "Player"]);
-    Command.overload(["pattern"]);
+    Command.mandatory("amount", ParamType.Int);
+    Command.mandatory("Health", ParamType.Int);
+    Command.overload(["giveAction", "Player", "GemStone", "amount"]);
+    Command.overload(["giveAction", "Player", "GiveVolume"]);
+    Command.overload(["resetAction", "Player", "Health"]);
+    Command.overload(["openAction"]);
     Command.setCallback((_cmd, origin, output, results) => {
         let playerList = results.Player;
         let playerName = "";
+        let OutputBlooe = false;
         if (results.pattern == "open") {
             openOPForm(origin.player);
+            OutputBlooe = true;
         } else {
             for (let i in playerList) {
                 let player = playerList[i];
                 if (results.pattern == "reset") {
-                    setPlayerHP(player, 20, "set");
+                    setPlayerHP(player, parseInt(results.Health), "set");
+                    OutputBlooe = true;
                 } else if (results.pattern == "give") {
-                    let newItem = mc.newItem(generateNewGemNbt(3, 1, player));
-                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
-                    player.giveItem(newItem);
-                    player.refreshItems();
+                    let newItem;
+                    let getItemBlooe = false;
+                    if (results.GemStone == "movinggem") {
+                        newItem = mc.newItem(generateNewGemNbt(1, 1, parseInt(results.amount), player));
+                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore1",)));
+                        getItemBlooe = true;
+                    } else if (results.GemStone == "powergem") {
+                        newItem = mc.newItem(generateNewGemNbt(2, 1, parseInt(results.amount), player));
+                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore2",)));
+                        getItemBlooe = true;
+                    } else if (results.GemStone == "durablegem") {
+                        newItem = mc.newItem(generateNewGemNbt(3, 1, parseInt(results.amount), player));
+                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
+                        getItemBlooe = true;
+                    }
+                    if (results.GiveVolume == "intensify") {
+                        newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
+                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
+                        getItemBlooe = true;
+                    }
+                    if (getItemBlooe) {
+                        OutputBlooe = true;
+                        //mc.spawnItem(newItem, player.pos.x, player.pos.y + 1, player.pos.z, player.pos.dimid);
+                        player.giveItem(newItem);
+                        player.refreshItems();
+                    }
                 }
                 playerName += `${player.name} `;
             }
         }
-        output.success(`${playerName} ok`)
+        if (OutputBlooe) {
+            output.success(`${playerName} ok`);
+        } else {
+            output.error(`${playerName} error`);
+        }
     })
     Command.setup();
 }
@@ -509,7 +550,7 @@ function generateNewNbt(type, lvl, name) {
  * @param {int} lvl 宝石等级
  * @returns 新的NBT
  */
-function generateNewGemNbt(type, lvl, player) {
+function generateNewGemNbt(type, lvl, amount, player) {
     let nbt1 = new NbtCompound({
         "Damage": new NbtInt(0),
         "RepairCost": new NbtInt(1),
@@ -525,7 +566,8 @@ function generateNewGemNbt(type, lvl, player) {
     })
     let NewItem = mc.newItem("minecraft:quartz", 1);
     let nbt = NewItem.getNbt();
-    nbt.setTag("tag", nbt1)
+    nbt.setTag("tag", nbt1);
+    nbt.setByte("Count", amount);
     return nbt;
 }
 
