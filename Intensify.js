@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 1, 6];
+const PluginsVersion = [0, 1, 7];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -395,7 +395,6 @@ function setCommand() {
                     }
                     if (getItemBlooe) {
                         OutputBlooe = true;
-                        //mc.spawnItem(newItem, player.pos.x, player.pos.y + 1, player.pos.z, player.pos.dimid);
                         player.giveItem(newItem);
                         player.refreshItems();
                     }
@@ -954,4 +953,6 @@ function equipmentDescriptionCorrection(player) {
  * 016:
  * 增加配置文件，可修改各种几率以及可强化物品.
  * 新增OP指令，可在游戏内添加可强化物品.
+ * 017：
+ * 完善指令
  */
