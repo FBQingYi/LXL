@@ -29,10 +29,14 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
     File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10 }, null, "\t"));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "seckilltopvp": true }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
+if (ConfigJson.seckilltopvp == undefined) {
+    ConfigJson.seckilltopvp = true;
+    File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
+}
 let ConfigItemWeapon = StrengthenItemsJson.weapon;
 let ConfigItemArmor = StrengthenItemsJson.armor;
 
@@ -187,15 +191,34 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
             }
             let itemdata = ComparisonTable[itemInformation.lvl];
             let Newdamage = itemdata.Weapon;
-            if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
-                setTimeout(() => {
-                    sengTell(player, "SkillTips1", [], 0)
-                    mob.kill();
-                }, 50);
+            if (ConfigJson.seckilltopvp) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
+                    setTimeout(() => {
+                        sengTell(player, "SkillTips1", [], 0)
+                        mob.kill();
+                    }, 50);
+                } else {
+                    setTimeout(() => {
+                        mob.hurt(Newdamage + gemDamage, 5)
+                    }, 300);
+                }
             } else {
-                setTimeout(() => {
-                    mob.hurt(Newdamage + gemDamage, 5)
-                }, 300);
+                if (!mob.isPlayer()) {
+                    if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
+                        setTimeout(() => {
+                            sengTell(player, "SkillTips1", [], 0)
+                            mob.kill();
+                        }, 50);
+                    } else {
+                        setTimeout(() => {
+                            mob.hurt(Newdamage + gemDamage, 5)
+                        }, 300);
+                    }
+                } else {
+                    setTimeout(() => {
+                        mob.hurt(Newdamage + gemDamage, 5)
+                    }, 300);
+                }
             }
         }
     }
@@ -954,5 +977,5 @@ function equipmentDescriptionCorrection(player) {
  * 增加配置文件，可修改各种几率以及可强化物品.
  * 新增OP指令，可在游戏内添加可强化物品.
  * 017：
- * 完善指令
+ * 完善指令,新增一击必杀用于pvp开关.
  */
