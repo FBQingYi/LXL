@@ -897,6 +897,11 @@ function itemDurableRepair(item, player) {
     }
 }
 
+/**
+ * 
+ * @param {Player} player 玩家对象
+ * @param {int} Sound 音乐名称位置
+ */
 function playSound(player, Sound) {
     mc.runcmdEx(`playsound ${SoundList[Sound]} ${player.realName}`);
 }
@@ -959,6 +964,8 @@ function equipmentDescriptionCorrection(player) {
     }
 }
 
+ll.export(generateNewNbt, "generateNewNbt");
+
 
 /**
  * 更新记录
@@ -978,4 +985,5 @@ function equipmentDescriptionCorrection(player) {
  * 新增OP指令，可在游戏内添加可强化物品.
  * 017：
  * 完善指令,新增一击必杀用于pvp开关.
+ * 新增共享函数，支持其他插件生成卷轴.
  */
