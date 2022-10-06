@@ -5,7 +5,7 @@ const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
 const PluginsVersion = [0, 0, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "customName": "宝藏僵尸", "reel": true, "probability": 10 } };
+const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6,"scale":4 ,"customName": "宝藏僵尸", "reel": true, "probability": 10 } };
 const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false };
 
 //------插件信息注册
@@ -127,6 +127,7 @@ function setNewEntity(entityType, pos, NbtData) {
         }
         newEntity.setNbt(newEntityNbt);
         newEntity.addTag("Intensify");
+        newEntity.setScale(NbtData.scale);
     }
 }
 

@@ -17,7 +17,7 @@ let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 mc.listen("onJoin", (player) => {
     let joinMsgList = ConfigJson.joinMsg;
     let joinMax = joinMsgList.length;
-    let Msg = joinMsgList[specifiedRangeRandomNumber(0, joinMax + 1)].replace(/{p}/g, player.name);
+    let Msg = joinMsgList[specifiedRangeRandomNumber(0, joinMax)].replace(/{p}/g, player.name);
     setTimeout(() => {
         if (ConfigJson.mode == 0) {
             mc.broadcast(Msg);
