@@ -200,7 +200,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                 } else {
                     setTimeout(() => {
                         mob.hurt(Newdamage + gemDamage, 5)
-                    }, 300);
+                    }, 500);
                 }
             } else {
                 if (!mob.isPlayer()) {
@@ -212,12 +212,12 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                     } else {
                         setTimeout(() => {
                             mob.hurt(Newdamage + gemDamage, 5)
-                        }, 300);
+                        }, 500);
                     }
                 } else {
                     setTimeout(() => {
                         mob.hurt(Newdamage + gemDamage, 5)
-                    }, 300);
+                    }, 500);
                 }
             }
         }
@@ -422,7 +422,7 @@ function setCommand() {
                         player.refreshItems();
                     }
                 }
-                playerName += `${player.name} `;
+                playerName += `${player.realName} `;
             }
         }
         if (OutputBlooe) {
@@ -841,9 +841,9 @@ function ReturnToNormalLore(item, player) {
         GemLore = JSON.parse(i18n.trl(player.langCode, "gem1", item2.gemlvl, i18n.trl(player.langCode, GemData.gemName), i18n.trl(player.langCode, GemData.gemExplain), GemData.lvl[parseInt(item2.gemlvl)], GemData.maxLvl));
     }
     if (item2.type == "Armor") {
-        DescriptionText = JSON.parse(i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.name, system.getTimeStr(), ComparisonTable[TargetLevel].exp));
+        DescriptionText = JSON.parse(i18n.trl(player.langCode, "EquipmentArmor", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Armor, player.realName, system.getTimeStr(), ComparisonTable[TargetLevel].exp));
     } else if (item2.type == "Weapon") {
-        DescriptionText = JSON.parse(i18n.trl(player.langCode, "EquipmentWeapon", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Weapon, player.name, system.getTimeStr(), ComparisonTable[TargetLevel].probability));
+        DescriptionText = JSON.parse(i18n.trl(player.langCode, "EquipmentWeapon", ComparisonTable[TargetLevel].name, ComparisonTable[TargetLevel].Weapon, player.realName, system.getTimeStr(), ComparisonTable[TargetLevel].probability));
     }
     if (GemLore != undefined) {
         GemLore.unshift(4, 0);
@@ -986,4 +986,5 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 017：
  * 完善指令,新增一击必杀用于pvp开关.
  * 新增共享函数，支持其他插件生成卷轴.
+ * 使用玩家真实名称，避免和其他插件冲突.
  */

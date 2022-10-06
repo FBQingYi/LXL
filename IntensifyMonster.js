@@ -5,7 +5,7 @@ const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
 const PluginsVersion = [0, 0, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6,"scale":4 ,"customName": "宝藏僵尸", "reel": true, "probability": 10 } };
+const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10 } };
 const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false };
 
 //------插件信息注册
@@ -75,6 +75,24 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                     newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)));
                     mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
                 }
+            }
+        }
+    }
+})
+
+/**
+ * 监听生物受伤事件.
+ * 判断是否是玩家受伤及造成伤害的是否是强化生物.
+ * 对玩家造成额外的真实伤害以及着火.
+ */
+mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
+    if (mob.isPlayer() && source != undefined) {
+        if (EntityNbtJson[mob.type] != undefined && source.hasTag("Intensify")) {
+            let damage = EntityNbtJson[mob.type].Additionaldamage;
+            let player = mob.toPlayer();
+            player.hurt(damage);
+            if (EntityNbtJson[mob.type].playerFire) {
+                player.setFire(EntityNbtJson[mob.type].FireTime, false);
             }
         }
     }
