@@ -90,10 +90,12 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
         if (EntityNbtJson[mob.type] != undefined && source.hasTag("Intensify")) {
             let damage = EntityNbtJson[mob.type].Additionaldamage;
             let player = mob.toPlayer();
-            player.hurt(damage);
-            if (EntityNbtJson[mob.type].playerFire) {
-                player.setFire(EntityNbtJson[mob.type].FireTime, false);
-            }
+            setTimeout(() => {
+                player.hurt(damage);
+                if (EntityNbtJson[mob.type].playerFire) {
+                    player.setFire(EntityNbtJson[mob.type].FireTime, false);
+                }
+            }, 500);
         }
     }
 })

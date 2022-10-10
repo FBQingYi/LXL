@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 1, 7];
+const PluginsVersion = [0, 1, 8];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -29,12 +29,16 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
     File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "seckilltopvp": true }, null, "\t"));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "seckilltopvp": true, "seckilltopve": true }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 if (ConfigJson.seckilltopvp == undefined) {
     ConfigJson.seckilltopvp = true;
+    File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
+}
+if (ConfigJson.seckilltopve == undefined) {
+    ConfigJson.seckilltopve = true;
     File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
 }
 let ConfigItemWeapon = StrengthenItemsJson.weapon;
@@ -181,6 +185,7 @@ mc.listen("onContainerChange", (player, block, _slotNum, _oldItem, _newItem) => 
  */
 mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
     if (source != undefined && source.isPlayer()) {
+        let addedDamageBool = true;
         let player = source.toPlayer();
         let playerHanditem = player.getHand();
         let itemInformation = upgradeItem(playerHanditem);
@@ -191,34 +196,27 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
             }
             let itemdata = ComparisonTable[itemInformation.lvl];
             let Newdamage = itemdata.Weapon;
-            if (ConfigJson.seckilltopvp) {
+            if (mob.isPlayer() && ConfigJson.seckilltopvp) {
                 if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
+                    addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
                         mob.kill();
                     }, 50);
-                } else {
-                    setTimeout(() => {
-                        mob.hurt(Newdamage + gemDamage, 5)
-                    }, 500);
                 }
-            } else {
-                if (!mob.isPlayer()) {
-                    if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
-                        setTimeout(() => {
-                            sengTell(player, "SkillTips1", [], 0)
-                            mob.kill();
-                        }, 50);
-                    } else {
-                        setTimeout(() => {
-                            mob.hurt(Newdamage + gemDamage, 5)
-                        }, 500);
-                    }
-                } else {
+            } else if (!mob.isPlayer() && ConfigJson.seckilltopve) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
+                    addedDamageBool = false;
                     setTimeout(() => {
-                        mob.hurt(Newdamage + gemDamage, 5)
-                    }, 500);
+                        sengTell(player, "SkillTips1", [], 0)
+                        mob.kill();
+                    }, 50);
                 }
+            }
+            if (addedDamageBool) {
+                setTimeout(() => {
+                    mob.hurt(Newdamage + gemDamage, 5)
+                }, 500);
             }
         }
     }
@@ -987,4 +985,6 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 完善指令,新增一击必杀用于pvp开关.
  * 新增共享函数，支持其他插件生成卷轴.
  * 使用玩家真实名称，避免和其他插件冲突.
+ * 018:
+ * 新增一击必杀用于pve的开关
  */
