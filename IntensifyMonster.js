@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 1];
+const PluginsVersion = [0, 0, 2];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10 } };
 const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false };
@@ -29,6 +29,7 @@ logger.setConsole(true);
 
 /**
  * 判断是否需要加载前置插件及语言文件.
+ * 判断生成概率是否需要限制.
  */
 if (Config.DockingIntensify) {
     if (ll.require("Intensify.js")) {
@@ -40,6 +41,9 @@ if (Config.DockingIntensify) {
             Config.DockingIntensify = false;
         }, 1000 * 5);
     }
+}
+if (Config.SpawnProbability > 60) {
+    Config.SpawnProbability = 50;
 }
 
 /**
@@ -160,3 +164,8 @@ function setNewEntity(entityType, pos, NbtData) {
 function specifiedRangeRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
+
+/** 
+ * 002
+ * 限制玩家将生成概率调整大于60%.
+ */
