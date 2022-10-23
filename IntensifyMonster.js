@@ -3,10 +3,11 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 2];
+const PluginsVersion = [0, 0, 3];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10 } };
 const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false };
+const LuminousItemsJson = {"minecraft:glowstone":1,"minecraft:torch":1,"minecraft:lantern":1,"minecraft:lit_pumpkin":1,"minecraft:lit_redstone_lamp":1};
 
 //------插件信息注册
 ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherInformation)
@@ -45,6 +46,7 @@ if (Config.DockingIntensify) {
 if (Config.SpawnProbability > 60) {
     Config.SpawnProbability = 50;
 }
+let a = 0
 
 /**
  * 监听生物生成.
@@ -54,9 +56,9 @@ if (Config.SpawnProbability > 60) {
 mc.listen("onMobSpawn", (typeName, pos) => {
     if (EntityNbtJson[typeName] != undefined) {
         let randomInt = specifiedRangeRandomNumber(0, 100);
-        if (randomInt < Config.SpawnProbability) {
+        let resultBool = WhetherPaintStrange(pos.x - 4, pos.z - 4, pos.x + 4, pos.z + 4, pos.y)
+        if (resultBool && randomInt < Config.SpawnProbability) {
             setNewEntity(typeName, pos, EntityNbtJson[typeName]);
-            return false;
         }
     }
 });
@@ -165,7 +167,72 @@ function specifiedRangeRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
+/**
+ * 获取附近是否有发光方块
+ * @param {int} x x点1
+ * @param {int} z z点1
+ * @param {int} x1 x点2
+ * @param {int} z1 z点2
+ * @param {int} y 
+ * @returns 布尔值
+ */
+function WhetherPaintStrange(x, z, x1, z1, y) {
+    let bool;
+    let a = { "x": x, "y": z };
+    let b = { "x": x1, "y": z1 };
+    let posx = generateTrack(a, b);
+    for (let i = 0; i < posx.length; i++) {
+        let x2 = posx[i].x
+        let z2 = posx[i].z
+        let it = mc.getBlock(parseInt(x2), y, parseInt(z2), 0)
+        if (it != undefined) {
+            if (LuminousItemsJson[it.type] != undefined) {
+                bool = false;
+                return false;
+            }
+        }
+    }
+    if(!bool){
+        return bool;
+    }else{
+        for (let i = 0; i < posx.length; i++) {
+            let x2 = posx[i].x
+            let z2 = posx[i].z
+            let it = mc.getBlock(parseInt(x2), y+1, parseInt(z2), 0)
+            if (it != undefined) {
+                if (LuminousItemsJson[it.type] != undefined) {
+                    bool = false;
+                    return false;
+                }
+            }
+        }
+    }
+    return bool;
+}
+
+/**
+ * 获取所有坐标点
+ * @param {JSON} a 坐标点a
+ * @param {JSON} b 坐标点b
+ * @returns 数组类型的坐标集合
+ */
+function generateTrack(a, b) {
+    var maxX = a.x <= b.x ? b.x : a.x;
+    var minX = a.x <= b.x ? a.x : b.x;
+    var maxY = a.y <= b.y ? b.y : a.y;
+    var minY = a.y <= b.y ? a.y : b.y;
+    var coor = [];
+    for (var i = minX; i <= maxX; i++) {
+        for (var j = minY; j <= maxY; j++) {
+            coor.push({ 'x': i, 'y': j });
+        }
+    }
+    return coor;
+}
+
 /** 
  * 002
  * 限制玩家将生成概率调整大于60%.
+ * 003
+ * 修复刷怪笼100%刷强化怪的问题
  */
