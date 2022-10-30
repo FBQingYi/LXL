@@ -3,11 +3,41 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 3];
+const PluginsVersion = [0, 0, 4];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10 } };
+const EntityNbtJsonData = {
+    "minecraft:zombie": {
+        "health": 40,
+        "movement": 0.35,
+        "underwater_movement": 0.2,
+        "lava_movement": 0.2,
+        "follow_range": 20,
+        "knockback_resistance": 6,
+        "scale": 4,
+        "Additionaldamage": 2,
+        "customName": "宝藏僵尸",
+        "reel": true,
+        "playerFire": true,
+        "FireTime": 10,
+        "probability": 10,
+        "OtherDrops": true,
+        "OtherDropsMode": 0,
+        "ListSpoils": [
+            {
+                "SpoilsTypeName": "minecraft:stone",
+                "SpoilsProbability": 10,
+                "SpoilsqQantity": 1
+            },
+            {
+                "SpoilsTypeName": "minecraft:gold_block",
+                "SpoilsProbability": 1,
+                "SpoilsqQantity": 1
+            }
+        ]
+    }
+};
 const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false };
-const LuminousItemsJson = {"minecraft:glowstone":1,"minecraft:torch":1,"minecraft:lantern":1,"minecraft:lit_pumpkin":1,"minecraft:lit_redstone_lamp":1};
+const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
 ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherInformation)
@@ -39,6 +69,7 @@ if (Config.DockingIntensify) {
     } else {
         setTimeout(() => {
             logger.error("未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false");
+            logger.error("The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json");
             Config.DockingIntensify = false;
         }, 1000 * 5);
     }
@@ -46,6 +77,7 @@ if (Config.DockingIntensify) {
 if (Config.SpawnProbability > 60) {
     Config.SpawnProbability = 50;
 }
+FourProfileUpdate();
 let a = 0
 
 /**
@@ -67,19 +99,42 @@ mc.listen("onMobSpawn", (typeName, pos) => {
  * 监听生物死亡.
  * 判断生物是否是强化生物并且是否开启掉落.
  * 然后调用前置插件生成新的卷轴nbt.
+ * 004后新增普通掉落.
  */
 mc.listen("onMobDie", (mob, source, _cause) => {
-    if (source != undefined && source.isPlayer() && Config.DockingIntensify) {
-        if (mob.hasTag("Intensify")) {
-            let entityJson = EntityNbtJson[mob.type];
-            let randomInt = specifiedRangeRandomNumber(0, 100);
-            let player = source.toPlayer();
+    if (source != undefined && source.isPlayer()) {
+        let entityJson = EntityNbtJson[mob.type];
+        if (entityJson != undefined) {
             let pos = mob.pos;
-            if (entityJson != undefined && entityJson.reel) {
-                if (randomInt < entityJson.probability) {
-                    let newItem = mc.newItem(getReelNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
-                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)));
-                    mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
+            if (Config.DockingIntensify) {
+                if (mob.hasTag("Intensify")) {
+                    let randomInt = specifiedRangeRandomNumber(0, 100);
+                    let player = source.toPlayer();
+                    if (entityJson.reel) {
+                        if (randomInt < entityJson.probability) {
+                            let newItem = mc.newItem(getReelNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
+                            newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)));
+                            mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
+                        }
+                    }
+                }
+            }
+            if (entityJson.OtherDrops && mob.hasTag("Intensify")) {
+                if (entityJson.OtherDropsMode == 0 && entityJson.ListSpoils != []) {
+                    let SpoilsList = entityJson.ListSpoils;
+                    SpoilsList.forEach(CurrentOptions => {
+                        let randomInt = specifiedRangeRandomNumber(0, 100);
+                        if (randomInt < CurrentOptions.SpoilsProbability) {
+                            let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                            mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                        }
+                    });
+                } else if (entityJson.OtherDropsMode == 1 && entityJson.ListSpoils != []) {
+                    let SpoilsList = entityJson.ListSpoils;
+                    let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length + 1);
+                    let itemData = SpoilsList[randomInt];
+                    let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                    mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                 }
             }
         }
@@ -177,7 +232,7 @@ function specifiedRangeRandomNumber(min, max) {
  * @returns 布尔值
  */
 function WhetherPaintStrange(x, z, x1, z1, y) {
-    let bool;
+    let bool = true;
     let a = { "x": x, "y": z };
     let b = { "x": x1, "y": z1 };
     let posx = generateTrack(a, b);
@@ -192,13 +247,13 @@ function WhetherPaintStrange(x, z, x1, z1, y) {
             }
         }
     }
-    if(!bool){
+    if (!bool) {
         return bool;
-    }else{
+    } else {
         for (let i = 0; i < posx.length; i++) {
             let x2 = posx[i].x
             let z2 = posx[i].z
-            let it = mc.getBlock(parseInt(x2), y+1, parseInt(z2), 0)
+            let it = mc.getBlock(parseInt(x2), y + 1, parseInt(z2), 0)
             if (it != undefined) {
                 if (LuminousItemsJson[it.type] != undefined) {
                     bool = false;
@@ -230,9 +285,44 @@ function generateTrack(a, b) {
     return coor;
 }
 
+/**
+ * 004版本生物配置更新
+ */
+function FourProfileUpdate() {
+    let UPEntityConfig = false;
+    for (let key in EntityNbtJson) {
+        let EntityData = EntityNbtJson[key];
+        if (EntityData.OtherDrops == undefined) {
+            UPEntityConfig = true;
+            EntityData.OtherDrops = false;
+            EntityData.OtherDropsMode = 0;
+            EntityData.ListSpoils = [{
+                "SpoilsTypeName": "minecraft:stone",
+                "SpoilsProbability": 10,
+                "SpoilsqQantity": 1
+            },
+            {
+                "SpoilsTypeName": "minecraft:gold_block",
+                "SpoilsProbability": 1,
+                "SpoilsqQantity": 1
+            }];
+        }
+    }
+    if (UPEntityConfig) {
+        File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJsonData, null, "\t"));
+        setTimeout(() => {
+            logger.error("0.0.4版本配置文件更新，请前往data/EntityData.json查看！");
+            logger.error("Please go to data/EntityData.json to view the updated configuration file!");
+        }, 1000 * 6);
+    }
+}
+
 /** 
  * 002
  * 限制玩家将生成概率调整大于60%.
  * 003
- * 修复刷怪笼100%刷强化怪的问题
+ * 修复刷怪笼100%刷强化怪的问题.
+ * 004
+ * 修复003不刷强化怪的问题.
+ * 新增额外的普通物品掉落.
  */
