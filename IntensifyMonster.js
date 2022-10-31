@@ -3,40 +3,10 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 4];
+const PluginsVersion = [0, 0, 5];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = {
-    "minecraft:zombie": {
-        "health": 40,
-        "movement": 0.35,
-        "underwater_movement": 0.2,
-        "lava_movement": 0.2,
-        "follow_range": 20,
-        "knockback_resistance": 6,
-        "scale": 4,
-        "Additionaldamage": 2,
-        "customName": "宝藏僵尸",
-        "reel": true,
-        "playerFire": true,
-        "FireTime": 10,
-        "probability": 10,
-        "OtherDrops": true,
-        "OtherDropsMode": 0,
-        "ListSpoils": [
-            {
-                "SpoilsTypeName": "minecraft:stone",
-                "SpoilsProbability": 10,
-                "SpoilsqQantity": 1
-            },
-            {
-                "SpoilsTypeName": "minecraft:gold_block",
-                "SpoilsProbability": 1,
-                "SpoilsqQantity": 1
-            }
-        ]
-    }
-};
-const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false };
+const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10, "OtherDrops": true, "OtherDropsMode": 0, "ListSpoils": [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }] } };
+const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false, "DockingGives": false };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
@@ -54,7 +24,7 @@ if (!File.exists(pluginPath + "data/EntityData.json")) {
 }
 let EntityNbtJson = JSON.parse(File.readFrom(pluginPath + "data/EntityData.json"));
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
-let getReelNbt;
+let getReelNbt, GetNewItemNbt;
 logger.setConsole(true);
 
 
@@ -68,9 +38,26 @@ if (Config.DockingIntensify) {
         i18n.load(IntensifyPath + "language/language.json", "en");
     } else {
         setTimeout(() => {
-            logger.error("未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false");
-            logger.error("The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json");
+            if (ll.language == "zh_Hans") {
+                logger.error("未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false");
+            } else {
+                logger.error("The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json");
+            }
             Config.DockingIntensify = false;
+        }, 1000 * 5);
+    }
+}
+if (Config.DockingGives) {
+    if (ll.require("gives.js")) {
+        GetNewItemNbt = ll.import("NewItemNbt");
+    } else {
+        setTimeout(() => {
+            if (ll.language == "zh_Hans") {
+                logger.error("未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false");
+            } else {
+                logger.error("The front-end plug-in gives.js is not found. Please go to download it or set DockingGives to false in the configuration file Config.json");
+            }
+            Config.DockingGives = false;
         }, 1000 * 5);
     }
 }
@@ -100,6 +87,7 @@ mc.listen("onMobSpawn", (typeName, pos) => {
  * 判断生物是否是强化生物并且是否开启掉落.
  * 然后调用前置插件生成新的卷轴nbt.
  * 004后新增普通掉落.
+ * 005后可对接gives掉落附魔物品.
  */
 mc.listen("onMobDie", (mob, source, _cause) => {
     if (source != undefined && source.isPlayer()) {
@@ -125,16 +113,38 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                     SpoilsList.forEach(CurrentOptions => {
                         let randomInt = specifiedRangeRandomNumber(0, 100);
                         if (randomInt < CurrentOptions.SpoilsProbability) {
-                            let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
-                            mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                            if (CurrentOptions.Spoils == "ordinary") {
+                                let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                                mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                            } else if (CurrentOptions.Spoils == "gives" && Config.DockingGives) {
+                                let itemDIsplayName = undefined;
+                                let initialItem = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                                if (CurrentOptions.DisplayName != "") {
+                                    itemDIsplayName = CurrentOptions.DisplayName;
+                                }
+                                let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, CurrentOptions.Curse, CurrentOptions.SpoilsqQantity);
+                                let item = mc.newItem(itemNewNbt);
+                                mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                            }
                         }
                     });
                 } else if (entityJson.OtherDropsMode == 1 && entityJson.ListSpoils != []) {
                     let SpoilsList = entityJson.ListSpoils;
                     let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length + 1);
                     let itemData = SpoilsList[randomInt];
-                    let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
-                    mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                    if (itemData.itemData == "ordinary") {
+                        let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                        mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                    } else if (itemData.Spoils == "gives" && Config.DockingGives) {
+                        let itemDIsplayName = undefined;
+                        let initialItem = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                        if (itemData.DisplayName != "") {
+                            itemDIsplayName = itemData.DisplayName;
+                        }
+                        let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, itemData.Curse, itemData.SpoilsqQantity);
+                        let item = mc.newItem(itemNewNbt);
+                        mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                    }
                 }
             }
         }
@@ -286,33 +296,37 @@ function generateTrack(a, b) {
 }
 
 /**
- * 004版本生物配置更新
+ * 版本配置更新
  */
 function FourProfileUpdate() {
     let UPEntityConfig = false;
-    for (let key in EntityNbtJson) {
-        let EntityData = EntityNbtJson[key];
-        if (EntityData.OtherDrops == undefined) {
-            UPEntityConfig = true;
-            EntityData.OtherDrops = false;
-            EntityData.OtherDropsMode = 0;
-            EntityData.ListSpoils = [{
-                "SpoilsTypeName": "minecraft:stone",
-                "SpoilsProbability": 10,
-                "SpoilsqQantity": 1
-            },
-            {
-                "SpoilsTypeName": "minecraft:gold_block",
-                "SpoilsProbability": 1,
-                "SpoilsqQantity": 1
-            }];
+    if (Config.DockingGives == undefined) {
+        Config.DockingGives = false;
+        for (let key in EntityNbtJson) {
+            let EntityData = EntityNbtJson[key];
+            if (EntityData.OtherDrops == undefined) {
+                UPEntityConfig = true;
+                EntityData.OtherDrops = false;
+                EntityData.OtherDropsMode = 0;
+                EntityData.ListSpoils = [{"Spoils":"ordinary","SpoilsTypeName":"minecraft:stone","SpoilsProbability":10,"SpoilsqQantity":1},{"Spoils":"gives","SpoilsTypeName":"minecraft:wooden_sword","DisplayName":"","SpoilsProbability":1,"SpoilsqQantity":1,"Curse":{"Enchantments":[{"n":16,"l":5}]}}];
+            } else if (EntityData.ListSpoils[0].Spoils == undefined) {
+                UPEntityConfig = true;
+                let SingleEntityList = EntityData.ListSpoils;
+                for (let key in SingleEntityList) {
+                    SingleEntityList[key].Spoils = "ordinary";
+                }
+            }
         }
     }
     if (UPEntityConfig) {
-        File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJsonData, null, "\t"));
+        File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
+        File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
         setTimeout(() => {
-            logger.error("0.0.4版本配置文件更新，请前往data/EntityData.json查看！");
-            logger.error("Please go to data/EntityData.json to view the updated configuration file!");
+            if (ll.language == "zh_Hans") {
+                logger.error("版本配置文件更新，请前往data/EntityData.json查看！");
+            } else {
+                logger.error("Please go to data/EntityData.json to view the updated configuration file!");
+            }
         }, 1000 * 6);
     }
 }
@@ -325,4 +339,7 @@ function FourProfileUpdate() {
  * 004
  * 修复003不刷强化怪的问题.
  * 新增额外的普通物品掉落.
+ * 005
+ * 修复004重置配置文件的BUG.
+ * 新增对接gives，可以直接掉落附魔物品.
  */
