@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 1, 8];
+const PluginsVersion = [0, 1, 9];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -29,7 +29,7 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
     File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "seckilltopvp": true, "seckilltopve": true }, null, "\t"));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "seckilltopvp": true, "seckilltopve": true, "seckillWhiteList": ["minecraft:ender_dragon"] }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
@@ -41,8 +41,13 @@ if (ConfigJson.seckilltopve == undefined) {
     ConfigJson.seckilltopve = true;
     File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
 }
+if (ConfigJson.seckillWhiteList == undefined) {
+    ConfigJson.seckillWhiteList = ["minecraft:ender_dragon"];
+    File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
+}
 let ConfigItemWeapon = StrengthenItemsJson.weapon;
 let ConfigItemArmor = StrengthenItemsJson.armor;
+let EntityseckillWhiteList = ConfigJson.seckillWhiteList;
 
 /**
  * 语言文件写入及加载.
@@ -197,7 +202,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
             let itemdata = ComparisonTable[itemInformation.lvl];
             let Newdamage = itemdata.Weapon;
             if (mob.isPlayer() && ConfigJson.seckilltopvp) {
-                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include()) {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
@@ -205,7 +210,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                     }, 50);
                 }
             } else if (!mob.isPlayer() && ConfigJson.seckilltopve) {
-                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include()) {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
@@ -987,4 +992,6 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 使用玩家真实名称，避免和其他插件冲突.
  * 018:
  * 新增一击必杀用于pve的开关
+ * 019:
+ * 新增一击必杀对生物类型白名单，白名单生物不会触发.
  */
