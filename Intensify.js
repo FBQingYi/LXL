@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 1, 9];
+const PluginsVersion = [0, 2, 0];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -29,25 +29,14 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
     File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "seckilltopvp": true, "seckilltopve": true, "seckillWhiteList": ["minecraft:ender_dragon"] }, null, "\t"));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "RSProbability": 15, "ESProbability": 10, "seckilltopvp": true, "seckilltopve": true, "seckillWhiteList": ["minecraft:ender_dragon"] }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
-if (ConfigJson.seckilltopvp == undefined) {
-    ConfigJson.seckilltopvp = true;
-    File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
-}
-if (ConfigJson.seckilltopve == undefined) {
-    ConfigJson.seckilltopve = true;
-    File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
-}
-if (ConfigJson.seckillWhiteList == undefined) {
-    ConfigJson.seckillWhiteList = ["minecraft:ender_dragon"];
-    File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
-}
 let ConfigItemWeapon = StrengthenItemsJson.weapon;
 let ConfigItemArmor = StrengthenItemsJson.armor;
 let EntityseckillWhiteList = ConfigJson.seckillWhiteList;
+versionUpdateModifyProfile();
 
 /**
  * 语言文件写入及加载.
@@ -81,12 +70,14 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "gemLore1": JSON.stringify(["§1-------==宝石==-------", "§2移速宝石", "§3可镶嵌在鞋子上", "§7成功几率：10%", "§6效果:增加移速"]),
         "gemLore2": JSON.stringify(["§1-------==宝石==-------", "§4暴击宝石", "§3可镶嵌在武器上", "§7成功几率：10%", "§6效果:增加伤害"]),
         "gemLore3": JSON.stringify(["§1-------==宝石==-------", "§6耐久宝石", "§3可镶嵌在任何装备上", "§7成功几率：10%", "§6效果:物品无限耐久"]),
-        "Command": "强化你的装备把OP指令!",
+        "Command": "强化你的装备吧!",
         "formtitle1": "强化武器-OP",
         "formcontent1": "请选择你要添加的类型",
         "formarms1": "武器",
         "formprotective1": "防具",
-        "formcontent2": "请选择你要添加的物品"
+        "formcontent2": "请选择你要添加的物品",
+        "reelFailed": "卷轴升级失败，卷轴消失！",
+        "failedEquip": "装备强化失败，卷轴消失！"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -116,12 +107,14 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "gemLore1": JSON.stringify(["§1-------==Gem==-------", "§2Speed shifting gem", "§3Can be inlaid on shoes", "§7Success probability: 10%", "Effect: increase movement speed"]),
         "gemLore2": JSON.stringify(["§1-------==Gem==-------", "§4Critical Hit Gem", "§3Embedded in weapons", "§7Success probability: 10%", "Effect: increase damage"]),
         "gemLore3": JSON.stringify(["§1-------==Gem==-------", "§6Durable gemstone", "§3Embedded on any equipment", "§7Success probability: 10%", "Effect: unlimited durability"]),
-        "Command": "Strengthen your equipment to put OP command!",
+        "Command": "Strengthen your equipment!",
         "formtitle1": "Strengthening weapons-OP",
         "formcontent1": "Please choose the type you want to add",
         "formarms1": "arms",
         "formprotective1": "Armor",
-        "formcontent2": "Please select the item you want to add"
+        "formcontent2": "Please select the item you want to add",
+        "reelFailed": "Scroll upgrade failed!",
+        "failedEquip": "Equipment strengthening failed, and the scroll disappeared!"
     }
 });
 
@@ -367,7 +360,7 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  * 注册命令函数，服务器启动时调用.
  */
 function setCommand() {
-    let Command = mc.newCommand("intensify", i18n.tr("Command",), PermType.GameMasters);
+    let Command = mc.newCommand("intensify", i18n.get("Command",ll.language), PermType.GameMasters);
     Command.setEnum("openAction", ["open"]);
     Command.setEnum("resetAction", ["reset"]);
     Command.setEnum("giveAction", ["give"]);
@@ -456,7 +449,7 @@ function openOPForm(player) {
                 let playerInventory = [];
                 getPlayerInventoryList.forEach(item => {
                     if (item.name != "") {
-                        playerInventory[playerInventory.length] = item.type;
+                        playerInventory[playerInventory.length] = `${item.type}\n${item.name}`;
                     }
                 });
                 if (playerInventory != []) {
@@ -613,15 +606,21 @@ function synthesisGenerate(Container, item1, player, index1, index2, lvl, langua
     if (item1.boolean && item2.boolean && item3.boolean) {
         if (item1.type == item2.type && item2.type == item3.type) {
             if (item1.lvl == item2.lvl && item2.lvl == item3.lvl && item3.lvl == lvl - 1) {
-                setTimeout(() => {
-                    Container.removeItem(0, 1);
-                    Container.removeItem(index1, 1);
-                    Container.removeItem(index2, 1);
-                    newItem = mc.newItem(generateNewNbt("intensify", lvl, i18n.trl(player.langCode, language1,)));
-                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, language2,)))
-                    Container.setItem(0, newItem);
-                }, 100);
-                playSound(player, 0)
+                Container.removeItem(0, 1);
+                Container.removeItem(index1, 1);
+                Container.removeItem(index2, 1);
+                if (ConfigJson.RSProbability > specifiedRangeRandomNumber(0, 100)) {
+                    setTimeout(() => {
+                        newItem = mc.newItem(generateNewNbt("intensify", lvl, i18n.trl(player.langCode, language1,)));
+                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, language2,)))
+                        Container.setItem(0, newItem);
+                    }, 100);
+                    playSound(player, 0);
+                } else {
+                    sengTell(player, "reelFailed", [], 0);
+                    playSound(player, 1);
+                }
+
             }
         }
     }
@@ -639,33 +638,43 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
     let item = Container.getItem(2);
     if (!item2.boolean && item.name != "" && JSON.stringify(StrengthenItemsJson).indexOf(item.type) != -1) {
         if (item1.lvl == 1) {
-            setTimeout(() => {
-                let nbt;
-                if (StrengthenItemsJson.weapon.indexOf(item.type) != -1) {
-                    nbt = setEquipmentNbt(item, "Weapon", TargetLevel);
-                } else if (StrengthenItemsJson.armor.indexOf(item.type) != -1) {
-                    nbt = setEquipmentNbt(item, "Armor", TargetLevel);
-                }
-                let newItem = mc.newItem(nbt);
-                SetLore(newItem, player);
-                Container.removeItem(0, 1);
+            Container.removeItem(0, 1);
+            if (ConfigJson.ESProbability > specifiedRangeRandomNumber(0, 100)) {
                 Container.removeItem(2, 1);
-                Container.setItem(0, newItem);
-            }, 100);
-            playSound(player, 0)
+                setTimeout(() => {
+                    let nbt;
+                    if (StrengthenItemsJson.weapon.indexOf(item.type) != -1) {
+                        nbt = setEquipmentNbt(item, "Weapon", TargetLevel);
+                    } else if (StrengthenItemsJson.armor.indexOf(item.type) != -1) {
+                        nbt = setEquipmentNbt(item, "Armor", TargetLevel);
+                    }
+                    let newItem = mc.newItem(nbt);
+                    SetLore(newItem, player);
+                    Container.setItem(0, newItem);
+                }, 100);
+                playSound(player, 0)
+            } else {
+                sengTell(player, "failedEquip", [], 0);
+                playSound(player, 1)
+            }
         }
     } else if (item1.boolean && item2.boolean && item2.type != "intensify") {
         if (item1.lvl == TargetLevel && item2.lvl == TargetLevel - 1) {
-            setTimeout(() => {
-                let nbt = item.getNbt();
-                nbt.getTag("tag").getTag("addon").setInt("lvl", TargetLevel);
-                newItem = mc.newItem(nbt);
-                SetLore(newItem, player);
-                Container.removeItem(0, 1);
+            Container.removeItem(0, 1);
+            if (ConfigJson.ESProbability > specifiedRangeRandomNumber(0, 100)) {
                 Container.removeItem(2, 1);
-                Container.setItem(0, newItem);
-            }, 100);
-            playSound(player, 0)
+                setTimeout(() => {
+                    let nbt = item.getNbt();
+                    nbt.getTag("tag").getTag("addon").setInt("lvl", TargetLevel);
+                    newItem = mc.newItem(nbt);
+                    SetLore(newItem, player);
+                    Container.setItem(0, newItem);
+                }, 100);
+                playSound(player, 0)
+            } else {
+                sengTell(player, "failedEquip", [], 0);
+                playSound(player, 1)
+            }
         }
     }
 }
@@ -967,6 +976,37 @@ function equipmentDescriptionCorrection(player) {
     }
 }
 
+/**
+ * 版本更新自动更新配置文件.
+ */
+function versionUpdateModifyProfile(){
+    let UPConfig = false;
+    //017版本更新
+    if (ConfigJson.seckilltopvp == undefined) {
+        ConfigJson.seckilltopvp = true;
+        UPConfig = true;
+    }
+    //018版本更新
+    if (ConfigJson.seckilltopve == undefined) {
+        ConfigJson.seckilltopve = true;
+        UPConfig = true;
+    }
+    //019版本更新
+    if (ConfigJson.seckillWhiteList == undefined) {
+        ConfigJson.seckillWhiteList = ["minecraft:ender_dragon"];
+        UPConfig = true;
+    }
+    //020版本更新
+    if (ConfigJson.RSProbability == undefined) {
+        ConfigJson.RSProbability = 15;
+        ConfigJson.ESProbability = 10;
+        UPConfig = true;
+    }
+    if(UPConfig){
+        File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
+    }
+}
+
 ll.export(generateNewNbt, "generateNewNbt");
 
 
@@ -994,4 +1034,18 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 新增一击必杀用于pve的开关
  * 019:
  * 新增一击必杀对生物类型白名单，白名单生物不会触发.
+ * 020：
+ * 新增卷轴合成几率和装备使用卷轴强化成功几率.
+ * 修复游戏内指令说明英文的问题.
+ * 添加装备时增加名称显示.
+ */
+
+/**
+ * 待修复BUG
+ * 放入强化石过多崩服.
+ * 
+ * ---------------------
+ * 
+ * 待增加功能
+ * 对弓箭等远程武器加强.
  */
