@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 0];
+const PluginsVersion = [0, 2, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -77,7 +77,9 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "formprotective1": "防具",
         "formcontent2": "请选择你要添加的物品",
         "reelFailed": "卷轴升级失败，卷轴消失！",
-        "failedEquip": "装备强化失败，卷轴消失！"
+        "failedEquip": "装备强化失败，卷轴消失！",
+        "ReinforceSuccess": "装备强化成功！",
+        "ScrollUSucceeded":"卷轴升级成功！"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -114,7 +116,9 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "formprotective1": "Armor",
         "formcontent2": "Please select the item you want to add",
         "reelFailed": "Scroll upgrade failed!",
-        "failedEquip": "Equipment strengthening failed, and the scroll disappeared!"
+        "failedEquip": "Equipment strengthening failed, and the scroll disappeared!",
+        "ReinforceSuccess": "Equipment strengthening succeeded!",
+        "ScrollUSucceeded":"Scroll upgrade succeeded!"
     }
 });
 
@@ -360,7 +364,7 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  * 注册命令函数，服务器启动时调用.
  */
 function setCommand() {
-    let Command = mc.newCommand("intensify", i18n.get("Command",ll.language), PermType.GameMasters);
+    let Command = mc.newCommand("intensify", i18n.get("Command", ll.language), PermType.GameMasters);
     Command.setEnum("openAction", ["open"]);
     Command.setEnum("resetAction", ["reset"]);
     Command.setEnum("giveAction", ["give"]);
@@ -606,17 +610,21 @@ function synthesisGenerate(Container, item1, player, index1, index2, lvl, langua
     if (item1.boolean && item2.boolean && item3.boolean) {
         if (item1.type == item2.type && item2.type == item3.type) {
             if (item1.lvl == item2.lvl && item2.lvl == item3.lvl && item3.lvl == lvl - 1) {
-                Container.removeItem(0, 1);
-                Container.removeItem(index1, 1);
-                Container.removeItem(index2, 1);
                 if (ConfigJson.RSProbability > specifiedRangeRandomNumber(0, 100)) {
                     setTimeout(() => {
                         newItem = mc.newItem(generateNewNbt("intensify", lvl, i18n.trl(player.langCode, language1,)));
                         newItem.setLore(JSON.parse(i18n.trl(player.langCode, language2,)))
+                        Container.removeItem(0, 1);
+                        Container.removeItem(index1, 1);
+                        Container.removeItem(index2, 1);
                         Container.setItem(0, newItem);
                     }, 100);
+                    sengTell(player, "ScrollUSucceeded", [], 0);
                     playSound(player, 0);
                 } else {
+                    Container.removeItem(0, 1);
+                    Container.removeItem(index1, 1);
+                    Container.removeItem(index2, 1);
                     sengTell(player, "reelFailed", [], 0);
                     playSound(player, 1);
                 }
@@ -638,9 +646,7 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
     let item = Container.getItem(2);
     if (!item2.boolean && item.name != "" && JSON.stringify(StrengthenItemsJson).indexOf(item.type) != -1) {
         if (item1.lvl == 1) {
-            Container.removeItem(0, 1);
             if (ConfigJson.ESProbability > specifiedRangeRandomNumber(0, 100)) {
-                Container.removeItem(2, 1);
                 setTimeout(() => {
                     let nbt;
                     if (StrengthenItemsJson.weapon.indexOf(item.type) != -1) {
@@ -650,28 +656,34 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
                     }
                     let newItem = mc.newItem(nbt);
                     SetLore(newItem, player);
+                    Container.removeItem(0, 1);
+                    Container.removeItem(2, 1);
                     Container.setItem(0, newItem);
                 }, 100);
+                sengTell(player, "ReinforceSuccess", [], 0);
                 playSound(player, 0)
             } else {
+                Container.removeItem(0, 1);
                 sengTell(player, "failedEquip", [], 0);
                 playSound(player, 1)
             }
         }
     } else if (item1.boolean && item2.boolean && item2.type != "intensify") {
         if (item1.lvl == TargetLevel && item2.lvl == TargetLevel - 1) {
-            Container.removeItem(0, 1);
             if (ConfigJson.ESProbability > specifiedRangeRandomNumber(0, 100)) {
-                Container.removeItem(2, 1);
                 setTimeout(() => {
                     let nbt = item.getNbt();
                     nbt.getTag("tag").getTag("addon").setInt("lvl", TargetLevel);
                     newItem = mc.newItem(nbt);
                     SetLore(newItem, player);
+                    Container.removeItem(0, 1);
+                    Container.removeItem(2, 1);
                     Container.setItem(0, newItem);
                 }, 100);
+                sengTell(player, "ReinforceSuccess", [], 0);
                 playSound(player, 0)
             } else {
+                Container.removeItem(0, 1);
                 sengTell(player, "failedEquip", [], 0);
                 playSound(player, 1)
             }
@@ -979,7 +991,7 @@ function equipmentDescriptionCorrection(player) {
 /**
  * 版本更新自动更新配置文件.
  */
-function versionUpdateModifyProfile(){
+function versionUpdateModifyProfile() {
     let UPConfig = false;
     //017版本更新
     if (ConfigJson.seckilltopvp == undefined) {
@@ -1002,7 +1014,7 @@ function versionUpdateModifyProfile(){
         ConfigJson.ESProbability = 10;
         UPConfig = true;
     }
-    if(UPConfig){
+    if (UPConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
     }
 }
@@ -1038,6 +1050,9 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 新增卷轴合成几率和装备使用卷轴强化成功几率.
  * 修复游戏内指令说明英文的问题.
  * 添加装备时增加名称显示.
+ * 021
+ * 修复020版本强化成功吞装备的严重BUG.
+ * 完善成功提示.
  */
 
 /**
