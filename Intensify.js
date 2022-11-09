@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 1];
+const PluginsVersion = [0, 2, 2];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -199,7 +199,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
             let itemdata = ComparisonTable[itemInformation.lvl];
             let Newdamage = itemdata.Weapon;
             if (mob.isPlayer() && ConfigJson.seckilltopvp) {
-                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include()) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include(mob.type)) {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
@@ -207,7 +207,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                     }, 50);
                 }
             } else if (!mob.isPlayer() && ConfigJson.seckilltopve) {
-                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include()) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include(mob.type)) {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
@@ -1053,6 +1053,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 021
  * 修复020版本强化成功吞装备的严重BUG.
  * 完善成功提示.
+ * 022
+ * 修复一击必杀的判定BUG.
  */
 
 /**

@@ -6,7 +6,7 @@ const pluginOther = { "版权归属": "LIGHT服务器" };
 const pluginConfigPath = './plugins/LIGHTMoney/';
 const BotQQ = 3301683738;
 const groupID = 770428976;
-const wsUrl = 'ws://127.0.0.1:25555';
+const wsUrl = 'ws://127.0.0.1:6096';
 let wsc = new WSClient();
 let reload = true;
 let db;
@@ -21,12 +21,12 @@ function LIGHTMoney(type, int, xuid) {
     switch (type) {
         case "add":
             if (int > 0) {
-                db.set(xuid, amend(playerBalance, int, "+"));
+                return db.set(xuid, amend(playerBalance, int, "+"));
             }
             break;
         case "remove":
             if (playerBalance >= int) {
-                db.set(xuid, amend(playerBalance, int, "-"));
+                return db.set(xuid, amend(playerBalance, int, "-"));
             }
             break;
         case "query":
@@ -39,16 +39,16 @@ function WsLink() {
     wsc.connect(wsUrl);
     wsc.listen("onTextReceived", (msg) => {
         let MsgJson = JSON.parse(msg);
-        if (MsgJson.MsgSource == "Group") {
-            if (MsgJson.Text.substr(0, 1) == "/") {
-                let MsgSenderQQ = MsgJson.QQ;
-                let url = `http://zc.qingyimc.cn/selIdByQQ?qq=${MsgSenderQQ}`;
+        if (MsgJson.message_type == "group" && MsgJson.post_type == "message") {
+            if (MsgJson.raw_message.substr(0, 1) == "/") {
+                let MsgSenderQQ = MsgJson.sender.user_id;
+                let url = `http://zc.qingyimc.cn/queryUserByQQ?qq=${MsgSenderQQ}`;
                 network.httpGet(url, (status, result) => {
                     if (status == '200') {
-                        let QueryResults = JSON.parse(result).ID;
+                        let QueryResults = JSON.parse(result).xboxid;
                         let playerXuid = data.name2xuid(QueryResults);
                         if (playerXuid != undefined) {
-                            let GroupCmd = MsgJson.Text;
+                            let GroupCmd = MsgJson.raw_message;
                             let playerBalance = db.get(playerXuid);
                             if (GroupCmd == '/lmoney') {
                                 queryMoney(playerBalance, MsgSenderQQ)
@@ -56,7 +56,7 @@ function WsLink() {
                                 accounts(MsgJson, playerXuid)
                             }
                         } else {
-                            QingYiLxLWsMsg(groupID, `[@${MsgSenderQQ}] 未在服务器找到你的唯一ID！`);
+                            QingYiLxLWsMsg(groupID, `[CQ:at,qq=${MsgSenderQQ}] 未在服务器找到你的唯一ID！`);
                         }
                     }
                 });
@@ -68,9 +68,9 @@ function WsLink() {
 //群指令查询
 function queryMoney(playerBalance, MsgSenderQQ) {
     if (playerBalance != undefined) {
-        QingYiLxLWsMsg(groupID, `[@${MsgSenderQQ}] 当前Y币为：${playerBalance}`);
+        QingYiLxLWsMsg(groupID, `[CQ:at,qq=${MsgSenderQQ}] 当前Y币为：${format(playerBalance, 4)}`);
     } else {
-        QingYiLxLWsMsg(groupID, `[@${MsgSenderQQ}] 未查询到你的Y币余额！`);
+        QingYiLxLWsMsg(groupID, `[CQ:at,qq=${MsgSenderQQ}] 未查询到你的Y币余额！`);
     }
 }
 
@@ -78,22 +78,22 @@ function queryMoney(playerBalance, MsgSenderQQ) {
 function accounts(MsgJson, playerXuid) {
     try {
         let playerBalance = db.get(playerXuid);
-        let addQQ = MsgJson.Text.split(' ')[0].split('@')[1].split(']')[0];
-        let intmoney = parseFloat(MsgJson.Text.split(']')[1].split(' ')[1]).toFixed(4);
+        let addQQ = MsgJson.raw_message.split('qq=')[1].split(']')[0];
+        let intmoney = parseFloat(MsgJson.raw_message.split('] ')[1]).toFixed(4);
         if (intmoney <= 0) {
             return;
         }
-        let url = `http://zc.qingyimc.cn/selIdByQQ?qq=${addQQ}`;
+        let url = `http://zc.qingyimc.cn/queryUserByQQ?qq=${addQQ}`;
         network.httpGet(url, (status, result) => {
             if (status == '200') {
                 let QueryResults = JSON.parse(result);
-                if (QueryResults.ID == null) {
-                    let PostMsg = `[系统] 转账失败\n未找到改玩家注册数据`;
+                if (QueryResults.xboxid == null) {
+                    let PostMsg = `[系统] 转账失败\n未找到该玩家注册数据`;
                     QingYiLxLWsMsg(groupID, PostMsg);
                 } else {
                     if (playerBalance != undefined && playerBalance > intmoney) {
                         db.set(playerXuid, amend(playerBalance, intmoney, "-"));
-                        let playerXuid2 = data.name2xuid(QueryResults.ID);
+                        let playerXuid2 = data.name2xuid(QueryResults.xboxid);
                         if (playerXuid2 != undefined) {
                             let playerBalance2 = db.get(playerXuid2);
                             if (playerBalance2 == undefined) {
@@ -101,12 +101,12 @@ function accounts(MsgJson, playerXuid) {
                                 playerBalance2 = 0;
                             }
                             db.set(playerXuid2, amend(playerBalance2, intmoney, "+"));
-                            QingYiLxLWsMsg(groupID, "转账成功，当前余额：" + db.get(playerXuid) + "\n转账金额为：" + intmoney);
+                            QingYiLxLWsMsg(groupID, "转账成功，当前余额：" + format(db.get(playerXuid), 4) + "\n转账金额为：" + format(intmoney, 4));
                         } else {
-                            QingYiLxLWsMsg(groupID, `[@${MsgSenderQQ}] 未在服务器找到接收方的唯一ID！`);
+                            QingYiLxLWsMsg(groupID, `[CQ:at,qq=${MsgSenderQQ}] 未在服务器找到接收方的唯一ID！`);
                         }
                     } else {
-                        QingYiLxLWsMsg(groupID, "转账失败，当前余额：" + playerBalance + "\n转账金额为：" + intmoney);
+                        QingYiLxLWsMsg(groupID, "转账失败，当前余额：" + format(playerBalance, 4) + "\n转账金额为：" + format(intmoney,4));
                     }
 
                 }
@@ -156,7 +156,15 @@ function amend(num1, num2, symbol) {
 
 //发送群消息
 function QingYiLxLWsMsg(group, PostMsg) {
-    let Msgjson = { "BotQQ": BotQQ, "Group": group, "Msg": PostMsg, "ServerMsg": "LIGHTMoney", "PlayerName": "LIGHTMoney" }
+    let Msgjson = {
+        "action": "send_group_msg",
+        "params": {
+            "group_id": group,
+            "message": PostMsg,
+            "auto_escape": false
+        },
+        "echo": "1254588"
+    }
     wsc.send(JSON.stringify(Msgjson))
 }
 
@@ -182,13 +190,31 @@ mc.listen("onConsoleCmd", (cmd) => {
             mc.runcmdEx(cmd);
         }, 1000);
         return false;
-    } else if (cmd.indexOf('lmoney add') != -1) {
+    } else if (cmd.indexOf('lmoney set') != -1) {
         let name = cmd.split(' ')[2];
         let playerXuid2 = data.name2xuid(name);
         db.set(playerXuid2, parseFloat(cmd.split(' ')[3]).toFixed(4));
         return false;
+    } else if (cmd.indexOf('lmoney add') != -1) {
+        let name = cmd.split(' ')[2];
+        let playerXuid2 = data.name2xuid(name);
+        db.set(playerXuid2, amend(db.get(playerXuid2), parseFloat(cmd.split(' ')[3]).toFixed(4), "+"));
+        return false;
+    } else if (cmd.indexOf('lmoney remove') != -1) {
+        let name = cmd.split(' ')[2];
+        let playerXuid2 = data.name2xuid(name);
+        let remove = amend(db.get(playerXuid2), parseFloat(cmd.split(' ')[3]).toFixed(4), "-");
+        if (!remove < 0) {
+            db.set(playerXuid2, parseFloat(remove));
+        }
+        return false;
     }
 });
+
+function format(num, cent) {
+    num = parseFloat(num)
+    return (num.toFixed(cent) + '').replace(/\d{1,4}(?=(\d{4})+(\.\d*)?$)/g, '$&,');
+}
 
 ll.export(LIGHTMoney, "LIGHTMoney");
 
