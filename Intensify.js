@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 2];
+const PluginsVersion = [0, 2, 4];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -29,7 +29,29 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
     File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
 }
 if (!File.exists(pluginPath + "Config.json")) {
-    File.writeTo(pluginPath + "Config.json", JSON.stringify({ "SProbability": 1, "GProbability": 1, "PSuccess": 10, "RSProbability": 15, "ESProbability": 10, "seckilltopvp": true, "seckilltopve": true, "seckillWhiteList": ["minecraft:ender_dragon"] }, null, "\t"));
+    File.writeTo(pluginPath + "Config.json", JSON.stringify({
+        "SProbability": 1,
+        "GProbability": 1,
+        "PSuccess": 10,
+        "ScrollUpgrade": {
+            "twoReelProbability": 40,
+            "threeReelProbability": 30,
+            "fourReelProbability": 20,
+            "fiveReelProbability": 10
+        },
+        "ItemUpgrade": {
+            "zeroItemUpgrade": 40,
+            "oneItemUpgrade": 30,
+            "twoItemUpgrade": 20,
+            "threeItemUpgrade": 10,
+            "fourItemUpgrade": 5
+        },
+        "seckilltopvp": true,
+        "seckilltopve": true,
+        "seckillWhiteList": [
+            "minecraft:ender_dragon"
+        ]
+    }, null, "\t"));
 }
 let StrengthenItemsJson = JSON.parse(File.readFrom(pluginPath + "data/EquipmentData.json"));
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
@@ -79,7 +101,7 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "reelFailed": "卷轴升级失败，卷轴消失！",
         "failedEquip": "装备强化失败，卷轴消失！",
         "ReinforceSuccess": "装备强化成功！",
-        "ScrollUSucceeded":"卷轴升级成功！"
+        "ScrollUSucceeded": "卷轴升级成功！"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -118,7 +140,7 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "reelFailed": "Scroll upgrade failed!",
         "failedEquip": "Equipment strengthening failed, and the scroll disappeared!",
         "ReinforceSuccess": "Equipment strengthening succeeded!",
-        "ScrollUSucceeded":"Scroll upgrade succeeded!"
+        "ScrollUSucceeded": "Scroll upgrade succeeded!"
     }
 });
 
@@ -185,8 +207,8 @@ mc.listen("onContainerChange", (player, block, _slotNum, _oldItem, _newItem) => 
  * 实体受伤事件监听.
  * 用来处理玩家手持强化道具攻击伤害.
  */
-mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
-    if (source != undefined && source.isPlayer()) {
+mc.listen("onMobHurt", (mob, source, _damage, cause) => {
+    if (source != undefined && source.isPlayer() && cause == 2) {
         let addedDamageBool = true;
         let player = source.toPlayer();
         let playerHanditem = player.getHand();
@@ -199,7 +221,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
             let itemdata = ComparisonTable[itemInformation.lvl];
             let Newdamage = itemdata.Weapon;
             if (mob.isPlayer() && ConfigJson.seckilltopvp) {
-                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include(mob.type)) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !listJudgment(mob.type)) {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
@@ -207,7 +229,7 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                     }, 50);
                 }
             } else if (!mob.isPlayer() && ConfigJson.seckilltopve) {
-                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !EntityseckillWhiteList.include(mob.type)) {
+                if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !listJudgment(mob.type)) {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0)
@@ -610,17 +632,15 @@ function synthesisGenerate(Container, item1, player, index1, index2, lvl, langua
     if (item1.boolean && item2.boolean && item3.boolean) {
         if (item1.type == item2.type && item2.type == item3.type) {
             if (item1.lvl == item2.lvl && item2.lvl == item3.lvl && item3.lvl == lvl - 1) {
-                if (ConfigJson.RSProbability > specifiedRangeRandomNumber(0, 100)) {
-                    setTimeout(() => {
-                        newItem = mc.newItem(generateNewNbt("intensify", lvl, i18n.trl(player.langCode, language1,)));
-                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, language2,)))
-                        Container.removeItem(0, 1);
-                        Container.removeItem(index1, 1);
-                        Container.removeItem(index2, 1);
-                        Container.setItem(0, newItem);
-                    }, 100);
-                    sengTell(player, "ScrollUSucceeded", [], 0);
-                    playSound(player, 0);
+                let RandomValue = specifiedRangeRandomNumber(0, 100);
+                if (item1.lvl == 1 && ConfigJson.ScrollUpgrade.twoReelProbability > RandomValue) {
+                    ArticlesGeneratedContainer(Container, player, index1, index2, lvl, language1, language2);
+                } else if (item1.lvl == 2 && ConfigJson.ScrollUpgrade.threeReelProbability > RandomValue) {
+                    ArticlesGeneratedContainer(Container, player, index1, index2, lvl, language1, language2);
+                } else if (item1.lvl == 3 && ConfigJson.ScrollUpgrade.fourReelProbability > RandomValue) {
+                    ArticlesGeneratedContainer(Container, player, index1, index2, lvl, language1, language2);
+                } else if (item1.lvl == 4 && ConfigJson.ScrollUpgrade.fiveReelProbability > RandomValue) {
+                    ArticlesGeneratedContainer(Container, player, index1, index2, lvl, language1, language2);
                 } else {
                     Container.removeItem(0, 1);
                     Container.removeItem(index1, 1);
@@ -632,6 +652,30 @@ function synthesisGenerate(Container, item1, player, index1, index2, lvl, langua
             }
         }
     }
+}
+
+
+/**
+ * 强化成功在容器内生成新的物品
+ * @param {Container} Container 容器对象
+ * @param {player} player 玩家对象
+ * @param {int} index1 容器序号1
+ * @param {int} index2 容器序号2
+ * @param {int} lvl 强化后等级
+ * @param {string} language1 语言文件1
+ * @param {string} language2 语言文件2
+ */
+function ArticlesGeneratedContainer(Container, player, index1, index2, lvl, language1, language2) {
+    setTimeout(() => {
+        newItem = mc.newItem(generateNewNbt("intensify", lvl, i18n.trl(player.langCode, language1,)));
+        newItem.setLore(JSON.parse(i18n.trl(player.langCode, language2,)))
+        Container.removeItem(0, 1);
+        Container.removeItem(index1, 1);
+        Container.removeItem(index2, 1);
+        Container.setItem(0, newItem);
+    }, 100);
+    sengTell(player, "ScrollUSucceeded", [], 0);
+    playSound(player, 0);
 }
 
 /**
@@ -646,7 +690,7 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
     let item = Container.getItem(2);
     if (!item2.boolean && item.name != "" && JSON.stringify(StrengthenItemsJson).indexOf(item.type) != -1) {
         if (item1.lvl == 1) {
-            if (ConfigJson.ESProbability > specifiedRangeRandomNumber(0, 100)) {
+            if (ConfigJson.ItemUpgrade.zeroItemUpgrade > specifiedRangeRandomNumber(0, 100)) {
                 setTimeout(() => {
                     let nbt;
                     if (StrengthenItemsJson.weapon.indexOf(item.type) != -1) {
@@ -670,18 +714,15 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
         }
     } else if (item1.boolean && item2.boolean && item2.type != "intensify") {
         if (item1.lvl == TargetLevel && item2.lvl == TargetLevel - 1) {
-            if (ConfigJson.ESProbability > specifiedRangeRandomNumber(0, 100)) {
-                setTimeout(() => {
-                    let nbt = item.getNbt();
-                    nbt.getTag("tag").getTag("addon").setInt("lvl", TargetLevel);
-                    newItem = mc.newItem(nbt);
-                    SetLore(newItem, player);
-                    Container.removeItem(0, 1);
-                    Container.removeItem(2, 1);
-                    Container.setItem(0, newItem);
-                }, 100);
-                sengTell(player, "ReinforceSuccess", [], 0);
-                playSound(player, 0)
+            let RandomValue = specifiedRangeRandomNumber(0, 100);
+            if (item1.lvl == 2 && ConfigJson.ItemUpgrade.oneItemUpgrade > RandomValue) {
+                GenerateEnhancementItems(item, TargetLevel, Container, player);
+            } else if (item1.lvl == 3 && ConfigJson.ItemUpgrade.twoItemUpgrade > RandomValue) {
+                GenerateEnhancementItems(item, TargetLevel, Container, player);
+            } else if (item1.lvl == 4 && ConfigJson.ItemUpgrade.threeItemUpgrade > RandomValue) {
+                GenerateEnhancementItems(item, TargetLevel, Container, player);
+            } else if (item1.lvl == 5 && ConfigJson.ItemUpgrade.fourItemUpgrade > RandomValue) {
+                GenerateEnhancementItems(item, TargetLevel, Container, player);
             } else {
                 Container.removeItem(0, 1);
                 sengTell(player, "failedEquip", [], 0);
@@ -689,6 +730,27 @@ function equipmentStrengthening(Container, TargetLevel, item1, player) {
             }
         }
     }
+}
+
+/**
+ * 生成强化后的物品对象
+ * @param {Item} item 物品对象
+ * @param {int} TargetLevel 目标等级
+ * @param {Container} Container 容器对象
+ * @param {player} player 玩家对象
+ */
+function GenerateEnhancementItems(item, TargetLevel, Container, player) {
+    setTimeout(() => {
+        let nbt = item.getNbt();
+        nbt.getTag("tag").getTag("addon").setInt("lvl", TargetLevel);
+        newItem = mc.newItem(nbt);
+        SetLore(newItem, player);
+        Container.removeItem(0, 1);
+        Container.removeItem(2, 1);
+        Container.setItem(0, newItem);
+    }, 100);
+    sengTell(player, "ReinforceSuccess", [], 0);
+    playSound(player, 0)
 }
 
 /**
@@ -922,12 +984,27 @@ function itemDurableRepair(item, player) {
 }
 
 /**
- * 
+ * 给玩家播放指定音效.
  * @param {Player} player 玩家对象
  * @param {int} Sound 音乐名称位置
  */
 function playSound(player, Sound) {
     mc.runcmdEx(`playsound ${SoundList[Sound]} ${player.realName}`);
+}
+
+/**
+ * 一击必杀生物列表判定.
+ * @param {String} key 需要判断的实体标准类型
+ * @returns Bool值
+ */
+function listJudgment(key) {
+    let keyBool = false;
+    EntityseckillWhiteList.forEach(seckillType => {
+        if (seckillType == key) {
+            keyBool = true;
+        }
+    });
+    return keyBool
 }
 
 /**
@@ -1014,6 +1091,25 @@ function versionUpdateModifyProfile() {
         ConfigJson.ESProbability = 10;
         UPConfig = true;
     }
+    //024版本更新
+    if(ConfigJson.ItemUpgrade == undefined){
+        ConfigJson.ScrollUpgrade = {
+            "twoReelProbability": 40,
+            "threeReelProbability": 30,
+            "fourReelProbability": 20,
+            "fiveReelProbability": 10
+        }
+        ConfigJson.ItemUpgrade = {
+            "zeroItemUpgrade": 40,
+            "oneItemUpgrade": 30,
+            "twoItemUpgrade": 20,
+            "threeItemUpgrade": 10,
+            "fourItemUpgrade": 5
+        }
+        delete ConfigJson.RSProbability;
+        delete ConfigJson.ESProbability;
+        UPConfig = true;
+    }
     if (UPConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
     }
@@ -1055,6 +1151,10 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 完善成功提示.
  * 022
  * 修复一击必杀的判定BUG.
+ * 023
+ * 屏蔽弹射物伤害触发相关技能.
+ * 024
+ * 卷轴相关强化几率细分化
  */
 
 /**
