@@ -7,11 +7,11 @@ const itemGemTable = [
     { "gemName": "DurableGem", "gemExplain": "DurableGemExplain", "maxLvl": 1, "lvl": [0, "∞"] }
 ]
 const ComparisonTable = [{}, { "name": "Ⅰ", "Weapon": 1, "Armor": 1, "exp": 1, "probability": 1 }, { "name": "Ⅱ", "Weapon": 2, "Armor": 3, "exp": 2, "probability": 2 }, { "name": "Ⅲ", "Weapon": 3, "Armor": 5, "exp": 4, "probability": 4 }, { "name": "Ⅳ", "Weapon": 4, "Armor": 10, "exp": 6, "probability": 6 }, { "name": "∞", "Weapon": 5, "Armor": 20, "exp": 8, "probability": 8 }];
-const SoundList = ["random.anvil_use", "random.anvil_break"];
+const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"];
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 4];
+const PluginsVersion = [0, 2, 5];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -30,8 +30,6 @@ if (!File.exists(pluginPath + "data/EquipmentData.json")) {
 }
 if (!File.exists(pluginPath + "Config.json")) {
     File.writeTo(pluginPath + "Config.json", JSON.stringify({
-        "SProbability": 1,
-        "GProbability": 1,
         "PSuccess": 10,
         "ScrollUpgrade": {
             "twoReelProbability": 40,
@@ -46,6 +44,18 @@ if (!File.exists(pluginPath + "Config.json")) {
             "threeItemUpgrade": 10,
             "fourItemUpgrade": 5
         },
+        "BlockReelDropList": {
+            "minecraft:stone": {
+                "DropRange": 1,
+                "MaximumRandomNumber": 1000
+            }
+        },
+        "EntityGemDropList": {
+            "minecraft:zombie": {
+                "DropRange": 1,
+                "MaximumRandomNumber": 1000
+            }
+        },
         "seckilltopvp": true,
         "seckilltopve": true,
         "seckillWhiteList": [
@@ -58,6 +68,7 @@ let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 let ConfigItemWeapon = StrengthenItemsJson.weapon;
 let ConfigItemArmor = StrengthenItemsJson.armor;
 let EntityseckillWhiteList = ConfigJson.seckillWhiteList;
+let Coolingtime = true;
 versionUpdateModifyProfile();
 
 /**
@@ -101,7 +112,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "reelFailed": "卷轴升级失败，卷轴消失！",
         "failedEquip": "装备强化失败，卷轴消失！",
         "ReinforceSuccess": "装备强化成功！",
-        "ScrollUSucceeded": "卷轴升级成功！"
+        "ScrollUSucceeded": "卷轴升级成功！",
+        "placeGamErr": "放置宝石过多，无法强化！"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -140,7 +152,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "reelFailed": "Scroll upgrade failed!",
         "failedEquip": "Equipment strengthening failed, and the scroll disappeared!",
         "ReinforceSuccess": "Equipment strengthening succeeded!",
-        "ScrollUSucceeded": "Scroll upgrade succeeded!"
+        "ScrollUSucceeded": "Scroll upgrade succeeded!",
+        "placeGamErr": "Too many gems placed, unable to strengthen!"
     }
 });
 
@@ -163,12 +176,16 @@ mc.listen("onPlayerCmd", (player1, cmd) => {
  * 然后再通过随机数判断是否给强化卷轴.
  */
 mc.listen("onDestroyBlock", (player, block) => {
-    if (block.type == "minecraft:stone") {
-        if (specifiedRangeRandomNumber(0, 100) < ConfigJson.SProbability) {
-            let pos = block.pos;
-            newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
-            newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
-            mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid)
+    if (block.name != "") {
+        let BlockData = ConfigJson.BlockReelDropList[block.type];
+        if (BlockData != undefined) {
+            if (specifiedRangeRandomNumber(0, BlockData.MaximumRandomNumber) < BlockData.DropRange) {
+                let pos = block.pos;
+                newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
+                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
+                mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid)
+            }
+
         }
     }
 });
@@ -320,15 +337,21 @@ mc.listen("onExperienceAdd", (player, _exp) => {
     let armorContainer = player.getArmor();
     let containerAllList = armorContainer.getAllItems();
     let EXP = 0;
-    containerAllList.forEach(item => {
-        if (item.name != "") {
-            let itemInformation = upgradeItem(item);
-            if (itemInformation.boolean) {
-                EXP += ComparisonTable[parseInt(itemInformation.lvl)].exp;
+    if (Coolingtime) {
+        containerAllList.forEach(item => {
+            if (item.name != "") {
+                let itemInformation = upgradeItem(item);
+                if (itemInformation.boolean) {
+                    EXP += ComparisonTable[parseInt(itemInformation.lvl)].exp;
+                }
             }
-        }
-    });
-    player.setCurrentExperience(player.getCurrentExperience() + EXP);
+        });
+        player.setCurrentExperience(player.getCurrentExperience() + EXP);
+        Coolingtime = false;
+        setTimeout(() => {
+            Coolingtime = true;
+        }, 1000 * 5);
+    }
 })
 
 /**
@@ -362,22 +385,25 @@ mc.listen("onJoin", (player) => {
  * 主要用来生成宝石.
  */
 mc.listen("onMobDie", (mob, source, _cause) => {
-    if (source != undefined && source.isPlayer()) {
-        if (specifiedRangeRandomNumber(0, 100) < ConfigJson.GProbability) {
-            let player = source.toPlayer();
-            let gemtype = specifiedRangeRandomNumber(1, 3);
-            let newItem = mc.newItem(generateNewGemNbt(gemtype, 1, 1, player))
-            let pos = mob.pos;
-            if (gemtype == 1) {
-                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore1",)));
+    if (source != undefined && source.isPlayer() && mob.name != "") {
+        let EntityData = ConfigJson.EntityGemDropList[mob.type];
+        if (EntityData != undefined) {
+            if (specifiedRangeRandomNumber(0, EntityData.MaximumRandomNumber) < EntityData.DropRange) {
+                let player = source.toPlayer();
+                let gemtype = specifiedRangeRandomNumber(1, 3);
+                let newItem = mc.newItem(generateNewGemNbt(gemtype, 1, 1, player))
+                let pos = mob.pos;
+                if (gemtype == 1) {
+                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore1",)));
+                }
+                if (gemtype == 2) {
+                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore2",)));
+                }
+                if (gemtype == 3) {
+                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
+                }
+                mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
             }
-            if (gemtype == 2) {
-                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore2",)));
-            }
-            if (gemtype == 3) {
-                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "gemLore3",)));
-            }
-            mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
         }
     }
 })
@@ -761,51 +787,58 @@ function GenerateEnhancementItems(item, TargetLevel, Container, player) {
  */
 function GemEnhancement(player, item1, Container) {
     let item2 = upgradeItem(Container.getItem(2));
-    let item1Type = parseInt(item1.gemtype);
-    if (item2.boolean) {
-        let typeBoolean = false;
-        if (item1Type == 1 && item2.itemType.indexOf("_boots") != -1) {
-            typeBoolean = true;
-        } else if (item1Type == 2 && item2.type == "Weapon") {
-            typeBoolean = true;
-        } else if (item1Type == 3) {
-            typeBoolean = true;
-        }
-        if (typeBoolean) {
-            let item = Container.getItem(2);
-            if (item2.type != "intensify" && item2.type != "gem") {
-                let nbt = item.getNbt();
-                if (parseInt(item2.gemtype) == 0) {
-                    nbt.getTag("tag").getTag("addon").setInt("gemtype", parseInt(item1.gemtype));
-                    item2.gemtype = item1.gemtype;
-                }
-                if (item1.gemtype == item2.gemtype) {
-                    if (parseInt(item2.gemlvl) < itemGemTable[parseInt(item2.gemtype)].maxLvl) {
-                        if (specifiedRangeRandomNumber(0, 100) < ConfigJson.PSuccess) {
-                            nbt.getTag("tag").getTag("addon").setInt("gemlvl", parseInt(item2.gemlvl) + 1);
-                            newItem = mc.newItem(nbt);
-                            SetLore(newItem, player);
-                            Container.removeItem(0, 1);
-                            Container.removeItem(2, 1);
-                            Container.setItem(0, newItem);
-                            playSound(player, 0)
+    let item = upgradeItem(Container.getItem(0));
+    if (item.count > 10) {
+        playSound(player, 2);
+        sengTell(player, "placeGamErr", [], 0);
+        return false;
+    } else {
+        let item1Type = parseInt(item1.gemtype);
+        if (item2.boolean) {
+            let typeBoolean = false;
+            if (item1Type == 1 && item2.itemType.indexOf("_boots") != -1) {
+                typeBoolean = true;
+            } else if (item1Type == 2 && item2.type == "Weapon") {
+                typeBoolean = true;
+            } else if (item1Type == 3) {
+                typeBoolean = true;
+            }
+            if (typeBoolean) {
+                let item = Container.getItem(2);
+                if (item2.type != "intensify" && item2.type != "gem") {
+                    let nbt = item.getNbt();
+                    if (parseInt(item2.gemtype) == 0) {
+                        nbt.getTag("tag").getTag("addon").setInt("gemtype", parseInt(item1.gemtype));
+                        item2.gemtype = item1.gemtype;
+                    }
+                    if (item1.gemtype == item2.gemtype) {
+                        if (parseInt(item2.gemlvl) < itemGemTable[parseInt(item2.gemtype)].maxLvl) {
+                            if (specifiedRangeRandomNumber(0, 100) < ConfigJson.PSuccess) {
+                                nbt.getTag("tag").getTag("addon").setInt("gemlvl", parseInt(item2.gemlvl) + 1);
+                                newItem = mc.newItem(nbt);
+                                SetLore(newItem, player);
+                                Container.removeItem(0, 1);
+                                Container.removeItem(2, 1);
+                                Container.setItem(0, newItem);
+                                playSound(player, 0)
+                            } else {
+                                Container.removeItem(0, 1);
+                                playSound(player, 1)
+                                sengTell(player, "TessellationTipsErr1", [], 0);
+                            }
                         } else {
-                            Container.removeItem(0, 1);
-                            playSound(player, 1)
-                            sengTell(player, "TessellationTipsErr1", [], 0);
+                            sengTell(player, "TessellationTipsErr2", [], 0);
                         }
                     } else {
-                        sengTell(player, "TessellationTipsErr2", [], 0);
+                        sengTell(player, "TessellationTipsErr3", [], 0);
                     }
-                } else {
-                    sengTell(player, "TessellationTipsErr3", [], 0);
                 }
+            } else {
+                sengTell(player, "TessellationTipsErr3", [], 0);
             }
         } else {
-            sengTell(player, "TessellationTipsErr3", [], 0);
+            sengTell(player, "TessellationTipsErr4", [], 0);
         }
-    } else {
-        sengTell(player, "TessellationTipsErr4", [], 0);
     }
 }
 
@@ -1092,7 +1125,7 @@ function versionUpdateModifyProfile() {
         UPConfig = true;
     }
     //024版本更新
-    if(ConfigJson.ItemUpgrade == undefined){
+    if (ConfigJson.ItemUpgrade == undefined) {
         ConfigJson.ScrollUpgrade = {
             "twoReelProbability": 40,
             "threeReelProbability": 30,
@@ -1108,6 +1141,29 @@ function versionUpdateModifyProfile() {
         }
         delete ConfigJson.RSProbability;
         delete ConfigJson.ESProbability;
+        UPConfig = true;
+    }
+    if(ConfigJson.RSProbability != undefined){
+        delete ConfigJson.RSProbability;
+        delete ConfigJson.ESProbability;
+        UPConfig = true;
+    }
+    //025版本更新
+    if (ConfigJson.BlockReelDropList == undefined) {
+        ConfigJson.BlockReelDropList = {
+            "minecraft:stone": {
+                "DropRange": 1,
+                "MaximumRandomNumber": 1000
+            }
+        }
+        ConfigJson.EntityGemDropList = {
+            "minecraft:zombie": {
+                "DropRange": 1,
+                "MaximumRandomNumber": 1000
+            }
+        }
+        delete ConfigJson.SProbability;
+        delete ConfigJson.GProbability;
         UPConfig = true;
     }
     if (UPConfig) {
@@ -1155,11 +1211,15 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 屏蔽弹射物伤害触发相关技能.
  * 024
  * 卷轴相关强化几率细分化
+ * 025
+ * 完善配置文件.
+ * 支持腐竹自定义卷轴和宝石掉落的概率和对象.
+ * 限制宝石放入投掷器的数量，避免崩服.
+ * 设置获取额外的经验技能cd，cd时间为5s，减少重复几率.
  */
 
 /**
  * 待修复BUG
- * 放入强化石过多崩服.
  * 
  * ---------------------
  * 
