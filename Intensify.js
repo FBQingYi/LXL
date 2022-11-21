@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 5];
+const PluginsVersion = [0, 2, 6];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -505,13 +505,15 @@ function openOPForm(player) {
             } else {
                 let getPlayerInventoryList = player.getInventory().getAllItems();
                 let playerInventory = [];
+                let playerInventoryType = [];
                 getPlayerInventoryList.forEach(item => {
                     if (item.name != "") {
                         playerInventory[playerInventory.length] = `${item.type}\n${item.name}`;
+                        playerInventoryType[playerInventoryType.length] = item.type;
                     }
                 });
-                if (playerInventory != []) {
-                    OPSetItemForm(player, playerInventory, id);
+                if (playerInventoryType != []) {
+                    OPSetItemForm(player, playerInventory, playerInventoryType, id);
                 }
             }
         })
@@ -521,14 +523,15 @@ function openOPForm(player) {
 /**
  * 玩家选择类型后弹窗选择物品.
  * @param {Player} player 玩家对象
- * @param {list} itemList 物品type名称列表
+ * @param {Array} itemListDisplay 背包物品显示列表
+ * @param {Array} itemList 物品type名称列表
  * @param {int} type 添加类型
  */
-function OPSetItemForm(player, itemList, type) {
+function OPSetItemForm(player, itemListDisplay, itemList, type) {
     let fm = mc.newSimpleForm()
         .setTitle(i18n.trl(player.langCode, "formtitle1",))
         .setContent(i18n.trl(player.langCode, "formcontent2",));
-    itemList.forEach(itemType => {
+    itemListDisplay.forEach(itemType => {
         fm.addButton(itemType);
     });
     player.sendForm(fm, (player, id) => {
@@ -1224,6 +1227,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 限制宝石放入投掷器的数量，避免崩服.
  * 设置获取额外的经验技能cd，cd时间为5s，减少重复几率.
  * 耐久宝石加入配置文件可选择是否掉落.
+ * 026
+ * 修复新增装备记录的标准类型名错误的问题.
  */
 
 /**
