@@ -58,6 +58,7 @@ if (!File.exists(pluginPath + "Config.json")) {
         },
         "seckilltopvp": true,
         "seckilltopve": true,
+        "durableGemsFall": false,
         "seckillWhiteList": [
             "minecraft:ender_dragon"
         ]
@@ -390,7 +391,12 @@ mc.listen("onMobDie", (mob, source, _cause) => {
         if (EntityData != undefined) {
             if (specifiedRangeRandomNumber(0, EntityData.MaximumRandomNumber) < EntityData.DropRange) {
                 let player = source.toPlayer();
-                let gemtype = specifiedRangeRandomNumber(1, 3);
+                let gemtype
+                if (ConfigJson.durableGemsFall) {
+                    gemtype = specifiedRangeRandomNumber(1, 4);
+                } else {
+                    gemtype = specifiedRangeRandomNumber(1, 3);
+                }
                 let newItem = mc.newItem(generateNewGemNbt(gemtype, 1, 1, player))
                 let pos = mob.pos;
                 if (gemtype == 1) {
@@ -1143,7 +1149,7 @@ function versionUpdateModifyProfile() {
         delete ConfigJson.ESProbability;
         UPConfig = true;
     }
-    if(ConfigJson.RSProbability != undefined){
+    if (ConfigJson.RSProbability != undefined) {
         delete ConfigJson.RSProbability;
         delete ConfigJson.ESProbability;
         UPConfig = true;
@@ -1162,6 +1168,7 @@ function versionUpdateModifyProfile() {
                 "MaximumRandomNumber": 1000
             }
         }
+        ConfigJson.durableGemsFall = false;
         delete ConfigJson.SProbability;
         delete ConfigJson.GProbability;
         UPConfig = true;
@@ -1216,6 +1223,7 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 支持腐竹自定义卷轴和宝石掉落的概率和对象.
  * 限制宝石放入投掷器的数量，避免崩服.
  * 设置获取额外的经验技能cd，cd时间为5s，减少重复几率.
+ * 耐久宝石加入配置文件可选择是否掉落.
  */
 
 /**
