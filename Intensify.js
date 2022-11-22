@@ -114,7 +114,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "failedEquip": "装备强化失败，卷轴消失！",
         "ReinforceSuccess": "装备强化成功！",
         "ScrollUSucceeded": "卷轴升级成功！",
-        "placeGamErr": "放置宝石过多，无法强化！"
+        "placeGamErr": "放置宝石过多，无法强化！",
+        "026UPLog": "配置文件已经重置，请重新添加装备！"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -154,7 +155,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "failedEquip": "Equipment strengthening failed, and the scroll disappeared!",
         "ReinforceSuccess": "Equipment strengthening succeeded!",
         "ScrollUSucceeded": "Scroll upgrade succeeded!",
-        "placeGamErr": "Too many gems placed, unable to strengthen!"
+        "placeGamErr": "Too many gems placed, unable to strengthen!",
+        "026UPLog": "The configuration file has been reset, please add equipment again!"
     }
 });
 
@@ -1175,6 +1177,13 @@ function versionUpdateModifyProfile() {
         delete ConfigJson.SProbability;
         delete ConfigJson.GProbability;
         UPConfig = true;
+    }
+    //026版本更新
+    if (JSON.stringify(StrengthenItemsJson).indexOf('\\n') != -1) {
+        File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsDefaultJson, null, "\t"));
+        setTimeout(() => {
+            log(i18n.trl(ll.language, "026UPLog", []));
+        }, 1000 * 5);
     }
     if (UPConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
