@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 6];
+const PluginsVersion = [0, 2, 7];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -259,7 +259,9 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
             }
             if (addedDamageBool) {
                 setTimeout(() => {
-                    mob.hurt(Newdamage + gemDamage, 5)
+                    if (mob != undefined) {
+                        mob.hurt(Newdamage + gemDamage, 5)
+                    }
                 }, 500);
             }
         }
@@ -1238,6 +1240,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 耐久宝石加入配置文件可选择是否掉落.
  * 026
  * 修复新增装备记录的标准类型名错误的问题.
+ * 027
+ * 修复生物死亡后触发的伤害报错.
  */
 
 /**
