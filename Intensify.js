@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 7];
+const PluginsVersion = [0, 2, 9];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -249,27 +249,17 @@ mc.listen("onDestroyBlock", (player, block) => {
  */
 mc.listen("onContainerChange", (player, block, _slotNum, _oldItem, _newItem) => {
     if (block.type == "minecraft:dropper") {
-        let Container = block.getContainer();
-        let item1 = upgradeItem(Container.getItem(0));
-        if (item1.boolean && item1.type == "intensify" && item1.itemType == "minecraft:field_masoned_banner_pattern") {
-            if (item1.lvl == 1) {
-                equipmentStrengthening(Container, 1, item1, player);
-                synthesisGenerate(Container, item1, player, 1, 2, 2, "StrengtheningReel2", "StrengtheningReel2explain");
-            } else if (item1.lvl == 2) {
-                equipmentStrengthening(Container, 2, item1, player);
-                synthesisGenerate(Container, item1, player, 3, 6, 3, "StrengtheningReel3", "StrengtheningReel3explain");
-            } else if (item1.lvl == 3) {
-                equipmentStrengthening(Container, 3, item1, player);
-                synthesisGenerate(Container, item1, player, 4, 8, 4, "StrengtheningReel4", "StrengtheningReel4explain");
-            } else if (item1.lvl == 4) {
-                equipmentStrengthening(Container, 4, item1, player);
-                synthesisGenerate(Container, item1, player, 2, 7, 5, "StrengtheningReel5", "StrengtheningReel5explain");
-            } else if (item1.lvl == 5) {
-                equipmentStrengthening(Container, 5, item1, player);
-            }
-        } else if (item1.boolean && item1.type == "gem" && item1.itemType == "minecraft:quartz") {
-            GemEnhancement(player, item1, Container);
-        }
+        ContainerListeningProcessing(player, block);
+    }
+});
+
+/**
+ * 方块接受玩家互动监听.
+ * 主要用于校验，避免玩家卡BUG.
+ */
+mc.listen("onBlockInteracted", (player, block) => {
+    if (block.type == "minecraft:dropper") {
+        ContainerListeningProcessing(player, block);
     }
 });
 
@@ -538,6 +528,37 @@ function setCommand() {
         }
     })
     Command.setup();
+}
+
+/**
+ * 容器事件统一处理，主要用于强化和升级.
+ * @param {{Player}} player 玩家对象
+ * @param {Block} block 方块对象
+ */
+function ContainerListeningProcessing(player, block) {
+    if (block.type == "minecraft:dropper") {
+        let Container = block.getContainer();
+        let item1 = upgradeItem(Container.getItem(0));
+        if (item1.boolean && item1.type == "intensify" && item1.itemType == "minecraft:field_masoned_banner_pattern") {
+            if (item1.lvl == 1) {
+                equipmentStrengthening(Container, 1, item1, player);
+                synthesisGenerate(Container, item1, player, 1, 2, 2, "StrengtheningReel2", "StrengtheningReel2explain");
+            } else if (item1.lvl == 2) {
+                equipmentStrengthening(Container, 2, item1, player);
+                synthesisGenerate(Container, item1, player, 3, 6, 3, "StrengtheningReel3", "StrengtheningReel3explain");
+            } else if (item1.lvl == 3) {
+                equipmentStrengthening(Container, 3, item1, player);
+                synthesisGenerate(Container, item1, player, 4, 8, 4, "StrengtheningReel4", "StrengtheningReel4explain");
+            } else if (item1.lvl == 4) {
+                equipmentStrengthening(Container, 4, item1, player);
+                synthesisGenerate(Container, item1, player, 2, 7, 5, "StrengtheningReel5", "StrengtheningReel5explain");
+            } else if (item1.lvl == 5) {
+                equipmentStrengthening(Container, 5, item1, player);
+            }
+        } else if (item1.boolean && item1.type == "gem" && item1.itemType == "minecraft:quartz") {
+            GemEnhancement(player, item1, Container);
+        }
+    }
 }
 
 /**
@@ -1323,6 +1344,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 支持批量添加物品.
  * 加入破坏方块校验,避免和其他插件的冲突.
  * 完善cc指令输出内容.
+ * 029
+ * 玩家打开投掷器时进行校验,避免卡BUG.
  */
 
 /**
