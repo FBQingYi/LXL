@@ -117,6 +117,47 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "placeGamErr": "放置宝石过多，无法强化！",
         "026UPLog": "配置文件已经重置，请重新添加装备！"
     },
+    "zh_TW": {
+        "StrengtheningReel1": "§3一級强化卷軸",
+        "StrengtheningReel1explain": JSON.stringify(["§2-------介紹-------", "§3一級强化卷軸", "可用於:原始裝備", "§6使用效果:裝備變為一階", "-------====-------", "§3一階裝備:", "§2護甲類裝備:+1生命", "§4攻擊類武器:+1攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
+        "StrengtheningReel2": "§9二級强化卷軸",
+        "StrengtheningReel2explain": JSON.stringify(["§2-------介紹-------", "§9二級强化卷軸", "可用於:一階裝備", "§6使用效果:裝備變為二階", "-------====-------", "§9二階裝備:", "§2護甲類裝備:+3生命", "§4攻擊類武器:+2攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
+        "StrengtheningReel3": "§1三級强化卷軸",
+        "StrengtheningReel3explain": JSON.stringify(["§2-------介紹-------", "§1三級强化卷軸", "可用於:二階裝備", "§6使用效果:裝備變為三階", "-------====-------", "§1三階裝備:", "§2護甲類裝備:+5生命", "§4攻擊類武器:+3攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
+        "StrengtheningReel4": "§4四級强化卷軸",
+        "StrengtheningReel4explain": JSON.stringify(["§2-------介紹-------", "§4四級强化卷軸", "可用於:三階裝備", "§6使用效果:裝備變為四階", "-------====-------", "§4四階裝備:", "§2護甲類裝備:+10生命", "§4攻擊類武器:+4攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
+        "StrengtheningReel5": "§6終極强化卷軸",
+        "StrengtheningReel5explain": JSON.stringify(["§2-------介紹-------", "§6終極强化卷軸", "可用於:四階裝備", "§6使用效果:裝備變為終極", "-------====-------", "§6終極裝備:", "§2護甲類裝備:+20生命", "§4攻擊類武器:+5攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
+        "EquipmentWeapon": JSON.stringify(["§2-------==内容==-------", "§3{0}階武器", "§4額外傷害:+{1}", "§6技能:有{4}%幾率直接擊殺！", "-------鍛造資訊-------", "鍛造玩家:{2}", "鍛造時間:{3}"]),
+        "EquipmentArmor": JSON.stringify(["§2-------==内容==-------", "§3{0}階護具", "§4生命上限:+{1}", "§2額外經驗+{4}", "-------鍛造資訊-------", "鍛造玩家:{2}", "鍛造時間:{3}"]),
+        "SkillTips1": "§6觸發技能:一擊必殺！",
+        "gem1": JSON.stringify(["§1-------==寶石==-------", "§2{0}級{1}", "§6效果:{2}+{3}", "§3PS:此寶石最高等級為:{4}級"]),
+        "MovingGem": "移速寶石",
+        "PowerGem": "暴擊寶石",
+        "DurableGem": "耐久寶石",
+        "MovingGemExplain": "移動速度",
+        "PowerGemExplain": "額外傷害",
+        "DurableGemExplain": "物品耐久",
+        "TessellationTipsErr1": "§4鑲嵌失敗。寶石已消失！",
+        "TessellationTipsErr2": "§4已達到最大等級,無法鑲嵌！",
+        "TessellationTipsErr3": "§4此寶石無法用於此物品！",
+        "TessellationTipsErr4": "§4沒找到强化資訊,請先使用强化卷軸强化後再鑲嵌寶石！",
+        "gemLore1": JSON.stringify(["§1-------==寶石==-------", "§2移速寶石", "§3可鑲嵌在鞋子上", "§7成功幾率:10%", "§6效果:新增移速"]),
+        "gemLore2": JSON.stringify(["§1-------==寶石==-------", "§4暴擊寶石", "§3可鑲嵌在武器上", "§7成功幾率:10%", "§6效果:新增傷害"]),
+        "gemLore3": JSON.stringify(["§1-------==寶石==-------", "§6耐久寶石", "§3可鑲嵌在任何裝備上", "§7成功幾率:10%", "§6效果:物品無限耐久"]),
+        "Command": "强化你的裝備吧！",
+        "formtitle1": "强化武器-OP",
+        "formcontent1": "請選擇你要添加的類型",
+        "formarms1": "武器",
+        "formprotective1": "防具",
+        "formcontent2": "請選擇你要添加的物品",
+        "reelFailed": "卷軸陞級失敗,卷軸消失！",
+        "failedEquip": "裝備强化失敗,卷軸消失！",
+        "ReinforceSuccess": "裝備强化成功！",
+        "ScrollUSucceeded": "卷軸陞級成功！",
+        "placeGamErr": "放置寶石過多,無法强化！",
+        "026UPLog": "設定檔已經重置,請重新添加裝備！"
+    },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
         "StrengtheningReel1explain": JSON.stringify(["§2-------=introduce=-------", "§3Primary strengthening reel", "Available for: original equipment", "§6Use effect: equipment becomes first level", "-------====-------", "§3First level equipment:", "§2Armor equipment:+1 HP", "§4Attack weapons:+1 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
@@ -166,10 +207,17 @@ i18n.load(pluginPath + "language/language.json", "en", {
  */
 mc.listen("onPlayerCmd", (player1, cmd) => {
     if (player1.isOP() && cmd == 'cc') {
+        let LLVision = ll.versionString();
         let item = player1.getHand();
-        let nbt = item.getNbt();
-        log(nbt.toSNBT())
-        //log(item.type)
+        let DebugMsg;
+        if (item != undefined && item.name != "") {
+            let nbt = item.getNbt();
+            DebugMsg = `LL版本：${LLVision}\n插件版本：${PluginsVersion}\n手持物Nbt：\n${nbt.toString()}`;
+        } else {
+            DebugMsg = `LL版本：${LLVision}\n插件版本：${PluginsVersion}\n手持物Nbt：无}`;
+        }
+        player1.tell(`${Format.Bold}${Format.Green}---information---\n${Format.Red}${DebugMsg}\n${Format.Green}请将以上内容截图发送给开发者!`);
+        return false;
     }
 });
 
@@ -179,18 +227,20 @@ mc.listen("onPlayerCmd", (player1, cmd) => {
  * 然后再通过随机数判断是否给强化卷轴.
  */
 mc.listen("onDestroyBlock", (player, block) => {
-    if (block.name != "") {
-        let BlockData = ConfigJson.BlockReelDropList[block.type];
-        if (BlockData != undefined) {
-            if (specifiedRangeRandomNumber(0, BlockData.MaximumRandomNumber) < BlockData.DropRange) {
-                let pos = block.pos;
-                newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
-                newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
-                mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid)
-            }
+    setTimeout(() => {
+        if (block.name != "" && DeterminationBrokenBlocks(block)) {
+            let BlockData = ConfigJson.BlockReelDropList[block.type];
+            if (BlockData != undefined) {
+                if (specifiedRangeRandomNumber(0, BlockData.MaximumRandomNumber) < BlockData.DropRange) {
+                    let pos = block.pos;
+                    newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
+                    newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
+                    mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid)
+                }
 
+            }
         }
-    }
+    }, 20);
 });
 
 /**
@@ -235,7 +285,7 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
         let itemInformation = upgradeItem(playerHanditem);
         if (itemInformation.boolean && itemInformation.type == "Weapon") {
             let gemDamage = 0;
-            if (itemInformation.gemtype != undefined && parseInt(itemInformation.gemtype) != 0) {
+            if (itemInformation.gemtype != undefined && parseInt(itemInformation.gemtype) == 2) {
                 gemDamage = itemGemTable[parseInt(itemInformation.gemtype)].lvl[parseInt(itemInformation.gemlvl)];
             }
             let itemdata = ComparisonTable[itemInformation.lvl];
@@ -244,7 +294,7 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
                 if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !listJudgment(mob.type)) {
                     addedDamageBool = false;
                     setTimeout(() => {
-                        sengTell(player, "SkillTips1", [], 0)
+                        sengTell(player, "SkillTips1", [], 0);
                         mob.kill();
                     }, 50);
                 }
@@ -252,16 +302,14 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
                 if (specifiedRangeRandomNumber(0, 1000) <= itemdata.probability * 10 && !listJudgment(mob.type)) {
                     addedDamageBool = false;
                     setTimeout(() => {
-                        sengTell(player, "SkillTips1", [], 0)
+                        sengTell(player, "SkillTips1", [], 0);
                         mob.kill();
                     }, 50);
                 }
             }
             if (addedDamageBool) {
                 setTimeout(() => {
-                    if (mob != undefined) {
-                        mob.hurt(Newdamage + gemDamage, 5)
-                    }
+                    mob.hurt(Newdamage + gemDamage, 5);
                 }, 500);
             }
         }
@@ -303,11 +351,11 @@ mc.listen("onServerStarted", () => {
                     db.set("HP", playerHPData);
                 }
                 if (playerHPData[player.xuid] > HP) {
-                    setPlayerHP(player, playerHPData[player.xuid] - HP, "remove");
+                    setPlayerHP(player, playerHPData[player.xuid] - HP, "remove", 0);
                     playerHPData[player.xuid] = HP;
                     db.set("HP", playerHPData);
                 } else if (playerHPData[player.xuid] < HP) {
-                    setPlayerHP(player, HP - playerHPData[player.xuid], "add");
+                    setPlayerHP(player, HP - playerHPData[player.xuid], "add", 0);
                     playerHPData[player.xuid] = HP;
                     db.set("HP", playerHPData);
                 }
@@ -319,11 +367,11 @@ mc.listen("onServerStarted", () => {
                 }
                 if (playerMoveData[player.xuid] > Move) {
                     setPlayerMove(player, playerMoveData[player.xuid], "remove")
-                    playerMoveData[player.xuid] = Move
+                    playerMoveData[player.xuid] = Move;
                     db.set("Move", playerMoveData);
                 } else if (playerMoveData[player.xuid] < Move) {
                     setPlayerMove(player, Move, "add")
-                    playerMoveData[player.xuid] = Move
+                    playerMoveData[player.xuid] = Move;
                     db.set("Move", playerMoveData);
                 }
                 equipmentDescriptionCorrection(player);
@@ -451,7 +499,7 @@ function setCommand() {
             for (let i in playerList) {
                 let player = playerList[i];
                 if (results.pattern == "reset") {
-                    setPlayerHP(player, parseInt(results.Health), "set");
+                    setPlayerHP(player, parseInt(results.Health), "set", 20);
                     OutputBlooe = true;
                 } else if (results.pattern == "give") {
                     let newItem;
@@ -532,23 +580,34 @@ function openOPForm(player) {
  * @param {int} type 添加类型
  */
 function OPSetItemForm(player, itemListDisplay, itemList, type) {
-    let fm = mc.newSimpleForm()
+    let fm = mc.newCustomForm()
         .setTitle(i18n.trl(player.langCode, "formtitle1",))
-        .setContent(i18n.trl(player.langCode, "formcontent2",));
+        .addLabel(i18n.trl(player.langCode, "formcontent2",));
     itemListDisplay.forEach(itemType => {
-        fm.addButton(itemType);
+        fm.addSwitch(itemType);
     });
-    player.sendForm(fm, (player, id) => {
-        if (id == undefined) {
+    player.sendForm(fm, (player, data) => {
+        if (data == undefined) {
             return false;
         } else {
-            let addItemType = itemList[id];
-            if (type == 0) {
-                ConfigItemWeapon[ConfigItemWeapon.length] = addItemType;
-            } else if (type == 1) {
-                ConfigItemArmor[ConfigItemArmor.length] = addItemType;
+            let CumulativeList = [];
+            for (let i = 0; i < data.length;) {
+                data = data.filter(Boolean);
+                if (data[i]) {
+                    CumulativeList.push(itemList[i]);
+                }
+                i++;
             }
-            File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsJson, null, "\t"));
+            if (CumulativeList != []) {
+                if (type == 0) {
+                    ConfigItemWeapon.push.apply(ConfigItemWeapon, CumulativeList);
+                    ConfigItemWeapon = Array.from(new Set(ConfigItemWeapon));
+                } else if (type == 1) {
+                    ConfigItemArmor.push.apply(ConfigItemArmor, CumulativeList);
+                    ConfigItemArmor = Array.from(new Set(ConfigItemArmor));
+                }
+                File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsJson, null, "\t"));
+            }
         }
     });
 }
@@ -892,7 +951,7 @@ function setEquipmentNbt(item, type, lvl) {
  * @param {int} HP 增加的最大生命值
  * @param {string} pattern 模式
  */
-function setPlayerHP(player, HP, pattern) {
+function setPlayerHP(player, HP, pattern, data) {
     let PlayerHealth = player.health;
     let playerMaxHealth = player.maxHealth;
     if (pattern == "add") {
@@ -900,7 +959,7 @@ function setPlayerHP(player, HP, pattern) {
     } else if (pattern == "remove") {
         HP = playerMaxHealth - HP;
     } else if (pattern == "set") {
-        HP = 20;
+        HP = data;
     }
     if (HP <= 0) {
         HP = 2
@@ -1023,8 +1082,8 @@ function amend(num1, num2, symbol) {
  * @param {Player} player 玩家对象
  */
 function itemDurableRepair(item, player) {
-    if (item.damage < 50) {
-        item.setDamage(100);
+    if (item.damage > 50) {
+        item.setDamage(0);
         player.refreshItems();
     }
 }
@@ -1051,6 +1110,22 @@ function listJudgment(key) {
         }
     });
     return keyBool
+}
+
+/**
+ * 校验方块是否破坏成功.
+ * @param {Block} block 方块对象
+ * @returns 布尔值，方块是否破坏成功.
+ */
+function DeterminationBrokenBlocks(block) {
+    let boole = false;
+    let blockObtain = mc.getBlock(block.pos);
+    if (blockObtain != undefined && blockObtain.name != "") {
+        if (block.type != blockObtain.type) {
+            boole = true;
+        }
+    }
+    return boole
 }
 
 /**
@@ -1241,11 +1316,18 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 026
  * 修复新增装备记录的标准类型名错误的问题.
  * 027
- * 修复生物死亡后触发的伤害报错.
+ * 修复耐久宝石导致的报错.
+ * 修复重置物品耐久判断的问题.
+ * 新增繁体中文.
+ * 028
+ * 支持批量添加物品.
+ * 加入破坏方块校验,避免和其他插件的冲突.
+ * 完善cc指令输出内容.
  */
 
 /**
  * 待修复BUG
+ * 死亡掉落情况下玩家血量可能会出现bug.
  * 
  * ---------------------
  * 
