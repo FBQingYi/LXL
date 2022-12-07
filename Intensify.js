@@ -471,11 +471,13 @@ function setCommand() {
     Command.mandatory("pattern", ParamType.Enum, "giveAction", 1);
     Command.mandatory("GiveVolume", ParamType.Enum, "intensifyAction", 0);
     Command.mandatory("GemStone", ParamType.Enum, "GemStoneAction", 0);
+    Command.mandatory("Level", ParamType.Int);
     Command.mandatory("Player", ParamType.Player);
     Command.mandatory("amount", ParamType.Int);
     Command.mandatory("Health", ParamType.Int);
     Command.overload(["giveAction", "Player", "GemStone", "amount"]);
     Command.overload(["giveAction", "Player", "GiveVolume"]);
+    Command.overload(["giveAction", "Player", "GiveVolume", "Level"]);
     Command.overload(["resetAction", "Player", "Health"]);
     Command.overload(["openAction"]);
     Command.setCallback((_cmd, origin, output, results) => {
@@ -508,9 +510,20 @@ function setCommand() {
                         getItemBlooe = true;
                     }
                     if (results.GiveVolume == "intensify") {
-                        newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
-                        newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
-                        getItemBlooe = true;
+                        if (results.Level == undefined || results.Level == "") {
+                            newItem = mc.newItem(generateNewNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
+                            newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)))
+                            getItemBlooe = true;
+                        } else {
+                            let Level = parseInt(results.Level);
+                            if (Level > 0 && Level < 6) {
+                                let name1 = "StrengtheningReel" + results.Level;
+                                let name2 = name1 + "explain";
+                                newItem = mc.newItem(generateNewNbt("intensify", Level, i18n.trl(player.langCode, name1,)));
+                                newItem.setLore(JSON.parse(i18n.trl(player.langCode, name2,)))
+                                getItemBlooe = true;
+                            }
+                        }
                     }
                     if (getItemBlooe) {
                         OutputBlooe = true;
@@ -1346,6 +1359,7 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 完善cc指令输出内容.
  * 029
  * 玩家打开投掷器时进行校验,避免卡BUG.
+ * 卷轴可通过指令直接获取相应等级.
  */
 
 /**
