@@ -3,10 +3,52 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 5];
+const PluginsVersion = [0, 0, 6];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10, "OtherDrops": true, "OtherDropsMode": 0, "ListSpoils": [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }] } };
-const ConfigDataJson = { "SpawnProbability": 5, "DockingIntensify": false, "DockingGives": false };
+const EntityNbtJsonData = {
+    "minecraft:zombie": {
+        "health": 40,
+        "movement": 0.35,
+        "underwater_movement": 0.2,
+        "lava_movement": 0.2,
+        "follow_range": 20,
+        "knockback_resistance": 6,
+        "scale": 4,
+        "Additionaldamage": 2,
+        "customName": "宝藏僵尸",
+        "reel": true,
+        "playerFire": true,
+        "FireTime": 10,
+        "probability": 10,
+        "OtherDrops": true,
+        "OtherDropsMode": 0,
+        "SpawnProbability": 5,
+        "ListSpoils": [
+            {
+                "Spoils": "ordinary",
+                "SpoilsTypeName": "minecraft:stone",
+                "SpoilsProbability": 10,
+                "SpoilsqQantity": 1
+            },
+            {
+                "Spoils": "gives",
+                "SpoilsTypeName": "minecraft:wooden_sword",
+                "DisplayName": "",
+                "SpoilsProbability": 1,
+                "SpoilsqQantity": 1,
+                "Curse": {
+                    "Enchantments": [
+                        {
+                            "n": 16,
+                            "l": 5
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+};
+const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
@@ -61,9 +103,6 @@ if (Config.DockingGives) {
         }, 1000 * 5);
     }
 }
-if (Config.SpawnProbability > 60) {
-    Config.SpawnProbability = 50;
-}
 FourProfileUpdate();
 let a = 0
 
@@ -74,9 +113,13 @@ let a = 0
  */
 mc.listen("onMobSpawn", (typeName, pos) => {
     if (EntityNbtJson[typeName] != undefined) {
+        let EntityGenerationProbability = EntityNbtJson[typeName].SpawnProbability;
+        if (EntityGenerationProbability > 60) {
+            EntityGenerationProbability = 50;
+        }
         let randomInt = specifiedRangeRandomNumber(0, 100);
-        let resultBool = WhetherPaintStrange(pos.x - 4, pos.z - 4, pos.x + 4, pos.z + 4, pos.y)
-        if (resultBool && randomInt < Config.SpawnProbability) {
+        let resultBool = WhetherPaintStrange(pos.x - 6, pos.z - 6, pos.x + 6, pos.z + 6, pos.y)
+        if (resultBool && randomInt < EntityGenerationProbability) {
             setNewEntity(typeName, pos, EntityNbtJson[typeName]);
         }
     }
@@ -308,7 +351,7 @@ function FourProfileUpdate() {
                 UPEntityConfig = true;
                 EntityData.OtherDrops = false;
                 EntityData.OtherDropsMode = 0;
-                EntityData.ListSpoils = [{"Spoils":"ordinary","SpoilsTypeName":"minecraft:stone","SpoilsProbability":10,"SpoilsqQantity":1},{"Spoils":"gives","SpoilsTypeName":"minecraft:wooden_sword","DisplayName":"","SpoilsProbability":1,"SpoilsqQantity":1,"Curse":{"Enchantments":[{"n":16,"l":5}]}}];
+                EntityData.ListSpoils = [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }];
             } else if (EntityData.ListSpoils[0].Spoils == undefined) {
                 UPEntityConfig = true;
                 let SingleEntityList = EntityData.ListSpoils;
@@ -317,6 +360,20 @@ function FourProfileUpdate() {
                 }
             }
         }
+    }
+    if (Config.SpawnProbability != undefined) {
+        for (let type in EntityNbtJson) {
+            let currentEntity = EntityNbtJson[type];
+            if (currentEntity.SpawnProbability == undefined) {
+                if (Config.SpawnProbability > 60) {
+                    currentEntity.SpawnProbability = 50;
+                } else {
+                    currentEntity.SpawnProbability = Config.SpawnProbability;
+                }
+            }
+        }
+        delete Config.SpawnProbability;
+        UPEntityConfig = true;
     }
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
@@ -342,4 +399,6 @@ function FourProfileUpdate() {
  * 005
  * 修复004重置配置文件的BUG.
  * 新增对接gives，可以直接掉落附魔物品.
+ * 006
+ * 每种生物可自定义生成概率.
  */
