@@ -3,52 +3,10 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 6];
+const PluginsVersion = [0, 0, 7];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = {
-    "minecraft:zombie": {
-        "health": 40,
-        "movement": 0.35,
-        "underwater_movement": 0.2,
-        "lava_movement": 0.2,
-        "follow_range": 20,
-        "knockback_resistance": 6,
-        "scale": 4,
-        "Additionaldamage": 2,
-        "customName": "宝藏僵尸",
-        "reel": true,
-        "playerFire": true,
-        "FireTime": 10,
-        "probability": 10,
-        "OtherDrops": true,
-        "OtherDropsMode": 0,
-        "SpawnProbability": 5,
-        "ListSpoils": [
-            {
-                "Spoils": "ordinary",
-                "SpoilsTypeName": "minecraft:stone",
-                "SpoilsProbability": 10,
-                "SpoilsqQantity": 1
-            },
-            {
-                "Spoils": "gives",
-                "SpoilsTypeName": "minecraft:wooden_sword",
-                "DisplayName": "",
-                "SpoilsProbability": 1,
-                "SpoilsqQantity": 1,
-                "Curse": {
-                    "Enchantments": [
-                        {
-                            "n": 16,
-                            "l": 5
-                        }
-                    ]
-                }
-            }
-        ]
-    }
-};
-const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false };
+const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10, "OtherDrops": true, "OtherDropsMode": 0, "SpawnProbability": 5, "ListSpoils": [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }] } };
+const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false, "mobSpawner": false };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
@@ -120,7 +78,14 @@ mc.listen("onMobSpawn", (typeName, pos) => {
         let randomInt = specifiedRangeRandomNumber(0, 100);
         let resultBool = WhetherPaintStrange(pos.x - 6, pos.z - 6, pos.x + 6, pos.z + 6, pos.y)
         if (resultBool && randomInt < EntityGenerationProbability) {
-            setNewEntity(typeName, pos, EntityNbtJson[typeName]);
+            if (Config.mobSpawner) {
+                setNewEntity(typeName, pos, EntityNbtJson[typeName]);
+            } else {
+                let mobSpawnerBool = findNearestBlock(pos);
+                if (!mobSpawnerBool) {
+                    setNewEntity(typeName, pos, EntityNbtJson[typeName]);
+                }
+            }
         }
     }
 });
@@ -339,6 +304,38 @@ function generateTrack(a, b) {
 }
 
 /**
+ * 查看附近是否有刷怪笼.
+ * 代码来自minedetector插件.
+ * @param {Pos} pos 坐标对象
+ * @returns 布尔值
+ */
+function findNearestBlock(pos) {
+    const { x, y, z, dimid } = pos;
+    let blockTypes = "minecraft:mob_spawner";
+    let radius = 6;
+    let lastDistance = 0;
+    let boole = false;
+    for (let lx = x - radius; lx <= x + radius; lx += 1) {
+        for (let ly = y - radius; ly <= y + radius; ly += 1) {
+            for (let lz = z - radius; lz <= z + radius; lz += 1) {
+                const block = mc.getBlock(lx, ly, lz, dimid);
+                if (blockTypes == block.type) {
+                    const distance = Math.sqrt(
+                        (x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)
+                    );
+                    if (distance < lastDistance || !lastDistance) {
+                        lastDistance = distance;
+                        boole = true;
+                        return boole;
+                    }
+                }
+            }
+        }
+    }
+    return boole;
+}
+
+/**
  * 版本配置更新
  */
 function FourProfileUpdate() {
@@ -375,6 +372,10 @@ function FourProfileUpdate() {
         delete Config.SpawnProbability;
         UPEntityConfig = true;
     }
+    if (Config.mobSpawner == undefined) {
+        Config.mobSpawner = false;
+        UPEntityConfig = true;
+    }
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
         File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
@@ -401,4 +402,6 @@ function FourProfileUpdate() {
  * 新增对接gives，可以直接掉落附魔物品.
  * 006
  * 每种生物可自定义生成概率.
+ * 007
+ * 新增配置项：刷怪笼附近不生成强化怪.
  */
