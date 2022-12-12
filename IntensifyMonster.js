@@ -3,9 +3,55 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 0, 7];
+const PluginsVersion = [0, 1, 8];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
-const EntityNbtJsonData = { "minecraft:zombie": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 4, "Additionaldamage": 2, "customName": "宝藏僵尸", "reel": true, "playerFire": true, "FireTime": 10, "probability": 10, "OtherDrops": true, "OtherDropsMode": 0, "SpawnProbability": 5, "ListSpoils": [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }] } };
+const EntityNbtJsonData = {
+    "minecraft:zombie": [
+        {
+            "health": 40,
+            "movement": 0.35,
+            "underwater_movement": 0.2,
+            "lava_movement": 0.2,
+            "follow_range": 20,
+            "knockback_resistance": 6,
+            "scale": 4,
+            "Additionaldamage": 2,
+            "customName": "宝藏僵尸",
+            "reel": true,
+            "playerFire": true,
+            "FireTime": 10,
+            "probability": 10,
+            "OtherDrops": true,
+            "OtherDropsMode": 0,
+            "SpawnProbability": 5,
+            "GiveXpToPlayer": 5,
+            "UniqueName": "zombie1",
+            "ListSpoils": [
+                {
+                    "Spoils": "ordinary",
+                    "SpoilsTypeName": "minecraft:stone",
+                    "SpoilsProbability": 10,
+                    "SpoilsqQantity": 1
+                },
+                {
+                    "Spoils": "gives",
+                    "SpoilsTypeName": "minecraft:wooden_sword",
+                    "DisplayName": "",
+                    "SpoilsProbability": 1,
+                    "SpoilsqQantity": 1,
+                    "Curse": {
+                        "Enchantments": [
+                            {
+                                "n": 16,
+                                "l": 5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+};
 const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false, "mobSpawner": false };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
@@ -27,6 +73,33 @@ let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 let getReelNbt, GetNewItemNbt;
 logger.setConsole(true);
 
+/**
+ * 语言文件写入及加载.
+ */
+i18n.load(pluginPath + "language/language.json", "en", {
+    "zh_CN": {
+        "formTitle": "选择实体",
+        "configUp": "版本配置文件更新，请前往data/EntityData.json查看！",
+        "cmdExplain": "查看现有实体数据",
+        "Intensifyerr": "未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false",
+        "giveserr": "未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false",
+        "entityInformation": "实体名称:{0}\n实体最大生命值:{1}\n实体移动速度:{2}\n实体追踪距离:{3}\n实体抗性:{1}"
+    },
+    "zh_TW": {
+        "configUp": "版本設定檔更新,請前往data/EntityData.json查看！",
+        "cmdExplain": "查看現有實體數據",
+        "Intensifyerr": "未找到前置挿件Intensify.js,請前往下載或者在設定檔Config.json中將DockingIntensify設定為false",
+        "giveserr": "未找到前置挿件gives.js,請前往下載或者在設定檔Config.json中將DockingGives設定為false",
+        "entityInformation": "實體名稱:{0}\n實體最大生命值:{1}\n實體移動速度:{2}\n實體追跡距離:{3}\n實體抗性:{4}"
+    },
+    "en": {
+        "configUp": "Please go to data/EntityData.json to view the updated configuration file!",
+        "cmdExplain": "View existing entity data",
+        "Intensifyerr": "The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json",
+        "giveserr": "The front-end plug-in gives.js is not found. Please go to download it or set DockingGives to false in the configuration file Config.json",
+        "entityInformation": "Entity name: {0}  nMaximum HP of entity: {1}  nMoving speed of entity: {2}  nEntity tracking distance: {3}  nEntity resistance: {4}"
+    }
+});
 
 /**
  * 判断是否需要加载前置插件及语言文件.
@@ -38,11 +111,7 @@ if (Config.DockingIntensify) {
         i18n.load(IntensifyPath + "language/language.json", "en");
     } else {
         setTimeout(() => {
-            if (ll.language == "zh_Hans") {
-                logger.error("未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false");
-            } else {
-                logger.error("The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json");
-            }
+            logger.error(i18n.trl(ll.language, "Intensifyerr",));
             Config.DockingIntensify = false;
         }, 1000 * 5);
     }
@@ -52,11 +121,7 @@ if (Config.DockingGives) {
         GetNewItemNbt = ll.import("NewItemNbt");
     } else {
         setTimeout(() => {
-            if (ll.language == "zh_Hans") {
-                logger.error("未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false");
-            } else {
-                logger.error("The front-end plug-in gives.js is not found. Please go to download it or set DockingGives to false in the configuration file Config.json");
-            }
+            logger.error(i18n.trl(ll.language, "giveserr",));
             Config.DockingGives = false;
         }, 1000 * 5);
     }
@@ -71,19 +136,23 @@ let a = 0
  */
 mc.listen("onMobSpawn", (typeName, pos) => {
     if (EntityNbtJson[typeName] != undefined) {
-        let EntityGenerationProbability = EntityNbtJson[typeName].SpawnProbability;
-        if (EntityGenerationProbability > 60) {
-            EntityGenerationProbability = 50;
-        }
-        let randomInt = specifiedRangeRandomNumber(0, 100);
-        let resultBool = WhetherPaintStrange(pos.x - 6, pos.z - 6, pos.x + 6, pos.z + 6, pos.y)
-        if (resultBool && randomInt < EntityGenerationProbability) {
-            if (Config.mobSpawner) {
-                setNewEntity(typeName, pos, EntityNbtJson[typeName]);
-            } else {
-                let mobSpawnerBool = findNearestBlock(pos);
-                if (!mobSpawnerBool) {
-                    setNewEntity(typeName, pos, EntityNbtJson[typeName]);
+        let ConfigureRandom = specifiedRangeRandomNumber(0, EntityNbtJson[typeName].length);
+        let SelectConfiguration = EntityNbtJson[typeName][ConfigureRandom];
+        if (SelectConfiguration != undefined) {
+            let EntityGenerationProbability = SelectConfiguration.SpawnProbability;
+            if (EntityGenerationProbability > 60) {
+                EntityGenerationProbability = 50;
+            }
+            let randomInt = specifiedRangeRandomNumber(0, 100);
+            let resultBool = WhetherPaintStrange(pos.x - 6, pos.z - 6, pos.x + 6, pos.z + 6, pos.y)
+            if (resultBool && randomInt < EntityGenerationProbability) {
+                if (Config.mobSpawner) {
+                    setNewEntity(typeName, pos, SelectConfiguration);
+                } else {
+                    let mobSpawnerBool = findNearestBlock(pos);
+                    if (!mobSpawnerBool) {
+                        setNewEntity(typeName, pos, SelectConfiguration);
+                    }
                 }
             }
         }
@@ -98,62 +167,72 @@ mc.listen("onMobSpawn", (typeName, pos) => {
  * 005后可对接gives掉落附魔物品.
  */
 mc.listen("onMobDie", (mob, source, _cause) => {
-    if (source != undefined && source.isPlayer()) {
+    if (source != undefined && source.isPlayer() && mob.hasTag("Intensify")) {
         let entityJson = EntityNbtJson[mob.type];
         if (entityJson != undefined) {
+            let entityDataJson = {};
             let pos = mob.pos;
-            if (Config.DockingIntensify) {
-                if (mob.hasTag("Intensify")) {
+            for (let i = 0; i < entityJson.length; i++) {
+                let EntityJsonUniqueName = entityJson[i].UniqueName;
+                if (mob.hasTag(EntityJsonUniqueName)) {
+                    entityDataJson = entityJson[i];
+                    break;
+                }
+            }
+            if (entityDataJson != {}) {
+                if (Config.DockingIntensify) {
                     let randomInt = specifiedRangeRandomNumber(0, 100);
                     let player = source.toPlayer();
-                    if (entityJson.reel) {
-                        if (randomInt < entityJson.probability) {
+                    if (entityDataJson.reel) {
+                        if (randomInt < entityDataJson.probability) {
                             let newItem = mc.newItem(getReelNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
                             newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)));
                             mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
                         }
                     }
                 }
-            }
-            if (entityJson.OtherDrops && mob.hasTag("Intensify")) {
-                if (entityJson.OtherDropsMode == 0 && entityJson.ListSpoils != []) {
-                    let SpoilsList = entityJson.ListSpoils;
-                    SpoilsList.forEach(CurrentOptions => {
-                        let randomInt = specifiedRangeRandomNumber(0, 100);
-                        if (randomInt < CurrentOptions.SpoilsProbability) {
-                            if (CurrentOptions.Spoils == "ordinary") {
-                                let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
-                                mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
-                            } else if (CurrentOptions.Spoils == "gives" && Config.DockingGives) {
-                                let itemDIsplayName = undefined;
-                                let initialItem = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
-                                if (CurrentOptions.DisplayName != "") {
-                                    itemDIsplayName = CurrentOptions.DisplayName;
+                if (entityDataJson.OtherDrops) {
+                    if (entityDataJson.OtherDropsMode == 0 && entityDataJson.ListSpoils != []) {
+                        let SpoilsList = entityDataJson.ListSpoils;
+                        SpoilsList.forEach(CurrentOptions => {
+                            let randomInt = specifiedRangeRandomNumber(0, 100);
+                            if (randomInt < CurrentOptions.SpoilsProbability) {
+                                if (CurrentOptions.Spoils == "ordinary") {
+                                    let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                                    mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                                } else if (CurrentOptions.Spoils == "gives" && Config.DockingGives) {
+                                    let itemDIsplayName = undefined;
+                                    let initialItem = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                                    if (CurrentOptions.DisplayName != "") {
+                                        itemDIsplayName = CurrentOptions.DisplayName;
+                                    }
+                                    let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, CurrentOptions.Curse, CurrentOptions.SpoilsqQantity);
+                                    let item = mc.newItem(itemNewNbt);
+                                    mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                                 }
-                                let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, CurrentOptions.Curse, CurrentOptions.SpoilsqQantity);
-                                let item = mc.newItem(itemNewNbt);
-                                mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                             }
+                        });
+                    } else if (entityDataJson.OtherDropsMode == 1 && entityDataJson.ListSpoils != []) {
+                        let SpoilsList = entityDataJson.ListSpoils;
+                        let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length + 1);
+                        let itemData = SpoilsList[randomInt];
+                        if (itemData.itemData == "ordinary") {
+                            let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                            mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                        } else if (itemData.Spoils == "gives" && Config.DockingGives) {
+                            let itemDIsplayName = undefined;
+                            let initialItem = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                            if (itemData.DisplayName != "") {
+                                itemDIsplayName = itemData.DisplayName;
+                            }
+                            let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, itemData.Curse, itemData.SpoilsqQantity);
+                            let item = mc.newItem(itemNewNbt);
+                            mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                         }
-                    });
-                } else if (entityJson.OtherDropsMode == 1 && entityJson.ListSpoils != []) {
-                    let SpoilsList = entityJson.ListSpoils;
-                    let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length + 1);
-                    let itemData = SpoilsList[randomInt];
-                    if (itemData.itemData == "ordinary") {
-                        let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
-                        mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
-                    } else if (itemData.Spoils == "gives" && Config.DockingGives) {
-                        let itemDIsplayName = undefined;
-                        let initialItem = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
-                        if (itemData.DisplayName != "") {
-                            itemDIsplayName = itemData.DisplayName;
-                        }
-                        let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, itemData.Curse, itemData.SpoilsqQantity);
-                        let item = mc.newItem(itemNewNbt);
-                        mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                     }
                 }
+                let player = source.toPlayer();
+                player.addExperience(entityDataJson.GiveXpToPlayer);
             }
         }
     }
@@ -166,18 +245,75 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  */
 mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
     if (mob.isPlayer() && source != undefined) {
-        if (EntityNbtJson[mob.type] != undefined && source.hasTag("Intensify")) {
-            let damage = EntityNbtJson[mob.type].Additionaldamage;
-            let player = mob.toPlayer();
-            setTimeout(() => {
-                player.hurt(damage);
-                if (EntityNbtJson[mob.type].playerFire) {
-                    player.setFire(EntityNbtJson[mob.type].FireTime, false);
+        let entityJson = EntityNbtJson[source.type];
+        if (entityJson != undefined && source.hasTag("Intensify")) {
+            let entityDataJson = {};
+            for (let i = 0; i < entityJson.length; i++) {
+                let EntityJsonUniqueName = entityJson[i].UniqueName;
+                if (source.hasTag(EntityJsonUniqueName)) {
+                    entityDataJson = entityJson[i];
+                    break;
                 }
-            }, 500);
+            }
+            if (entityDataJson != {}) {
+                let damage = entityDataJson.Additionaldamage;
+                let player = mob.toPlayer();
+                setTimeout(() => {
+                    player.hurt(damage);
+                    if (entityDataJson.playerFire) {
+                        player.setFire(entityDataJson.FireTime, false);
+                    }
+                }, 500);
+            }
         }
     }
 })
+
+mc.listen("onServerStarted", () => {
+    mc.regPlayerCmd("intensifymonster", i18n.trl(ll.language, "cmdExplain",), PlayerCmdHandle, 1);
+});
+
+function PlayerCmdHandle(player, _args) {
+    if (player.isOP()) {
+        let fm = mc.newSimpleForm();
+        let EntityArray = mc.getAllEntities();
+        if (JSON.stringify(EntityArray) != "[]") {
+            fm.setTitle(i18n.trl(player.langCode, "formTitle",))
+            EntityArray.forEach(entity => {
+                fm.addButton(`${entity.name}\n${entity.type}`);
+            });
+            player.sendForm(fm, (player, id) => {
+                if (id == undefined) {
+                    return false;
+                } else {
+                    let en = EntityArray[id];
+                    let enDataJson = {};
+                    let enNbtObj = JSON.parse(en.getNbt().toString()).Attributes;
+                    if (enNbtObj != undefined) {
+                        enNbtObj.forEach(Current => {
+                            switch (Current.Name) {
+                                case "minecraft:health":
+                                    enDataJson.health = Current.DefaultMax;
+                                    break;
+                                case "minecraft:movement":
+                                    enDataJson.movement = Current.Current;
+                                    break;
+                                case "minecraft:follow_range":
+                                    enDataJson.follow_range = Current.Current;
+                                    break;
+                                case "minecraft:knockback_resistance":
+                                    enDataJson.knockback_resistance = Current.Current;
+                                    break;
+                            }
+                        });
+                    }
+                    let msg = i18n.trl(player.langCode, "entityInformation", en.name, enDataJson.health, enDataJson.movement, enDataJson.follow_range, enDataJson.knockback_resistance);
+                    player.tell(msg);
+                }
+            })
+        }
+    }
+}
 
 /**
  * 生成新的实体并修改属性
@@ -226,6 +362,7 @@ function setNewEntity(entityType, pos, NbtData) {
         }
         newEntity.setNbt(newEntityNbt);
         newEntity.addTag("Intensify");
+        newEntity.addTag(NbtData.UniqueName);
         newEntity.setScale(NbtData.scale);
     }
 }
@@ -340,51 +477,82 @@ function findNearestBlock(pos) {
  */
 function FourProfileUpdate() {
     let UPEntityConfig = false;
-    if (Config.DockingGives == undefined) {
-        Config.DockingGives = false;
+    let NewProfileVersion = false;
+    for (let key in EntityNbtJson) {
+        if (EntityNbtJson[key][0] == undefined) {
+            NewProfileVersion = true;
+        }
+    }
+    //归档更新，0.1.8版本前的更新
+    if (NewProfileVersion) {
+        if (Config.DockingGives == undefined) {
+            Config.DockingGives = false;
+            for (let key in EntityNbtJson) {
+                let EntityData = EntityNbtJson[key];
+                if (EntityData.OtherDrops == undefined) {
+                    UPEntityConfig = true;
+                    EntityData.OtherDrops = false;
+                    EntityData.OtherDropsMode = 0;
+                    EntityData.ListSpoils = [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }];
+                } else if (EntityData.ListSpoils[0].Spoils == undefined) {
+                    UPEntityConfig = true;
+                    let SingleEntityList = EntityData.ListSpoils;
+                    for (let key in SingleEntityList) {
+                        SingleEntityList[key].Spoils = "ordinary";
+                    }
+                }
+            }
+        }
+        if (Config.SpawnProbability != undefined) {
+            for (let type in EntityNbtJson) {
+                let currentEntity = EntityNbtJson[type];
+                if (currentEntity.SpawnProbability == undefined) {
+                    if (Config.SpawnProbability > 60) {
+                        currentEntity.SpawnProbability = 50;
+                    } else {
+                        currentEntity.SpawnProbability = Config.SpawnProbability;
+                    }
+                }
+            }
+            delete Config.SpawnProbability;
+            UPEntityConfig = true;
+        }
+        if (Config.mobSpawner == undefined) {
+            Config.mobSpawner = false;
+            UPEntityConfig = true;
+        }
+        if (EntityNbtJson[Object.keys(EntityNbtJson)[0]].GiveXpToPlayer == undefined) {
+            for (let type in EntityNbtJson) {
+                let currentEntity = EntityNbtJson[type];
+                if (currentEntity.GiveXpToPlayer == undefined) {
+                    currentEntity.GiveXpToPlayer = 5;
+                }
+            }
+            UPEntityConfig = true;
+        }
+    }
+    //新配置文件后的更新
+    if (Config.ProfileVersion == undefined) {
+        Config.ProfileVersion = "0.0.1";
         for (let key in EntityNbtJson) {
-            let EntityData = EntityNbtJson[key];
-            if (EntityData.OtherDrops == undefined) {
-                UPEntityConfig = true;
-                EntityData.OtherDrops = false;
-                EntityData.OtherDropsMode = 0;
-                EntityData.ListSpoils = [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }];
-            } else if (EntityData.ListSpoils[0].Spoils == undefined) {
-                UPEntityConfig = true;
-                let SingleEntityList = EntityData.ListSpoils;
-                for (let key in SingleEntityList) {
-                    SingleEntityList[key].Spoils = "ordinary";
-                }
+            let TemporaryArray = [];
+            if (EntityNbtJson[key].UniqueName == undefined) {
+                EntityNbtJson[key].UniqueName = key.split(":")[1];
             }
-        }
-    }
-    if (Config.SpawnProbability != undefined) {
-        for (let type in EntityNbtJson) {
-            let currentEntity = EntityNbtJson[type];
-            if (currentEntity.SpawnProbability == undefined) {
-                if (Config.SpawnProbability > 60) {
-                    currentEntity.SpawnProbability = 50;
-                } else {
-                    currentEntity.SpawnProbability = Config.SpawnProbability;
-                }
+            if (EntityNbtJson[key].GiveXpToPlayer == undefined) {
+                EntityNbtJson[key].GiveXpToPlayer = 5;
             }
+            TemporaryArray.push(EntityNbtJson[key]);
+            EntityNbtJson[key] = TemporaryArray;
         }
-        delete Config.SpawnProbability;
         UPEntityConfig = true;
     }
-    if (Config.mobSpawner == undefined) {
-        Config.mobSpawner = false;
-        UPEntityConfig = true;
-    }
+
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
         File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
         setTimeout(() => {
-            if (ll.language == "zh_Hans") {
-                logger.error("版本配置文件更新，请前往data/EntityData.json查看！");
-            } else {
-                logger.error("Please go to data/EntityData.json to view the updated configuration file!");
-            }
+            logger.error(i18n.trl(ll.language, "configUp",));
         }, 1000 * 6);
     }
 }
@@ -404,4 +572,12 @@ function FourProfileUpdate() {
  * 每种生物可自定义生成概率.
  * 007
  * 新增配置项：刷怪笼附近不生成强化怪.
+ * 018
+ * 生物被击杀给予击杀者额外的经验值.
+ * 修复某个提示错误.
+ * 修复对玩家额外伤害和着火无效的bug.
+ * 新增一种生物多个配置文件随机生成.
+ * 加入配置文件版本号.
+ * 加入指令，可在游戏内查询实体部分数据.
+ * 完善多语言设置，加入语言文件.
  */
