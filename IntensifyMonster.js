@@ -52,7 +52,7 @@ const EntityNbtJsonData = {
         }
     ]
 };
-const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false, "mobSpawner": false };
+const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false, "mobSpawner": false ,"ProfileVersion":"0.0.1"};
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
