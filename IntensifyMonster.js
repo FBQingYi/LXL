@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 1, 8];
+const PluginsVersion = [0, 1, 9];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -52,7 +52,7 @@ const EntityNbtJsonData = {
         }
     ]
 };
-const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false, "mobSpawner": false ,"ProfileVersion":"0.0.1"};
+const ConfigDataJson = { "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "0.0.1" };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
@@ -288,27 +288,30 @@ function PlayerCmdHandle(player, _args) {
                 } else {
                     let en = EntityArray[id];
                     let enDataJson = {};
-                    let enNbtObj = JSON.parse(en.getNbt().toString()).Attributes;
-                    if (enNbtObj != undefined) {
-                        enNbtObj.forEach(Current => {
-                            switch (Current.Name) {
-                                case "minecraft:health":
-                                    enDataJson.health = Current.DefaultMax;
-                                    break;
-                                case "minecraft:movement":
-                                    enDataJson.movement = Current.Current;
-                                    break;
-                                case "minecraft:follow_range":
-                                    enDataJson.follow_range = Current.Current;
-                                    break;
-                                case "minecraft:knockback_resistance":
-                                    enDataJson.knockback_resistance = Current.Current;
-                                    break;
-                            }
-                        });
+                    let EnNbt = en.getNbt();
+                    if (en!=undefined && EnNbt != undefined) {
+                        let enNbtObj = JSON.parse(EnNbt.toString()).Attributes;
+                        if (enNbtObj != undefined) {
+                            enNbtObj.forEach(Current => {
+                                switch (Current.Name) {
+                                    case "minecraft:health":
+                                        enDataJson.health = Current.DefaultMax;
+                                        break;
+                                    case "minecraft:movement":
+                                        enDataJson.movement = Current.Current;
+                                        break;
+                                    case "minecraft:follow_range":
+                                        enDataJson.follow_range = Current.Current;
+                                        break;
+                                    case "minecraft:knockback_resistance":
+                                        enDataJson.knockback_resistance = Current.Current;
+                                        break;
+                                }
+                            });
+                        }
+                        let msg = i18n.trl(player.langCode, "entityInformation", en.name, enDataJson.health, enDataJson.movement, enDataJson.follow_range, enDataJson.knockback_resistance);
+                        player.tell(msg);
                     }
-                    let msg = i18n.trl(player.langCode, "entityInformation", en.name, enDataJson.health, enDataJson.movement, enDataJson.follow_range, enDataJson.knockback_resistance);
-                    player.tell(msg);
                 }
             })
         }
@@ -580,4 +583,6 @@ function FourProfileUpdate() {
  * 加入配置文件版本号.
  * 加入指令，可在游戏内查询实体部分数据.
  * 完善多语言设置，加入语言文件.
+ * 019
+ * 修复查看实体数据时实体死亡报错
  */
