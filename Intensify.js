@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 3, 1];
+const PluginsVersion = [0, 3, 2];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -554,8 +554,13 @@ function setCommand() {
 function ContainerListeningProcessing(player, block) {
     if (block.type == "minecraft:dropper") {
         let Container = block.getContainer();
-        let item1 = upgradeItem(Container.getItem(0));
-        if (item1.boolean && item1.type == "intensify" && item1.itemType == "minecraft:field_masoned_banner_pattern") {
+        let item = Container.getItem(0);
+        let item1 = upgradeItem(item);
+        if (item.count > 1) {
+            playSound(player, 2);
+            sengTell(player, "placeGamErr", [], 0);
+            return false;
+        } else if (item1.boolean && item1.type == "intensify" && item1.itemType == "minecraft:field_masoned_banner_pattern") {
             if (item1.lvl == 1) {
                 equipmentStrengthening(Container, 1, item1, player);
                 synthesisGenerate(Container, item1, player, 1, 2, 2, "StrengtheningReel2", "StrengtheningReel2explain");
@@ -1376,6 +1381,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 修复强化卷轴升级时未校验的BUG.
  * 修复添加物品出现重复，添加失败等情况.
  * 新增添加物品时添加状态提示.
+ * 032
+ * 修复宝石放置过多崩服的情况.
  */
 
 /**
