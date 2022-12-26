@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 2, 9];
+const PluginsVersion = [0, 3, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -115,7 +115,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "ReinforceSuccess": "装备强化成功！",
         "ScrollUSucceeded": "卷轴升级成功！",
         "placeGamErr": "放置宝石过多，无法强化！",
-        "026UPLog": "配置文件已经重置，请重新添加装备！"
+        "026UPLog": "配置文件已经重置，请重新添加装备！",
+        "AddItemTips1": "§l§1本次添加{0}物品时，\n§2成功添加{1}个,\n§4重复{2}个。\n§6如果数量异常,建议清空背包后或者重载插件后单独添加异常物品！"
     },
     "zh_TW": {
         "StrengtheningReel1": "§3一級强化卷軸",
@@ -156,7 +157,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "ReinforceSuccess": "裝備强化成功！",
         "ScrollUSucceeded": "卷軸陞級成功！",
         "placeGamErr": "放置寶石過多,無法强化！",
-        "026UPLog": "設定檔已經重置,請重新添加裝備！"
+        "026UPLog": "設定檔已經重置,請重新添加裝備！",
+        "AddItemTips1": "§l§1本次添加{0}物品時，\n§2成功添加{1}個，\n§4重複{2}個。 \n§6如果數量异常，建議清空背包後或者重載挿件後單獨添加异常物品！"
     },
     "en": {
         "StrengtheningReel1": "§3Primary strengthening reel",
@@ -197,7 +199,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "ReinforceSuccess": "Equipment strengthening succeeded!",
         "ScrollUSucceeded": "Scroll upgrade succeeded!",
         "placeGamErr": "Too many gems placed, unable to strengthen!",
-        "026UPLog": "The configuration file has been reset, please add equipment again!"
+        "026UPLog": "The configuration file has been reset, please add equipment again!",
+        "AddItemTips1": "§l§1When adding {0} items this time,  \n §2{1} items were successfully added,  \n §4{2} items were repeated. \n §6If the quantity is abnormal, it is recommended to add abnormal items separately after emptying the backpack or reloading the plug-in!"
     }
 });
 
@@ -625,20 +628,29 @@ function OPSetItemForm(player, itemListDisplay, itemList, type) {
             return false;
         } else {
             let CumulativeList = [];
-            for (let i = 0; i < data.length;) {
-                data = data.filter(Boolean);
+            data = data.filter(Boolean);
+            for (let i = 0; i < data.length; i++) {
                 if (data[i]) {
                     CumulativeList.push(itemList[i]);
                 }
-                i++;
             }
             if (CumulativeList != []) {
                 if (type == 0) {
+                    let OldLength = ConfigItemWeapon.length;
+                    CumulativeList = Array.from(new Set(CumulativeList));
                     ConfigItemWeapon.push.apply(ConfigItemWeapon, CumulativeList);
-                    ConfigItemWeapon = Array.from(new Set(ConfigItemWeapon));
+                    StrengthenItemsJson.weapon = Array.from(new Set(ConfigItemWeapon));
+                    let SuccessfullyAdded = StrengthenItemsJson.weapon.length - OldLength;
+                    player.tell(i18n.trl(player.langCode, "AddItemTips1", data.length, SuccessfullyAdded, data.length - SuccessfullyAdded))
+                    ConfigItemWeapon = StrengthenItemsJson.weapon;
                 } else if (type == 1) {
+                    let OldLength = ConfigItemArmor.length;
+                    CumulativeList = Array.from(new Set(CumulativeList));
                     ConfigItemArmor.push.apply(ConfigItemArmor, CumulativeList);
-                    ConfigItemArmor = Array.from(new Set(ConfigItemArmor));
+                    StrengthenItemsJson.armor = Array.from(new Set(ConfigItemArmor));
+                    let SuccessfullyAdded = StrengthenItemsJson.armor.length - OldLength;
+                    player.tell(i18n.trl(player.langCode, "AddItemTips1", data.length, SuccessfullyAdded, data.length - SuccessfullyAdded))
+                    ConfigItemArmor = StrengthenItemsJson.armor;
                 }
                 File.writeTo(pluginPath + "data/EquipmentData.json", JSON.stringify(StrengthenItemsJson, null, "\t"));
             }
@@ -761,6 +773,7 @@ function generateNewGemNbt(type, lvl, amount, player) {
 function synthesisGenerate(Container, item1, player, index1, index2, lvl, language1, language2) {
     let item2 = upgradeItem(Container.getItem(index1));
     let item3 = upgradeItem(Container.getItem(index2));
+    item1 = upgradeItem(Container.getItem(0));
     if (item1.boolean && item2.boolean && item3.boolean) {
         if (item1.type == item2.type && item2.type == item3.type) {
             if (item1.lvl == item2.lvl && item2.lvl == item3.lvl && item3.lvl == lvl - 1) {
@@ -1303,7 +1316,6 @@ function versionUpdateModifyProfile() {
 
 ll.export(generateNewNbt, "generateNewNbt");
 
-
 /**
  * 更新记录
  * 002:
@@ -1360,6 +1372,10 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 029
  * 玩家打开投掷器时进行校验,避免卡BUG.
  * 卷轴可通过指令直接获取相应等级.
+ * 031
+ * 修复强化卷轴升级时未校验的BUG.
+ * 修复添加物品出现重复，添加失败等情况.
+ * 新增添加物品时添加状态提示.
  */
 
 /**
