@@ -216,7 +216,7 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                         let SpoilsList = entityDataJson.ListSpoils;
                         let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length + 1);
                         let itemData = SpoilsList[randomInt];
-                        if (itemData.itemData == "ordinary") {
+                        if (itemData.Spoils == "ordinary") {
                             let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
                             mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                         } else if (itemData.Spoils == "gives" && Config.DockingGives) {
@@ -584,5 +584,6 @@ function FourProfileUpdate() {
  * 加入指令，可在游戏内查询实体部分数据.
  * 完善多语言设置，加入语言文件.
  * 019
- * 修复查看实体数据时实体死亡报错
+ * 修复查看实体数据时实体死亡报错.
+ * 修复普通掉落问题.
  */
