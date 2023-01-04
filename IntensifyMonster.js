@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 1, 9];
+const PluginsVersion = [0, 2, 0];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -23,6 +23,12 @@ const EntityNbtJsonData = {
             "probability": 10,
             "OtherDrops": true,
             "OtherDropsMode": 0,
+            "WhetherDisarm": false,
+            "DisarmingProbability": 1,
+            "DropOffset": {
+                "x": 3,
+                "z": 2
+            },
             "SpawnProbability": 5,
             "GiveXpToPlayer": 5,
             "UniqueName": "zombie1",
@@ -62,6 +68,9 @@ ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherI
  * 读取各项配置文件.
  * 基础变量定义.
  */
+if (File.exists(pluginPath + "language/language.json")) {
+    File.delete(pluginPath + "language");
+}
 if (!File.exists(pluginPath + "Config.json")) {
     File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigDataJson, null, "\t"));
 }
@@ -71,6 +80,7 @@ if (!File.exists(pluginPath + "data/EntityData.json")) {
 let EntityNbtJson = JSON.parse(File.readFrom(pluginPath + "data/EntityData.json"));
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 let getReelNbt, GetNewItemNbt;
+let Generate = true;
 logger.setConsole(true);
 
 /**
@@ -80,24 +90,29 @@ i18n.load(pluginPath + "language/language.json", "en", {
     "zh_CN": {
         "formTitle": "选择实体",
         "configUp": "版本配置文件更新，请前往data/EntityData.json查看！",
-        "cmdExplain": "查看现有实体数据",
+        "cmdExplain": "嘿嘿，强化你的怪物吧！",
         "Intensifyerr": "未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false",
         "giveserr": "未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false",
-        "entityInformation": "实体名称:{0}\n实体最大生命值:{1}\n实体移动速度:{2}\n实体追踪距离:{3}\n实体抗性:{1}"
+        "entityInformation": "实体名称:{0}\n实体最大生命值:{1}\n实体移动速度:{2}\n实体追踪距离:{3}\n实体抗性:{1}",
+        "CmdOutpError1": "没有找到这个生物相关的配置文件"
     },
     "zh_TW": {
+        "formTitle": "選擇實體",
         "configUp": "版本設定檔更新,請前往data/EntityData.json查看！",
-        "cmdExplain": "查看現有實體數據",
+        "cmdExplain": "嘿嘿，强化你的怪物吧！",
         "Intensifyerr": "未找到前置挿件Intensify.js,請前往下載或者在設定檔Config.json中將DockingIntensify設定為false",
         "giveserr": "未找到前置挿件gives.js,請前往下載或者在設定檔Config.json中將DockingGives設定為false",
-        "entityInformation": "實體名稱:{0}\n實體最大生命值:{1}\n實體移動速度:{2}\n實體追跡距離:{3}\n實體抗性:{4}"
+        "entityInformation": "實體名稱:{0}\n實體最大生命值:{1}\n實體移動速度:{2}\n實體追跡距離:{3}\n實體抗性:{4}",
+        "CmdOutpError1": "沒有找到這個生物相關的設定檔"
     },
     "en": {
+        "formTitle": "Select Entity",
         "configUp": "Please go to data/EntityData.json to view the updated configuration file!",
-        "cmdExplain": "View existing entity data",
+        "cmdExplain": "Hey hey, strengthen your monster!",
         "Intensifyerr": "The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json",
         "giveserr": "The front-end plug-in gives.js is not found. Please go to download it or set DockingGives to false in the configuration file Config.json",
-        "entityInformation": "Entity name: {0}  nMaximum HP of entity: {1}  nMoving speed of entity: {2}  nEntity tracking distance: {3}  nEntity resistance: {4}"
+        "entityInformation": "Entity name: {0}  nMaximum HP of entity: {1}  nMoving speed of entity: {2}  nEntity tracking distance: {3}  nEntity resistance: {4}",
+        "CmdOutpError1": "This biological related configuration file was not found"
     }
 });
 
@@ -258,6 +273,20 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
             if (entityDataJson != {}) {
                 let damage = entityDataJson.Additionaldamage;
                 let player = mob.toPlayer();
+                if (entityDataJson.WhetherDisarm) {
+                    let random = specifiedRangeRandomNumber(0, 100);
+                    if (random < entityDataJson.DisarmingProbability) {
+                        let playerHand = player.getHand();
+                        if (!playerHand.isNull()) {
+                            let DropOffsetX = entityDataJson.DropOffset.x;
+                            let DropOffsetZ = entityDataJson.DropOffset.z;
+                            if (mc.spawnItem(playerHand, player.pos.x + DropOffsetX, player.pos.y, player.pos.z + DropOffsetZ, player.pos.dimid)) {
+                                playerHand.setNull()
+                                player.refreshItems()
+                            }
+                        }
+                    }
+                }
                 setTimeout(() => {
                     player.hurt(damage);
                     if (entityDataJson.playerFire) {
@@ -270,10 +299,64 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
 })
 
 mc.listen("onServerStarted", () => {
-    mc.regPlayerCmd("intensifymonster", i18n.trl(ll.language, "cmdExplain",), PlayerCmdHandle, 1);
+    let UniqueNameArray = EntityUniqueNameArraySet();
+    let Command = mc.newCommand("intensifymonster", i18n.get("cmdExplain", ll.language), PermType.GameMasters);
+    Command.setEnum("type", ["query", "spawn"]);
+    Command.setEnum("EntityUName", UniqueNameArray);
+    Command.mandatory("mode", ParamType.Enum, "type");
+    Command.mandatory("entity", ParamType.ActorType);
+    Command.mandatory("pos", ParamType.Vec3);
+    Command.mandatory("Uname", ParamType.Enum, "EntityUName");
+    Command.overload(["mode"]);
+    Command.overload(["mode", "entity", "Uname", "pos"]);
+    Command.setCallback((cmd, origin, output, results) => {
+        if (results.mode == "query" && origin.player != undefined) {
+            PlayerCmdHandle(origin.player);
+        } else if (results.mode == "spawn") {
+            let pos = results.pos;
+            let entity = results.entity;
+            let uname = results.Uname;
+            if (EntityNbtJson[entity] != undefined) {
+                let EntityDataJson = UniqueNameGetEntityJson(uname, entity);
+                if (EntityDataJson != {}) {
+                    setNewEntity(entity, pos, EntityDataJson);
+                } else {
+                    output.error(i18n.get("CmdOutpError1", ll.language));
+                }
+            } else {
+                output.error(i18n.get("CmdOutpError1", ll.language));
+            }
+        }
+    });
+    Command.setup();
 });
 
-function PlayerCmdHandle(player, _args) {
+function UniqueNameGetEntityJson(UniqueName, EntityType) {
+    let EntityJson = {};
+    if (EntityNbtJson[EntityType] != undefined) {
+        let currentEntity = EntityNbtJson[EntityType];
+        for (let key in currentEntity) {
+            let entityDataJson = currentEntity[key];
+            if (entityDataJson.UniqueName == UniqueName) {
+                EntityJson = entityDataJson;
+                return entityDataJson;
+            }
+        }
+    }
+    return EntityJson;
+}
+
+function EntityUniqueNameArraySet() {
+    let UniqueNameArray = [];
+    for (let key in EntityNbtJson) {
+        EntityNbtJson[key].forEach(entityDataJson => {
+            UniqueNameArray.push(entityDataJson.UniqueName);
+        });
+    }
+    return UniqueNameArray;
+}
+
+function PlayerCmdHandle(player) {
     if (player.isOP()) {
         let fm = mc.newSimpleForm();
         let EntityArray = mc.getAllEntities();
@@ -289,23 +372,25 @@ function PlayerCmdHandle(player, _args) {
                     let en = EntityArray[id];
                     let enDataJson = {};
                     let EnNbt = en.getNbt();
-                    if (en!=undefined && EnNbt != undefined) {
-                        let enNbtObj = JSON.parse(EnNbt.toString()).Attributes;
+                    if (en != undefined && EnNbt != undefined) {
+                        let enNbtObj = EnNbt.toObject().Attributes;
                         if (enNbtObj != undefined) {
                             enNbtObj.forEach(Current => {
-                                switch (Current.Name) {
-                                    case "minecraft:health":
-                                        enDataJson.health = Current.DefaultMax;
-                                        break;
-                                    case "minecraft:movement":
-                                        enDataJson.movement = Current.Current;
-                                        break;
-                                    case "minecraft:follow_range":
-                                        enDataJson.follow_range = Current.Current;
-                                        break;
-                                    case "minecraft:knockback_resistance":
-                                        enDataJson.knockback_resistance = Current.Current;
-                                        break;
+                                if (Current != undefined) {
+                                    switch (Current.Name) {
+                                        case "minecraft:health":
+                                            enDataJson.health = Current.DefaultMax;
+                                            break;
+                                        case "minecraft:movement":
+                                            enDataJson.movement = Current.Current;
+                                            break;
+                                        case "minecraft:follow_range":
+                                            enDataJson.follow_range = Current.Current;
+                                            break;
+                                        case "minecraft:knockback_resistance":
+                                            enDataJson.knockback_resistance = Current.Current;
+                                            break;
+                                    }
                                 }
                             });
                         }
@@ -325,48 +410,54 @@ function PlayerCmdHandle(player, _args) {
  * @param {List} NbtData 实体修改的数据
  */
 function setNewEntity(entityType, pos, NbtData) {
-    let newEntity = mc.spawnMob(entityType, pos);
-    if (newEntity != undefined) {
-        let newEntityNbt = newEntity.getNbt();
-        let newEntityAttributes = newEntityNbt.getTag("Attributes");
-        if (NbtData.customName != "") {
-            newEntityNbt.setString("CustomName", `${NbtData.customName}`)
-            newEntityNbt.setFloat("CustomNameVisible", 1);
-        }
-        if (newEntityAttributes != undefined) {
-            let newEntityAttributesListLength = newEntityAttributes.getSize();
-            for (let i = 0; i < newEntityAttributesListLength; i++) {
-                let currentLocationObject = newEntityAttributes.getTag(i)
-                if (currentLocationObject.getTag("Name") == "minecraft:health") {
-                    currentLocationObject.setFloat("Base", NbtData.health)
-                    currentLocationObject.setFloat("Current", NbtData.health)
-                    currentLocationObject.setFloat("DefaultMax", NbtData.health)
-                    currentLocationObject.setFloat("Max", NbtData.health);
-                } else if (currentLocationObject.getTag("Name") == "minecraft:movement") {
-                    currentLocationObject.setFloat("Base", NbtData.movement)
-                    currentLocationObject.setFloat("Current", NbtData.movement);
-                } else if (currentLocationObject.getTag("Name") == "minecraft:underwater_movement") {
-                    currentLocationObject.setFloat("Base", NbtData.underwater_movement)
-                    currentLocationObject.setFloat("Current", NbtData.underwater_movement);
-                } else if (currentLocationObject.getTag("Name") == "minecraft:lava_movement") {
-                    currentLocationObject.setFloat("Base", NbtData.lava_movement)
-                    currentLocationObject.setFloat("Current", NbtData.lava_movement);
-                } else if (currentLocationObject.getTag("Name") == "minecraft:follow_range") {
-                    currentLocationObject.setFloat("Base", NbtData.follow_range)
-                    currentLocationObject.setFloat("Current", NbtData.follow_range);
-                } else if (currentLocationObject.getTag("Name") == "minecraft:knockback_resistance") {
-                    currentLocationObject.setFloat("Base", NbtData.knockback_resistance)
-                    currentLocationObject.setFloat("DefaultMax", NbtData.knockback_resistance)
-                    currentLocationObject.setFloat("Max", NbtData.knockback_resistance)
-                    currentLocationObject.setFloat("DefaultMin", NbtData.knockback_resistance)
-                    currentLocationObject.setFloat("Min", NbtData.knockback_resistance);
+    if (Generate) {
+        Generate = false;
+        let newEntity = mc.spawnMob(entityType, pos);
+        if (newEntity != undefined) {
+            let newEntityNbt = newEntity.getNbt();
+            let newEntityAttributes = newEntityNbt.getTag("Attributes");
+            if (NbtData.customName != "") {
+                newEntityNbt.setString("CustomName", `${NbtData.customName}`)
+                newEntityNbt.setFloat("CustomNameVisible", 1);
+            }
+            if (newEntityAttributes != undefined) {
+                let newEntityAttributesListLength = newEntityAttributes.getSize();
+                for (let i = 0; i < newEntityAttributesListLength; i++) {
+                    let currentLocationObject = newEntityAttributes.getTag(i)
+                    if (currentLocationObject.getTag("Name") == "minecraft:health") {
+                        currentLocationObject.setFloat("Base", NbtData.health)
+                        currentLocationObject.setFloat("Current", NbtData.health)
+                        currentLocationObject.setFloat("DefaultMax", NbtData.health)
+                        currentLocationObject.setFloat("Max", NbtData.health);
+                    } else if (currentLocationObject.getTag("Name") == "minecraft:movement") {
+                        currentLocationObject.setFloat("Base", NbtData.movement)
+                        currentLocationObject.setFloat("Current", NbtData.movement);
+                    } else if (currentLocationObject.getTag("Name") == "minecraft:underwater_movement") {
+                        currentLocationObject.setFloat("Base", NbtData.underwater_movement)
+                        currentLocationObject.setFloat("Current", NbtData.underwater_movement);
+                    } else if (currentLocationObject.getTag("Name") == "minecraft:lava_movement") {
+                        currentLocationObject.setFloat("Base", NbtData.lava_movement)
+                        currentLocationObject.setFloat("Current", NbtData.lava_movement);
+                    } else if (currentLocationObject.getTag("Name") == "minecraft:follow_range") {
+                        currentLocationObject.setFloat("Base", NbtData.follow_range)
+                        currentLocationObject.setFloat("Current", NbtData.follow_range);
+                    } else if (currentLocationObject.getTag("Name") == "minecraft:knockback_resistance") {
+                        currentLocationObject.setFloat("Base", NbtData.knockback_resistance)
+                        currentLocationObject.setFloat("DefaultMax", NbtData.knockback_resistance)
+                        currentLocationObject.setFloat("Max", NbtData.knockback_resistance)
+                        currentLocationObject.setFloat("DefaultMin", NbtData.knockback_resistance)
+                        currentLocationObject.setFloat("Min", NbtData.knockback_resistance);
+                    }
                 }
             }
+            newEntity.setNbt(newEntityNbt);
+            newEntity.addTag("Intensify");
+            newEntity.addTag(NbtData.UniqueName);
+            newEntity.setScale(NbtData.scale);
         }
-        newEntity.setNbt(newEntityNbt);
-        newEntity.addTag("Intensify");
-        newEntity.addTag(NbtData.UniqueName);
-        newEntity.setScale(NbtData.scale);
+        setTimeout(() => {
+            Generate = true;
+        }, 50);
     }
 }
 
@@ -550,6 +641,19 @@ function FourProfileUpdate() {
         }
         UPEntityConfig = true;
     }
+    if (Config.ProfileVersion == "0.0.1") {
+        Config.ProfileVersion = "0.0.2";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((EntityDataJson, position) => {
+                if (EntityDataJson.WhetherDisarm == undefined) {
+                    EntityNbtJson[key][position].WhetherDisarm = false;
+                    EntityNbtJson[key][position].DisarmingProbability = 1;
+                    EntityNbtJson[key][position].DropOffset = { "x": 3, "z": 2 };
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
 
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
@@ -584,6 +688,15 @@ function FourProfileUpdate() {
  * 加入指令，可在游戏内查询实体部分数据.
  * 完善多语言设置，加入语言文件.
  * 019
- * 修复查看实体数据时实体死亡报错.
  * 修复普通掉落问题.
+ * 020
+ * 修复实体重复触发生成的BUG.
+ * 修复查看实体数据时实体死亡报错.
+ * 新增指令在指定地点生成指定配置文件的生物.
+ * 随机缴械
+ * 
+ * 待添加功能
+ * 怪物隐身
+ * 隐身时间设置
+ * 死亡爆炸
  */
