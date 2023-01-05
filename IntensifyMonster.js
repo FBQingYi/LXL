@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 0];
+const PluginsVersion = [0, 2, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -550,14 +550,16 @@ function findNearestBlock(pos) {
         for (let ly = y - radius; ly <= y + radius; ly += 1) {
             for (let lz = z - radius; lz <= z + radius; lz += 1) {
                 const block = mc.getBlock(lx, ly, lz, dimid);
-                if (blockTypes == block.type) {
-                    const distance = Math.sqrt(
-                        (x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)
-                    );
-                    if (distance < lastDistance || !lastDistance) {
-                        lastDistance = distance;
-                        boole = true;
-                        return boole;
+                if(block != undefined){
+                    if (blockTypes == block.type) {
+                        const distance = Math.sqrt(
+                            (x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)
+                        );
+                        if (distance < lastDistance || !lastDistance) {
+                            lastDistance = distance;
+                            boole = true;
+                            return boole;
+                        }
                     }
                 }
             }
@@ -693,7 +695,9 @@ function FourProfileUpdate() {
  * 修复实体重复触发生成的BUG.
  * 修复查看实体数据时实体死亡报错.
  * 新增指令在指定地点生成指定配置文件的生物.
- * 随机缴械
+ * 随机缴械.
+ * 021
+ * 修复检查刷怪笼时未获取到方块导致的报错.
  * 
  * 待添加功能
  * 怪物隐身
