@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 1];
+const PluginsVersion = [0, 2, 2];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -159,8 +159,8 @@ mc.listen("onMobSpawn", (typeName, pos) => {
                 EntityGenerationProbability = 50;
             }
             let randomInt = specifiedRangeRandomNumber(0, 100);
-            let resultBool = WhetherPaintStrange(pos.x - 6, pos.z - 6, pos.x + 6, pos.z + 6, pos.y)
-            if (resultBool && randomInt < EntityGenerationProbability) {
+            let resultBool = WhetherPaintStrangeBlock(pos);
+            if (!resultBool && randomInt < EntityGenerationProbability) {
                 if (Config.mobSpawner) {
                     setNewEntity(typeName, pos, SelectConfiguration);
                 } else {
@@ -473,6 +473,39 @@ function specifiedRangeRandomNumber(min, max) {
 
 /**
  * 获取附近是否有发光方块
+ * 代码来自minedetector插件.
+ * @param {Pos} pos 坐标对象
+ * @returns 布尔值
+ */
+function WhetherPaintStrangeBlock(pos) {
+    const { x, y, z, dimid } = pos;
+    let radius = 6;
+    let lastDistance = 0;
+    let boole = false;
+    for (let lx = x - radius; lx <= x + radius; lx += 1) {
+        for (let ly = y - radius; ly <= y + radius; ly += 1) {
+            for (let lz = z - radius; lz <= z + radius; lz += 1) {
+                const block = mc.getBlock(lx, ly, lz, dimid);
+                if (block != undefined) {
+                    if (LuminousItemsJson[block.type] != undefined) {
+                        const distance = Math.sqrt(
+                            (x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)
+                        );
+                        if (distance < lastDistance || !lastDistance) {
+                            lastDistance = distance;
+                            boole = true;
+                            return boole;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return boole;
+}
+
+/**
+ * 获取附近是否有发光方块
  * @param {int} x x点1
  * @param {int} z z点1
  * @param {int} x1 x点2
@@ -550,7 +583,7 @@ function findNearestBlock(pos) {
         for (let ly = y - radius; ly <= y + radius; ly += 1) {
             for (let lz = z - radius; lz <= z + radius; lz += 1) {
                 const block = mc.getBlock(lx, ly, lz, dimid);
-                if(block != undefined){
+                if (block != undefined) {
                     if (blockTypes == block.type) {
                         const distance = Math.sqrt(
                             (x - lx) * (x - lx) + (y - ly) * (y - ly) + (z - lz) * (z - lz)
@@ -698,9 +731,12 @@ function FourProfileUpdate() {
  * 随机缴械.
  * 021
  * 修复检查刷怪笼时未获取到方块导致的报错.
+ * 022
+ * 尝试解决有光源的情况下刷怪.
  * 
  * 待添加功能
  * 怪物隐身
  * 隐身时间设置
  * 死亡爆炸
+ * 碎甲
  */

@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 3, 2];
+const PluginsVersion = [0, 3, 3];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -58,6 +58,7 @@ if (!File.exists(pluginPath + "Config.json")) {
         },
         "seckilltopvp": true,
         "seckilltopve": true,
+        "seckillFortifyingOrganism": false,
         "durableGemsFall": false,
         "seckillWhiteList": [
             "minecraft:ender_dragon"
@@ -288,7 +289,13 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0);
-                        mob.kill();
+                        if (mob.hasTag("Intensify")) {
+                            if (ConfigJson.seckillFortifyingOrganism) {
+                                mob.kill();
+                            }
+                        } else {
+                            mob.kill();
+                        }
                     }, 50);
                 }
             } else if (!mob.isPlayer() && ConfigJson.seckilltopve) {
@@ -296,7 +303,13 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
                     addedDamageBool = false;
                     setTimeout(() => {
                         sengTell(player, "SkillTips1", [], 0);
-                        mob.kill();
+                        if (mob.hasTag("Intensify")) {
+                            if (ConfigJson.seckillFortifyingOrganism) {
+                                mob.kill();
+                            }
+                        } else {
+                            mob.kill();
+                        }
                     }, 50);
                 }
             }
@@ -1314,6 +1327,12 @@ function versionUpdateModifyProfile() {
             log(i18n.trl(ll.language, "026UPLog", []));
         }, 1000 * 5);
     }
+    //033版本更新
+    if (ConfigJson.seckillFortifyingOrganism == undefined) {
+        ConfigJson.seckillFortifyingOrganism = false;
+        UPConfig = true;
+    }
+
     if (UPConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
     }
@@ -1383,6 +1402,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 新增添加物品时添加状态提示.
  * 032
  * 修复宝石放置过多崩服的情况.
+ * 033
+ * 新增一击必杀是否用于强化生物开关.
  */
 
 /**
