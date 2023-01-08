@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 2];
+const PluginsVersion = [0, 2, 3];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -29,6 +29,17 @@ const EntityNbtJsonData = {
                 "x": 3,
                 "z": 2
             },
+            "brambles": false,
+            "bramblesHurt": 1,
+            "dieBlast": false,
+            "BlastDestroy": false,
+            "BlastPower ": 1,
+            "BlastRange ": 5,
+            "BlastTime": 10,
+            "ArmorBreaker": false,
+            "ArmorBreakerToSE": false,
+            "ArmorProbability": 10,
+            "SingleReductionDamage":2,
             "SpawnProbability": 5,
             "GiveXpToPlayer": 5,
             "UniqueName": "zombie1",
@@ -81,6 +92,7 @@ let EntityNbtJson = JSON.parse(File.readFrom(pluginPath + "data/EntityData.json"
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 let getReelNbt, GetNewItemNbt;
 let Generate = true;
+let OPrecord = {};
 logger.setConsole(true);
 
 /**
@@ -94,7 +106,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "Intensifyerr": "未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false",
         "giveserr": "未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false",
         "entityInformation": "实体名称:{0}\n实体最大生命值:{1}\n实体移动速度:{2}\n实体追踪距离:{3}\n实体抗性:{1}",
-        "CmdOutpError1": "没有找到这个生物相关的配置文件"
+        "CmdOutpError1": "没有找到这个生物相关的配置文件",
+        "BlastTips": "因你击杀了{0},即将在{1}秒后发生爆炸!"
     },
     "zh_TW": {
         "formTitle": "選擇實體",
@@ -103,7 +116,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "Intensifyerr": "未找到前置挿件Intensify.js,請前往下載或者在設定檔Config.json中將DockingIntensify設定為false",
         "giveserr": "未找到前置挿件gives.js,請前往下載或者在設定檔Config.json中將DockingGives設定為false",
         "entityInformation": "實體名稱:{0}\n實體最大生命值:{1}\n實體移動速度:{2}\n實體追跡距離:{3}\n實體抗性:{4}",
-        "CmdOutpError1": "沒有找到這個生物相關的設定檔"
+        "CmdOutpError1": "沒有找到這個生物相關的設定檔",
+        "BlastTips": "因你擊殺了{0}，即將在{1}秒後發生爆炸！"
     },
     "en": {
         "formTitle": "Select Entity",
@@ -112,7 +126,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "Intensifyerr": "The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json",
         "giveserr": "The front-end plug-in gives.js is not found. Please go to download it or set DockingGives to false in the configuration file Config.json",
         "entityInformation": "Entity name: {0}  nMaximum HP of entity: {1}  nMoving speed of entity: {2}  nEntity tracking distance: {3}  nEntity resistance: {4}",
-        "CmdOutpError1": "This biological related configuration file was not found"
+        "CmdOutpError1": "This biological related configuration file was not found",
+        "BlastTips": "Because you killed {0}, it will explode in {1} seconds!"
     }
 });
 
@@ -144,13 +159,19 @@ if (Config.DockingGives) {
 FourProfileUpdate();
 let a = 0
 
+mc.listen("onRide", (entity1, entity2) => {
+    if (entity1.hasTag("Intensify")) {
+        return false;
+    }
+});
+
 /**
  * 监听生物生成.
  * 判断生物是否在强化文件内.
  * 然后随机判断是否生成强化生物.
  */
 mc.listen("onMobSpawn", (typeName, pos) => {
-    if (EntityNbtJson[typeName] != undefined) {
+    if (EntityNbtJson[typeName] != undefined && !JudgmentFootBlock(pos)) {
         let ConfigureRandom = specifiedRangeRandomNumber(0, EntityNbtJson[typeName].length);
         let SelectConfiguration = EntityNbtJson[typeName][ConfigureRandom];
         if (SelectConfiguration != undefined) {
@@ -195,9 +216,15 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                 }
             }
             if (entityDataJson != {}) {
+                let player = source.toPlayer();
+                if (entityDataJson.dieBlast) {
+                    player.tell(i18n.trl("BlastTips", player.langCode, mob.name, entityDataJson.BlastTime));
+                    setTimeout(() => {
+                        mc.explode(pos, null, entityDataJson.BlastPower, entityDataJson.BlastRange, entityDataJson.BlastDestroy, false);
+                    }, entityDataJson.BlastTime * 1000);
+                }
                 if (Config.DockingIntensify) {
                     let randomInt = specifiedRangeRandomNumber(0, 100);
-                    let player = source.toPlayer();
                     if (entityDataJson.reel) {
                         if (randomInt < entityDataJson.probability) {
                             let newItem = mc.newItem(getReelNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
@@ -246,7 +273,6 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                         }
                     }
                 }
-                let player = source.toPlayer();
                 player.addExperience(entityDataJson.GiveXpToPlayer);
             }
         }
@@ -271,7 +297,11 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                 }
             }
             if (entityDataJson != {}) {
-                let damage = entityDataJson.Additionaldamage;
+                let damage = 0;
+                if (entityDataJson.brambles) {
+                    damage += entityDataJson.bramblesHurt;
+                }
+                damage += entityDataJson.Additionaldamage;
                 let player = mob.toPlayer();
                 if (entityDataJson.WhetherDisarm) {
                     let random = specifiedRangeRandomNumber(0, 100);
@@ -287,6 +317,25 @@ mc.listen("onMobHurt", (mob, source, _damage, _cause) => {
                         }
                     }
                 }
+                if (entityDataJson.ArmorBreaker) {
+                    let playerArmor = player.getArmor();
+                    let playerArmorAllItem = playerArmor.getAllItems();
+                    playerArmorAllItem.forEach(item => {
+                        if (!item.isNull()) {
+                            let random = specifiedRangeRandomNumber(0, 100);
+                            if (entityDataJson.ArmorBreakerToSE) {
+                                if (random < entityDataJson.ArmorProbability) {
+                                    item.setDamage(item.damage+entityDataJson.SingleReductionDamage);
+                                }
+                            }else if (!isIntensify(item)) {
+                                if (random < entityDataJson.ArmorProbability) {
+                                    item.setDamage(item.damage+entityDataJson.SingleReductionDamage);
+                                }
+                            }
+                        }
+                    });
+                }
+
                 setTimeout(() => {
                     player.hurt(damage);
                     if (entityDataJson.playerFire) {
@@ -346,6 +395,17 @@ function UniqueNameGetEntityJson(UniqueName, EntityType) {
     return EntityJson;
 }
 
+function JudgmentFootBlock(pos) {
+    let ReturnValue = false;
+    let block = mc.getBlock(pos.x, pos.y - 1, pos.z, pos.dimid);
+    if (block != undefined) {
+        if (block.isSlabBlock) {
+            ReturnValue = true;
+        }
+    }
+    return ReturnValue;
+}
+
 function EntityUniqueNameArraySet() {
     let UniqueNameArray = [];
     for (let key in EntityNbtJson) {
@@ -401,6 +461,19 @@ function PlayerCmdHandle(player) {
             })
         }
     }
+}
+
+function isIntensify(item) {
+    let returnBoole = false;
+    let ItemNbt = item.getNbt();
+    let ItemTag = ItemNbt.getTag("tag");
+    if (ItemTag != undefined) {
+        let ItemAddon = ItemTag.getTag("addon");
+        if (ItemAddon != undefined) {
+            returnBoole = true;
+        }
+    }
+    return returnBoole;
 }
 
 /**
@@ -689,6 +762,39 @@ function FourProfileUpdate() {
         }
         UPEntityConfig = true;
     }
+    if (Config.ProfileVersion == "0.0.2") {
+        Config.ProfileVersion = "0.0.3";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((EntityDataJson, position) => {
+                if (EntityDataJson.brambles == undefined) {
+                    EntityNbtJson[key][position].brambles = false;
+                    EntityNbtJson[key][position].bramblesHurt = 1;
+                    EntityNbtJson[key][position].dieBlast = false;
+                    EntityNbtJson[key][position].BlastDestroy = false;
+                    EntityNbtJson[key][position].BlastPower = 1;
+                    EntityNbtJson[key][position].BlastRange = 5;
+                    EntityNbtJson[key][position].BlastTime = 10;
+
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
+    if (Config.ProfileVersion == "0.0.3") {
+        Config.ProfileVersion = "0.0.4";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((EntityDataJson, position) => {
+                if (EntityDataJson.brambles == undefined) {
+                    EntityNbtJson[key][position].ArmorBreaker = false;
+                    EntityNbtJson[key][position].ArmorBreakerToSE = false;
+                    EntityNbtJson[key][position].ArmorProbability = 10;
+                    EntityNbtJson[key][position].SingleReductionDamage = 2;
+
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
 
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
@@ -698,6 +804,7 @@ function FourProfileUpdate() {
         }, 1000 * 6);
     }
 }
+
 
 /** 
  * 002
@@ -733,10 +840,13 @@ function FourProfileUpdate() {
  * 修复检查刷怪笼时未获取到方块导致的报错.
  * 022
  * 尝试解决有光源的情况下刷怪.
+ * 尝试解决半砖刷怪.
+ * 新增怪荆棘开关和伤害.
+ * 新增死亡爆炸开关和范围.
+ * 023
+ * 尝试解决强化怪坐船等骑乘事件.
+ * 新增怪碎甲开关和几率.
+ * 
  * 
  * 待添加功能
- * 怪物隐身
- * 隐身时间设置
- * 死亡爆炸
- * 碎甲
  */

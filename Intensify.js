@@ -11,7 +11,7 @@ const SoundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"
 const pluginName = "Intensify";
 const PluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const PluginsVersion = [0, 3, 3];
+const PluginsVersion = [0, 3, 4];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 
 //------插件信息注册
@@ -569,28 +569,30 @@ function ContainerListeningProcessing(player, block) {
         let Container = block.getContainer();
         let item = Container.getItem(0);
         let item1 = upgradeItem(item);
-        if (item.count > 1) {
-            playSound(player, 2);
-            sengTell(player, "placeGamErr", [], 0);
-            return false;
-        } else if (item1.boolean && item1.type == "intensify" && item1.itemType == "minecraft:field_masoned_banner_pattern") {
-            if (item1.lvl == 1) {
-                equipmentStrengthening(Container, 1, item1, player);
-                synthesisGenerate(Container, item1, player, 1, 2, 2, "StrengtheningReel2", "StrengtheningReel2explain");
-            } else if (item1.lvl == 2) {
-                equipmentStrengthening(Container, 2, item1, player);
-                synthesisGenerate(Container, item1, player, 3, 6, 3, "StrengtheningReel3", "StrengtheningReel3explain");
-            } else if (item1.lvl == 3) {
-                equipmentStrengthening(Container, 3, item1, player);
-                synthesisGenerate(Container, item1, player, 4, 8, 4, "StrengtheningReel4", "StrengtheningReel4explain");
-            } else if (item1.lvl == 4) {
-                equipmentStrengthening(Container, 4, item1, player);
-                synthesisGenerate(Container, item1, player, 2, 7, 5, "StrengtheningReel5", "StrengtheningReel5explain");
-            } else if (item1.lvl == 5) {
-                equipmentStrengthening(Container, 5, item1, player);
+        if (item1.boolean) {
+            if (item.count > 1) {
+                playSound(player, 2);
+                sengTell(player, "placeGamErr", [], 0);
+                return false;
+            } else if (item1.type == "intensify" && item1.itemType == "minecraft:field_masoned_banner_pattern") {
+                if (item1.lvl == 1) {
+                    equipmentStrengthening(Container, 1, item1, player);
+                    synthesisGenerate(Container, item1, player, 1, 2, 2, "StrengtheningReel2", "StrengtheningReel2explain");
+                } else if (item1.lvl == 2) {
+                    equipmentStrengthening(Container, 2, item1, player);
+                    synthesisGenerate(Container, item1, player, 3, 6, 3, "StrengtheningReel3", "StrengtheningReel3explain");
+                } else if (item1.lvl == 3) {
+                    equipmentStrengthening(Container, 3, item1, player);
+                    synthesisGenerate(Container, item1, player, 4, 8, 4, "StrengtheningReel4", "StrengtheningReel4explain");
+                } else if (item1.lvl == 4) {
+                    equipmentStrengthening(Container, 4, item1, player);
+                    synthesisGenerate(Container, item1, player, 2, 7, 5, "StrengtheningReel5", "StrengtheningReel5explain");
+                } else if (item1.lvl == 5) {
+                    equipmentStrengthening(Container, 5, item1, player);
+                }
+            } else if (item1.type == "gem" && item1.itemType == "minecraft:quartz") {
+                GemEnhancement(player, item1, Container);
             }
-        } else if (item1.boolean && item1.type == "gem" && item1.itemType == "minecraft:quartz") {
-            GemEnhancement(player, item1, Container);
         }
     }
 }
@@ -1404,6 +1406,8 @@ ll.export(generateNewNbt, "generateNewNbt");
  * 修复宝石放置过多崩服的情况.
  * 033
  * 新增一击必杀是否用于强化生物开关.
+ * 034
+ * 修复投掷器放置其他物品出现的提示.
  */
 
 /**
