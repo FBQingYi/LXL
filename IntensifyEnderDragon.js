@@ -263,7 +263,7 @@ function PlayerInjuryTreatment(mob, source) {
                     if (random < Config.RandomDebuffProbability) {
                         let buffTime = specifiedRangeRandomNumber(Config.DebuffMinTime, Config.DebuffMaxTime);
                         let bufflvl = specifiedRangeRandomNumber(Config.DebuffMinLvL, Config.DebuffMaxLvL);
-                        let buffname = Config.DebuffArray[specifiedRangeRandomNumber(0, Config.DebuffArray.length + 1)];
+                        let buffname = Config.DebuffArray[specifiedRangeRandomNumber(0, Config.DebuffArray.length)];
                         mc.runcmdEx(`effect "${player.realName}" ${buffname} ${buffTime} ${bufflvl} false`);
                         player.tell(i18n.trl(player.langCode, "SetDebuffTips", buffname, bufflvl, buffTime), 5);
                     }
