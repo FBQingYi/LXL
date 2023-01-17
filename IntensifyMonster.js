@@ -70,7 +70,7 @@ const EntityNbtJsonData = {
         }
     ]
 };
-const ConfigDataJson = { "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "0.0.1" };
+const ConfigDataJson = { "ForceEntitySize": false, "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "0.0.1" };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
@@ -157,6 +157,29 @@ if (Config.DockingGives) {
     }
 }
 FourProfileUpdate();
+
+/**
+ * 每tk执行.
+ * 判定是否强制实体大小.
+ */
+mc.listen("onTick", () => {
+    if (Config.ForceEntitySize) {
+        let AllEntityArray = mc.getAllEntities();
+        let UniqueNameArray = EntityUniqueNameArraySet();
+        AllEntityArray.forEach(entity => {
+            if (entity.hasTag("Intensify")) {
+                let entityAllTag = entity.getAllTags();
+                for (let key in entityAllTag) {
+                    if (UniqueNameArray.includes(entityAllTag[key])) {
+                        let DataJsonObj = UniqueNameGetEntityJson(entityAllTag[key], entity.type);
+                        entity.setScale(DataJsonObj.scale);
+                    }
+                }
+            }
+        });
+    }
+})
+
 
 /**
  * 实体转化监听.
@@ -530,7 +553,6 @@ function isIntensify(item) {
 /**
  * 修改实体属性
  * @param {Entity} newEntity 实体对象
- * @param {Pos} pos 坐标对象
  * @param {List} NbtData 实体修改的数据
  */
 function setNewEntity(newEntity, NbtData) {
@@ -574,7 +596,9 @@ function setNewEntity(newEntity, NbtData) {
         newEntity.setNbt(newEntityNbt);
         newEntity.addTag("Intensify");
         newEntity.addTag(NbtData.UniqueName);
-        newEntity.setScale(NbtData.scale);
+        setTimeout(() => {
+            newEntity.setScale(NbtData.scale);
+        }, 200);
     }
 }
 
@@ -766,6 +790,11 @@ function FourProfileUpdate() {
         UPEntityConfig = true;
     }
 
+    if (Config.ForceEntitySize == undefined) {
+        Config.ForceEntitySize = false;
+        UPEntityConfig = true;
+    }
+
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
         File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
@@ -819,14 +848,19 @@ function FourProfileUpdate() {
  * 024
  * 适配LLSE新的怪物刷新接口.
  * 移除光源、半砖判断,优化性能.
+ * ---------------------------------------
  * 强化怪可以实现100%刷新.
  * 新增强化实体能否踩下压力板选项.
  * 新增实体是否能被抛射物伤害选项.
  * 新增粒子显示选项,开启后强化怪将会有粒子效果.
+ * 新增强制实体大小选项.
+ * ----------------------------------------
+ * 禁止强化生物转化为其他生物.
  * 修复爆炸提示出现的错误.
  * 修复爆炸配置文件key错误导致的报错.
  * 修复旧版本配置出现错误判断不会自动适配的bug.
  * 修复命令生成指定生物出现的错误.
+ * 修复设置实体模型大小失败的问题.
  * 
  * 待添加功能
  */
