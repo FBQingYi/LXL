@@ -43,6 +43,8 @@ const EntityNbtJsonData = {
             "SpawnProbability": 5,
             "GiveXpToPlayer": 5,
             "LongRangeDamage": true,
+            "KillPlayerRecovery": 10,
+            "addTalentValue": 1.1234,
             "UniqueName": "zombie1",
             "ListSpoils": [
                 {
@@ -70,7 +72,7 @@ const EntityNbtJsonData = {
         }
     ]
 };
-const ConfigDataJson = { "ForceEntitySize": false, "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "0.0.1" };
+const ConfigDataJson = { "DockingIntensifySurvival": false, "ForceEntitySize": false, "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "0.0.1" };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 
 //------插件信息注册
@@ -91,7 +93,7 @@ if (!File.exists(pluginPath + "data/EntityData.json")) {
 }
 let EntityNbtJson = JSON.parse(File.readFrom(pluginPath + "data/EntityData.json"));
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
-let getReelNbt, GetNewItemNbt, ParticleSpawner;
+let getReelNbt, GetNewItemNbt, ParticleSpawner, AddTalentValue;
 let Generate = true;
 logger.setConsole(true);
 
@@ -100,6 +102,8 @@ logger.setConsole(true);
  */
 i18n.load(pluginPath + "language/language.json", "en", {
     "zh_CN": {
+        "StrengtheningReel1": "§3一级强化卷轴",
+        "StrengtheningReel1explain": JSON.stringify(["§2-------介绍-------", "§3一级强化卷轴", "可用于:原始装备", "§6使用效果:装备变为一阶", "-------====-------", "§3一阶装备:", "§2护甲类装备:+1 生命", "§4攻击类武器:+1 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
         "formTitle": "选择实体",
         "configUp": "版本配置文件更新，请前往data/EntityData.json查看！",
         "cmdExplain": "嘿嘿，强化你的怪物吧！",
@@ -107,9 +111,12 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "giveserr": "未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false",
         "entityInformation": "实体名称:{0}\n实体最大生命值:{1}\n实体移动速度:{2}\n实体追踪距离:{3}\n实体抗性:{1}",
         "CmdOutpError1": "没有找到这个生物相关的配置文件",
-        "BlastTips": "因你击杀了{0},即将在{1}秒后发生爆炸!"
+        "BlastTips": "因你击杀了{0},即将在{1}秒后发生爆炸!",
+        "IntensifySurvivalerr": "未找到前置插件IntensifySurvival.js，请前往下载或者在配置文件Config.json中将DockingIntensifySurvival设置为false"
     },
     "zh_TW": {
+        "StrengtheningReel1": "§3一級强化卷軸",
+        "StrengtheningReel1explain": JSON.stringify(["§2-------介紹-------", "§3一級强化卷軸", "可用於:原始裝備", "§6使用效果:裝備變為一階", "-------====-------", "§3一階裝備:", "§2護甲類裝備:+1生命", "§4攻擊類武器:+1攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
         "formTitle": "選擇實體",
         "configUp": "版本設定檔更新,請前往data/EntityData.json查看！",
         "cmdExplain": "嘿嘿，强化你的怪物吧！",
@@ -117,9 +124,12 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "giveserr": "未找到前置挿件gives.js,請前往下載或者在設定檔Config.json中將DockingGives設定為false",
         "entityInformation": "實體名稱:{0}\n實體最大生命值:{1}\n實體移動速度:{2}\n實體追跡距離:{3}\n實體抗性:{4}",
         "CmdOutpError1": "沒有找到這個生物相關的設定檔",
-        "BlastTips": "因你擊殺了{0}，即將在{1}秒後發生爆炸！"
+        "BlastTips": "因你擊殺了{0}，即將在{1}秒後發生爆炸！",
+        "IntensifySurvivalerr": "未找到前置挿件IntensifySurvival.js，請前往下載或者在設定檔Config.json中將DockingIntensifySurvival設定為false"
     },
     "en": {
+        "StrengtheningReel1": "§3Primary strengthening reel",
+        "StrengtheningReel1explain": JSON.stringify(["§2-------=introduce=-------", "§3Primary strengthening reel", "Available for: original equipment", "§6Use effect: equipment becomes first level", "-------====-------", "§3First level equipment:", "§2Armor equipment:+1 HP", "§4Attack weapons:+1 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
         "formTitle": "Select Entity",
         "configUp": "Please go to data/EntityData.json to view the updated configuration file!",
         "cmdExplain": "Hey hey, strengthen your monster!",
@@ -127,7 +137,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "giveserr": "The front-end plug-in gives.js is not found. Please go to download it or set DockingGives to false in the configuration file Config.json",
         "entityInformation": "Entity name: {0}  nMaximum HP of entity: {1}  nMoving speed of entity: {2}  nEntity tracking distance: {3}  nEntity resistance: {4}",
         "CmdOutpError1": "This biological related configuration file was not found",
-        "BlastTips": "Because you killed {0}, it will explode in {1} seconds!"
+        "BlastTips": "Because you killed {0}, it will explode in {1} seconds!",
+        "IntensifySurvivalerr": "The front-end plug-in IntensifySurvivor.js was not found. Please go to download or set DockingIntensifySurvivor.js to false in the configuration file Config.json"
     }
 });
 
@@ -138,10 +149,9 @@ i18n.load(pluginPath + "language/language.json", "en", {
 if (Config.DockingIntensify) {
     if (ll.require("Intensify.js")) {
         getReelNbt = ll.import("generateNewNbt");
-        i18n.load(IntensifyPath + "language/language.json", "en");
     } else {
         setTimeout(() => {
-            logger.error(i18n.trl(ll.language, "Intensifyerr",));
+            logger.error(i18n.get("Intensifyerr", ll.language));
             Config.DockingIntensify = false;
         }, 1000 * 5);
     }
@@ -151,8 +161,18 @@ if (Config.DockingGives) {
         GetNewItemNbt = ll.import("NewItemNbt");
     } else {
         setTimeout(() => {
-            logger.error(i18n.trl(ll.language, "giveserr",));
+            logger.error(i18n.get("giveserr", ll.language));
             Config.DockingGives = false;
+        }, 1000 * 5);
+    }
+}
+if (Config.DockingIntensifySurvival) {
+    if (ll.require("IntensifySurvival.js")) {
+        AddTalentValue = ll.import("AddValue");
+    } else {
+        setTimeout(() => {
+            logger.error(i18n.get("IntensifySurvivalerr", ll.language));
+            Config.DockingIntensifySurvival = false;
         }, 1000 * 5);
     }
 }
@@ -165,21 +185,42 @@ FourProfileUpdate();
 mc.listen("onTick", () => {
     if (Config.ForceEntitySize) {
         let AllEntityArray = mc.getAllEntities();
-        let UniqueNameArray = EntityUniqueNameArraySet();
         AllEntityArray.forEach(entity => {
             if (entity.hasTag("Intensify")) {
-                let entityAllTag = entity.getAllTags();
-                for (let key in entityAllTag) {
-                    if (UniqueNameArray.includes(entityAllTag[key])) {
-                        let DataJsonObj = UniqueNameGetEntityJson(entityAllTag[key], entity.type);
-                        entity.setScale(DataJsonObj.scale);
-                    }
+                let UniqueName = getEntityUniqueName(entity);
+                if (UniqueName != "") {
+                    let DataJsonObj = UniqueNameGetEntityJson(UniqueName, entity.type);
+                    entity.setScale(DataJsonObj.scale);
                 }
             }
         });
     }
 })
 
+/**
+ * 玩家死亡监听.
+ * 用于处理强化怪击杀玩家回血.
+ */
+mc.listen("onPlayerDie", (_player, source) => {
+    if (source != undefined) {
+        if (source.hasTag("Intensify")) {
+            let UniqueName = getEntityUniqueName(source);
+            if (UniqueName != "") {
+                let DataJsonObj = UniqueNameGetEntityJson(UniqueName, entity.type);
+                let addHealth = DataJsonObj.KillPlayerRecovery;
+                if (addHealth != 0) {
+                    if (source.health < source.maxHealth) {
+                        if (source.maxHealth - source.health > addHealth) {
+                            source.setHealth(source.health + addHealth);
+                        } else {
+                            source.setHealth(source.maxHealth);
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
 
 /**
  * 实体转化监听.
@@ -208,20 +249,23 @@ mc.listen("onStepOnPressurePlate", (entity, _pressurePlate) => {
  * 判断生物是否在强化文件内.
  * 然后随机判断是否生成强化生物.
  */
-mc.listen("onMobSpawn", (typeName, pos, entity) => {
-    if (EntityNbtJson[typeName] != undefined) {
-        let ConfigureRandom = specifiedRangeRandomNumber(0, EntityNbtJson[typeName].length);
-        let SelectConfiguration = EntityNbtJson[typeName][ConfigureRandom];
-        if (SelectConfiguration != undefined) {
-            let EntityGenerationProbability = SelectConfiguration.SpawnProbability;
-            let randomInt = specifiedRangeRandomNumber(0, 100);
-            if (randomInt < EntityGenerationProbability) {
-                if (Config.mobSpawner) {
-                    setNewEntity(entity, SelectConfiguration);
-                } else {
-                    let mobSpawnerBool = findNearestBlock(pos);
-                    if (!mobSpawnerBool) {
+mc.listen("onMobSpawned", (entity, pos) => {
+    if (entity != undefined) {
+        let typeName = entity.type;
+        if (EntityNbtJson[typeName] != undefined) {
+            let ConfigureRandom = specifiedRangeRandomNumber(0, EntityNbtJson[typeName].length);
+            let SelectConfiguration = EntityNbtJson[typeName][ConfigureRandom];
+            if (SelectConfiguration != undefined) {
+                let EntityGenerationProbability = SelectConfiguration.SpawnProbability;
+                let randomInt = specifiedRangeRandomNumber(0, 100);
+                if (randomInt < EntityGenerationProbability) {
+                    if (Config.mobSpawner) {
                         setNewEntity(entity, SelectConfiguration);
+                    } else {
+                        let mobSpawnerBool = findNearestBlock(pos);
+                        if (!mobSpawnerBool) {
+                            setNewEntity(entity, SelectConfiguration);
+                        }
                     }
                 }
             }
@@ -306,6 +350,9 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                             mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
                         }
                     }
+                }
+                if (Config.DockingIntensifySurvival) {
+                    AddTalentValue(player.xuid, entityDataJson.addTalentValue);
                 }
                 player.addExperience(entityDataJson.GiveXpToPlayer);
             }
@@ -428,6 +475,24 @@ mc.listen("onServerStarted", () => {
 });
 
 /**
+ * 查询实体的唯一uname.
+ * @param {Entity} entity 实体对象
+ * @returns 实体的唯一name
+ */
+function getEntityUniqueName(entity) {
+    let result = "";
+    let UniqueNameArray = EntityUniqueNameArraySet();
+    let entityAllTag = entity.getAllTags();
+    for (let key in entityAllTag) {
+        if (UniqueNameArray.includes(entityAllTag[key])) {
+            result = entityAllTag[key];
+            return result;
+        }
+    }
+    return result;
+}
+
+/**
  * 粒子生成循环任务.
  */
 function ParticleScheduledTasks() {
@@ -438,7 +503,15 @@ function ParticleScheduledTasks() {
                 if (entity != undefined && entity.name != "") {
                     if (entity.hasTag("Intensify")) {
                         let pos = mc.newFloatPos(entity.pos.x, entity.pos.y + 2, entity.pos.z, entity.pos.dimid);
-                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle')
+                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
+                        pos = mc.newFloatPos(entity.pos.x, entity.pos.y + 1, entity.pos.z + 1, entity.pos.dimid);
+                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
+                        pos = mc.newFloatPos(entity.pos.x, entity.pos.y + 1, entity.pos.z - 1, entity.pos.dimid);
+                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
+                        pos = mc.newFloatPos(entity.pos.x + 1, entity.pos.y + 1, entity.pos.z, entity.pos.dimid);
+                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
+                        pos = mc.newFloatPos(entity.pos.x - 1, entity.pos.y + 1, entity.pos.z, entity.pos.dimid);
+                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
                     }
                 }
             });
@@ -782,6 +855,8 @@ function FourProfileUpdate() {
                 if (EntityDataJson["BlastPower "] != undefined) {
                     EntityNbtJson[key][position].BlastPower = EntityDataJson["BlastPower "];
                     EntityNbtJson[key][position].BlastRange = EntityDataJson["BlastRange "];
+                    EntityNbtJson[key][position].KillPlayerRecovery = 10;
+                    EntityNbtJson[key][position].addTalentValue = 1.1234;
                     delete EntityNbtJson[key][position]["BlastPower "];
                     delete EntityNbtJson[key][position]["BlastRange "];
                 }
@@ -792,6 +867,7 @@ function FourProfileUpdate() {
 
     if (Config.ForceEntitySize == undefined) {
         Config.ForceEntitySize = false;
+        Config.DockingIntensifySurvival = false;
         UPEntityConfig = true;
     }
 
@@ -854,6 +930,8 @@ function FourProfileUpdate() {
  * 新增实体是否能被抛射物伤害选项.
  * 新增粒子显示选项,开启后强化怪将会有粒子效果.
  * 新增强制实体大小选项.
+ * 新增击杀玩家回血配置项.
+ * 新增玩家击杀强化生物获得天赋点配置项(对接强化生存).
  * ----------------------------------------
  * 禁止强化生物转化为其他生物.
  * 修复爆炸提示出现的错误.
@@ -861,6 +939,7 @@ function FourProfileUpdate() {
  * 修复旧版本配置出现错误判断不会自动适配的bug.
  * 修复命令生成指定生物出现的错误.
  * 修复设置实体模型大小失败的问题.
+ * 修复未找到前置插件提示出现的错误.
  * 
  * 待添加功能
  */
