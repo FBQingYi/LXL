@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 4];
+const PluginsVersion = [0, 2, 6];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -168,7 +168,7 @@ if (Config.DockingGives) {
 }
 if (Config.DockingIntensifySurvival) {
     if (ll.require("IntensifySurvival.js")) {
-        AddTalentValue = ll.import("AddValue");
+        AddTalentValue = ll.import("IntensifySurvival", "AddValue");
     } else {
         setTimeout(() => {
             logger.error(i18n.get("IntensifySurvivalerr", ll.language));
@@ -190,7 +190,9 @@ mc.listen("onTick", () => {
                 let UniqueName = getEntityUniqueName(entity);
                 if (UniqueName != "") {
                     let DataJsonObj = UniqueNameGetEntityJson(UniqueName, entity.type);
-                    entity.setScale(DataJsonObj.scale);
+                    if(DataJsonObj != {}){
+                        entity.setScale(parseInt(DataJsonObj.scale));
+                    }
                 }
             }
         });
@@ -203,17 +205,19 @@ mc.listen("onTick", () => {
  */
 mc.listen("onPlayerDie", (_player, source) => {
     if (source != undefined) {
-        if (source.hasTag("Intensify")) {
+        if (source.hasTag("Intensify") && source.type !="minecraft:creeper") {
             let UniqueName = getEntityUniqueName(source);
             if (UniqueName != "") {
-                let DataJsonObj = UniqueNameGetEntityJson(UniqueName, entity.type);
-                let addHealth = DataJsonObj.KillPlayerRecovery;
-                if (addHealth != 0) {
-                    if (source.health < source.maxHealth) {
-                        if (source.maxHealth - source.health > addHealth) {
-                            source.setHealth(source.health + addHealth);
-                        } else {
-                            source.setHealth(source.maxHealth);
+                let DataJsonObj = UniqueNameGetEntityJson(UniqueName, source.type);
+                if(DataJsonObj != {}){
+                    let addHealth = DataJsonObj.KillPlayerRecovery;
+                    if (addHealth != 0) {
+                        if (source.health < source.maxHealth) {
+                            if (source.maxHealth - source.health > addHealth) {
+                                source.setHealth(source.health + addHealth);
+                            } else {
+                                source.setHealth(source.maxHealth);
+                            }
                         }
                     }
                 }
@@ -670,7 +674,7 @@ function setNewEntity(newEntity, NbtData) {
         newEntity.addTag("Intensify");
         newEntity.addTag(NbtData.UniqueName);
         setTimeout(() => {
-            newEntity.setScale(NbtData.scale);
+            newEntity.setScale(parseInt(NbtData.scale));
         }, 200);
     }
 }
@@ -855,10 +859,12 @@ function FourProfileUpdate() {
                 if (EntityDataJson["BlastPower "] != undefined) {
                     EntityNbtJson[key][position].BlastPower = EntityDataJson["BlastPower "];
                     EntityNbtJson[key][position].BlastRange = EntityDataJson["BlastRange "];
-                    EntityNbtJson[key][position].KillPlayerRecovery = 10;
-                    EntityNbtJson[key][position].addTalentValue = 1.1234;
                     delete EntityNbtJson[key][position]["BlastPower "];
                     delete EntityNbtJson[key][position]["BlastRange "];
+                }
+                if(EntityNbtJson[key][position].KillPlayerRecovery == undefined){
+                    EntityNbtJson[key][position].KillPlayerRecovery = 10;
+                    EntityNbtJson[key][position].addTalentValue = 1.1234;
                 }
             });
         }
@@ -867,7 +873,23 @@ function FourProfileUpdate() {
 
     if (Config.ForceEntitySize == undefined) {
         Config.ForceEntitySize = false;
+        UPEntityConfig = true;
+    }
+    if(Config.DockingIntensifySurvival == undefined){
         Config.DockingIntensifySurvival = false;
+        UPEntityConfig = true;
+    }
+
+    if (Config.ProfileVersion == "0.0.5") {
+        Config.ProfileVersion = "0.0.6";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((EntityDataJson, position) => {
+                if(EntityNbtJson[key][position].KillPlayerRecovery == undefined){
+                    EntityNbtJson[key][position].KillPlayerRecovery = 10;
+                    EntityNbtJson[key][position].addTalentValue = 1.1234;
+                }
+            });
+        }
         UPEntityConfig = true;
     }
 
@@ -940,6 +962,11 @@ function FourProfileUpdate() {
  * 修复命令生成指定生物出现的错误.
  * 修复设置实体模型大小失败的问题.
  * 修复未找到前置插件提示出现的错误.
+ * 025
+ * 修复和强化生存对接问题.
+ * 修复强制实体大小报错的问题.
+ * 026
+ * 修复玩家被强化实体杀死出现的错误.
  * 
  * 待添加功能
  */
