@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 5];
+const PluginsVersion = [0, 2, 6];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -875,8 +875,7 @@ function FourProfileUpdate() {
         Config.ForceEntitySize = false;
         UPEntityConfig = true;
     }
-
-    if (Config.DockingIntensifySurvival == undefined) {
+    if(Config.DockingIntensifySurvival == undefined){
         Config.DockingIntensifySurvival = false;
         UPEntityConfig = true;
     }
@@ -966,6 +965,8 @@ function FourProfileUpdate() {
  * 025
  * 修复和强化生存对接问题.
  * 修复强制实体大小报错的问题.
+ * 026
+ * 修复玩家被强化实体杀死出现的错误.
  * 
  * 待添加功能
  */
