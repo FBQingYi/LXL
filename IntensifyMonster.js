@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 6];
+const PluginsVersion = [0, 2, 7];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -18,6 +18,7 @@ const EntityNbtJsonData = {
             "Additionaldamage": 2,
             "customName": "宝藏僵尸",
             "reel": true,
+            "reelLvl": 1,
             "playerFire": true,
             "FireTime": 10,
             "probability": 10,
@@ -102,8 +103,6 @@ logger.setConsole(true);
  */
 i18n.load(pluginPath + "language/language.json", "en", {
     "zh_CN": {
-        "StrengtheningReel1": "§3一级强化卷轴",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------介绍-------", "§3一级强化卷轴", "可用于:原始装备", "§6使用效果:装备变为一阶", "-------====-------", "§3一阶装备:", "§2护甲类装备:+1 生命", "§4攻击类武器:+1 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
         "formTitle": "选择实体",
         "configUp": "版本配置文件更新，请前往data/EntityData.json查看！",
         "cmdExplain": "嘿嘿，强化你的怪物吧！",
@@ -115,8 +114,6 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "IntensifySurvivalerr": "未找到前置插件IntensifySurvival.js，请前往下载或者在配置文件Config.json中将DockingIntensifySurvival设置为false"
     },
     "zh_TW": {
-        "StrengtheningReel1": "§3一級强化卷軸",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------介紹-------", "§3一級强化卷軸", "可用於:原始裝備", "§6使用效果:裝備變為一階", "-------====-------", "§3一階裝備:", "§2護甲類裝備:+1生命", "§4攻擊類武器:+1攻擊", "PS:加攻擊是指在攻擊時\n對目標造成額外的真實傷害！"]),
         "formTitle": "選擇實體",
         "configUp": "版本設定檔更新,請前往data/EntityData.json查看！",
         "cmdExplain": "嘿嘿，强化你的怪物吧！",
@@ -128,9 +125,7 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "IntensifySurvivalerr": "未找到前置挿件IntensifySurvival.js，請前往下載或者在設定檔Config.json中將DockingIntensifySurvival設定為false"
     },
     "en": {
-        "StrengtheningReel1": "§3Primary strengthening reel",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------=introduce=-------", "§3Primary strengthening reel", "Available for: original equipment", "§6Use effect: equipment becomes first level", "-------====-------", "§3First level equipment:", "§2Armor equipment:+1 HP", "§4Attack weapons:+1 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "formTitle": "Select Entity",
+       "formTitle": "Select Entity",
         "configUp": "Please go to data/EntityData.json to view the updated configuration file!",
         "cmdExplain": "Hey hey, strengthen your monster!",
         "Intensifyerr": "The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json",
@@ -148,7 +143,7 @@ i18n.load(pluginPath + "language/language.json", "en", {
  */
 if (Config.DockingIntensify) {
     if (ll.require("Intensify.js")) {
-        getReelNbt = ll.import("generateNewNbt");
+        getReelNbt = ll.import("intensify", "reel");
     } else {
         setTimeout(() => {
             logger.error(i18n.get("Intensifyerr", ll.language));
@@ -190,7 +185,7 @@ mc.listen("onTick", () => {
                 let UniqueName = getEntityUniqueName(entity);
                 if (UniqueName != "") {
                     let DataJsonObj = UniqueNameGetEntityJson(UniqueName, entity.type);
-                    if(DataJsonObj != {}){
+                    if (DataJsonObj != {}) {
                         entity.setScale(parseInt(DataJsonObj.scale));
                     }
                 }
@@ -205,11 +200,11 @@ mc.listen("onTick", () => {
  */
 mc.listen("onPlayerDie", (_player, source) => {
     if (source != undefined) {
-        if (source.hasTag("Intensify") && source.type !="minecraft:creeper") {
+        if (source.hasTag("Intensify") && source.type != "minecraft:creeper") {
             let UniqueName = getEntityUniqueName(source);
             if (UniqueName != "") {
                 let DataJsonObj = UniqueNameGetEntityJson(UniqueName, source.type);
-                if(DataJsonObj != {}){
+                if (DataJsonObj != {}) {
                     let addHealth = DataJsonObj.KillPlayerRecovery;
                     if (addHealth != 0) {
                         if (source.health < source.maxHealth) {
@@ -309,8 +304,7 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                     let randomInt = specifiedRangeRandomNumber(0, 100);
                     if (entityDataJson.reel) {
                         if (randomInt < entityDataJson.probability) {
-                            let newItem = mc.newItem(getReelNbt("intensify", 1, i18n.trl(player.langCode, "StrengtheningReel1",)));
-                            newItem.setLore(JSON.parse(i18n.trl(player.langCode, "StrengtheningReel1explain",)));
+                            let newItem = getReelNbt(player, entityDataJson.reelLvl);
                             mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
                         }
                     }
@@ -862,7 +856,7 @@ function FourProfileUpdate() {
                     delete EntityNbtJson[key][position]["BlastPower "];
                     delete EntityNbtJson[key][position]["BlastRange "];
                 }
-                if(EntityNbtJson[key][position].KillPlayerRecovery == undefined){
+                if (EntityNbtJson[key][position].KillPlayerRecovery == undefined) {
                     EntityNbtJson[key][position].KillPlayerRecovery = 10;
                     EntityNbtJson[key][position].addTalentValue = 1.1234;
                 }
@@ -875,7 +869,7 @@ function FourProfileUpdate() {
         Config.ForceEntitySize = false;
         UPEntityConfig = true;
     }
-    if(Config.DockingIntensifySurvival == undefined){
+    if (Config.DockingIntensifySurvival == undefined) {
         Config.DockingIntensifySurvival = false;
         UPEntityConfig = true;
     }
@@ -883,10 +877,21 @@ function FourProfileUpdate() {
     if (Config.ProfileVersion == "0.0.5") {
         Config.ProfileVersion = "0.0.6";
         for (let key in EntityNbtJson) {
-            EntityNbtJson[key].forEach((EntityDataJson, position) => {
-                if(EntityNbtJson[key][position].KillPlayerRecovery == undefined){
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].KillPlayerRecovery == undefined) {
                     EntityNbtJson[key][position].KillPlayerRecovery = 10;
                     EntityNbtJson[key][position].addTalentValue = 1.1234;
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
+    if (Config.ProfileVersion == "0.0.6") {
+        Config.ProfileVersion = "0.0.7";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].reelLvl == undefined) {
+                    EntityNbtJson[key][position].reelLvl = 1;
                 }
             });
         }
@@ -967,6 +972,9 @@ function FourProfileUpdate() {
  * 修复强制实体大小报错的问题.
  * 026
  * 修复玩家被强化实体杀死出现的错误.
+ * 027
+ * 对接新版强化装备插件.
+ * 移除多余语言文件.
  * 
  * 待添加功能
  */

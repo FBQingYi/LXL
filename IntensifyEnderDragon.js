@@ -4,7 +4,7 @@
 const pluginName = "IntensifyEnderDragon";
 const PluginsIntroduction = '强化末影龙!';
 const pluginPath = "./plugins/IntensifyEnderDragon/";
-const PluginsVersion = [0, 0, 5];
+const PluginsVersion = [0, 0, 7];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const ConfigDataJson = {
     "DockingGives": false,
@@ -115,16 +115,6 @@ let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 
 i18n.load(pluginPath + "language/language.json", "zh_CN", {
     "zh_CN": {
-        "StrengtheningReel1": "§3一级强化卷轴",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------介绍-------", "§3一级强化卷轴", "可用于:原始装备", "§6使用效果:装备变为一阶", "-------====-------", "§3一阶装备:", "§2护甲类装备:+1 生命", "§4攻击类武器:+1 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel2": "§9二级强化卷轴",
-        "StrengtheningReel2explain": JSON.stringify(["§2-------介绍-------", "§9二级强化卷轴", "可用于:一阶装备", "§6使用效果:装备变为二阶", "-------====-------", "§9二阶装备:", "§2护甲类装备:+3 生命", "§4攻击类武器:+2 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel3": "§1三级强化卷轴",
-        "StrengtheningReel3explain": JSON.stringify(["§2-------介绍-------", "§1三级强化卷轴", "可用于:二阶装备", "§6使用效果:装备变为三阶", "-------====-------", "§1三阶装备:", "§2护甲类装备:+5 生命", "§4攻击类武器:+3 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel4": "§4四级强化卷轴",
-        "StrengtheningReel4explain": JSON.stringify(["§2-------介绍-------", "§4四级强化卷轴", "可用于:三阶装备", "§6使用效果:装备变为四阶", "-------====-------", "§4四阶装备:", "§2护甲类装备:+10 生命", "§4攻击类武器:+4 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
-        "StrengtheningReel5": "§6终极强化卷轴",
-        "StrengtheningReel5explain": JSON.stringify(["§2-------介绍-------", "§6终极强化卷轴", "可用于:四阶装备", "§6使用效果:装备变为终极", "-------====-------", "§6终极装备:", "§2护甲类装备:+20 生命", "§4攻击类武器:+5 攻击", "PS:加攻击是指在攻击时\n对目标造成额外的真实伤害!"]),
         "phase2Tips": "§l§2末影龙进入第二阶段\n此阶段爆炸无法对其造成伤害。",
         "phase3Tips": "§l§5末影龙进入终极阶段\n此阶段只有近战才能对其造成伤害。",
         "UnableCauseDamage": "§l§4此物品无法对末影龙造成伤害!",
@@ -146,16 +136,6 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
         "rewardTips": "§l§6{0}杀末影龙获得了\n{1}经验值\n{2} {3}，\n其他奖励已生成掉落物！",
     },
     "en": {
-        "StrengtheningReel1": "§3Primary strengthening reel",
-        "StrengtheningReel1explain": JSON.stringify(["§2-------=introduce=-------", "§3Primary strengthening reel", "Available for: original equipment", "§6Use effect: equipment becomes first level", "-------====-------", "§3First level equipment:", "§2Armor equipment:+1 HP", "§4Attack weapons:+1 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "StrengtheningReel2": "§9Secondary strengthening reel",
-        "StrengtheningReel2explain": JSON.stringify(["§2-------=introduce=-------", "§9Secondary strengthening reel", "Can be used for: Level 1 equipment", "§6Use effect: equipment becomes second level", "-------====-------", "§9Second level equipment:", "§2Armor equipment:+3 HP", "§4Attack weapons:+2 attack", "PS: Adding an attack means to cause extra real damage\n to the target when attacking!"]),
-        "StrengtheningReel3": "§1Three level strengthening reel",
-        "StrengtheningReel3explain": JSON.stringify(["§2-------=introduce=-------", "§1Three level strengthening reel", "Can be used for: second level equipment", "§6Use effect: equipment becomes three Level", "-------====-------", "§1Third level equipment:", "§2Armor equipment:+5 HP", "§4Attack weapons:+3 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "StrengtheningReel4": "§4Four level strengthening reel",
-        "StrengtheningReel4explain": JSON.stringify(["§2-------=introduce=-------", "§4Four level strengthening reel", "Can be used for: three level equipment", "§6Use effect: equipment becomes four Level", "-------====-------", "§4Fourth level equipment:", "§2Armor equipment:+10 HP", "§4Attack weapons:+4 attack", "PS: Adding an attack means to cause extra real damage \nto the target when attacking!"]),
-        "StrengtheningReel5": "§6Ultimate strengthening scroll",
-        "StrengtheningReel5explain": JSON.stringify(["§2-------=introduce=-------", "§6Ultimate strengthening scroll", "Can be used for: four level equipment", "§6Use effect: equipment becomes the ultimate", "-------====-------", "§6THE ULTIMATE GEAR:", "§2Armor equipment:+20 HP", "§4Attack weapons:+5 attack", "PS: Adding an attack means to cause extra real damage\n to the target when attacking!"]),
         "phase2Tips": "§l§2Last Shadow Dragon enters the second stage \n Explosion at this stage cannot cause damage to them.",
         "phase3Tips": "§l§5Last Shadow Dragon enters the final stage\nOnly melee can damage them at this stage.",
         "UnableCauseDamage": "§l§4This item cannot cause damage to the Shadow Dragon!",
@@ -184,7 +164,7 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
  */
 if (Config.DockingIntensify) {
     if (ll.require("Intensify.js")) {
-        getReelNbt = ll.import("generateNewNbt");
+        getReelNbt = ll.import("intensify", "reel");
     } else {
         setTimeout(() => {
             logger.error(i18n.trl(ll.language, "Intensifyerr",));
@@ -414,11 +394,11 @@ mc.listen("onMobDie", (mob, source, cause) => {
                     }
                 }
                 if (Config.KillerReward.LLmoney > 0) {
-                    Player.addMoney(Config.KillerReward.LLmoney);
+                    player.addMoney(Config.KillerReward.LLmoney);
                     TerminalBroadcasting(i18n.trl(player.langCode, "rewardTips", player.realName, rewardJson.xp, Config.KillerReward.LLmoney, Config.KillerReward.NameEconomicSystem));
                 }
 
-                AwardGeneration(mob, rewardJson);
+                AwardGeneration(mob, rewardJson,player);
             }
         }
         LastShadowDragonReturnsBlood();
@@ -431,8 +411,9 @@ mc.listen("onMobDie", (mob, source, cause) => {
  * 生成奖励掉落物.
  * @param {Entity} entity 实体对象
  * @param {JSONObj} rewardJson 奖励配置文件
+ * @param {player} player 玩家对象
  */
-function AwardGeneration(entity, rewardJson) {
+function AwardGeneration(entity, rewardJson,player) {
     let DropsArray = rewardJson.DropItemArray;
     if (rewardJson.DropMode == 0) {
         DropsArray.forEach(ItemJson => {
@@ -447,8 +428,7 @@ function AwardGeneration(entity, rewardJson) {
                 case "intensify":
                     if (Config.DockingIntensify) {
                         if (random < ItemJson.DroppingProbability && ItemJson.ReelGrade < 6) {
-                            let newItem = mc.newItem(getReelNbt("intensify", ItemJson.ReelGrade, i18n.trl(ll.language, "StrengtheningReel" + ItemJson.ReelGrade)));
-                            newItem.setLore(JSON.parse(i18n.get(`StrengtheningReel${ItemJson.ReelGrade}explain`, ll.language)));
+                            let newItem = mc.newItem(getReelNbt(player, ItemJson.ReelGrade));
                             for (let i = 0; i < ItemJson.DropQuantity; i++) {
                                 mc.spawnItem(newItem, entity.pos);
                             }
@@ -477,8 +457,7 @@ function AwardGeneration(entity, rewardJson) {
                 break;
             case "intensify":
                 if (Config.DockingIntensify) {
-                    let newItem = mc.newItem(getReelNbt("intensify", ItemJson.ReelGrade, i18n.trl(ll.language, "StrengtheningReel" + ItemJson.ReelGrade,)));
-                    newItem.setLore(JSON.parse(i18n.get(`StrengtheningReel${ItemJson.ReelGrade}explain`, ll.language)));
+                    let newItem = mc.newItem(getReelNbt(player, ItemJson.ReelGrade));
                     for (let i = 0; i < ItemJson.DropQuantity; i++) {
                         mc.spawnItem(newItem, entity.pos);
                     }
@@ -839,4 +818,12 @@ ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherI
  * 彻底修复起飞，爆炸出现主世界玩家的情况.
  * 尝试修复第二条龙无奖励的问题.
  * 移除不可用的debuff.
+ * 006
+ * 修复增加玩家llmoney经济出现的错误.
+ * 007
+ * 适配新版强化装备插件.
+ * 移除多余语言文件. 
+ * 
+ * 待修复bug
+ * 龙死亡接着放水晶召唤有几率生成出来的龙是不会给爆炸和起飞。
  */
