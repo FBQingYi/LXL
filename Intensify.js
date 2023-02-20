@@ -1,7 +1,7 @@
 const pluginName = "Intensify";
 const pluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const pluginsVersion = [1, 3, 5];
+const pluginsVersion = [1, 3, 7];
 const pluginsOtherInformation = { "插件作者": "清漪花开" };
 
 const soundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"];
@@ -15,7 +15,8 @@ const chestplateItemArray = ["minecraft:leather_chestplate", "minecraft:chainmai
 const leggingsItemArray = ["minecraft:leather_leggings", "minecraft:chainmail_leggings", "minecraft:iron_leggings", "minecraft:golden_leggings", "minecraft:diamond_leggings", "minecraft:netherite_leggings"];
 const bootsItemArray = ["minecraft:leather_boots", "minecraft:chainmail_boots", "minecraft:iron_boots", "minecraft:golden_boots", "minecraft:diamond_boots", "minecraft:netherite_boots"];
 const toolItemArray = ["minecraft:wooden_axe", "minecraft:wooden_pickaxe", "minecraft:wooden_shovel", "minecraft:wooden_hoe", "minecraft:stone_pickaxe", "minecraft:stone_shovel", "minecraft:stone_axe", "minecraft:stone_hoe", "minecraft:iron_axe", "minecraft:iron_pickaxe", "minecraft:iron_shovel", "minecraft:iron_hoe", "minecraft:golden_axe", "minecraft:golden_pickaxe", "minecraft:golden_shovel", "minecraft:golden_hoe", "minecraft:diamond_axe", "minecraft:diamond_pickaxe", "minecraft:diamond_shovel", "minecraft:diamond_hoe", "minecraft:netherite_axe", "minecraft:netherite_pickaxe", "minecraft:netherite_shovel", "minecraft:netherite_hoe"];
-const gemDataConfig = { "vampireGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "攻击时有几率触发吸血效果，根据等级不同触发几率恢复效果都不同。", "triggerProbability": [50, 60, 70, 80, 95], "CDTime": [10, 8, 6, 4, 2], "relatedData": [20, 30, 40, 50, 60], "successProbability": [8.5, 6.3, 4.2, 1.2, 0.5], "DropEntityList": ["minecraft:drowned"] }, "powerGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "攻击时有几率触发暴击效果，暴击将对被攻击者造成真实伤害。", "triggerProbability": [10, 20, 30, 50], "CDTime": [1200, 800, 400, 100], "relatedData": [1, 2, 4, 8], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"] }, "durableGem": { "maxLevel": 1, "droppingProbability": 0.0001, "describe": "崛起吧,我的金套!", "successProbability": [100], "relatedData": [1], "DropEntityList": ["minecraft:wither", "minecraft:warden"] } };
+const longRangeWeaponArray = ["minecraft:bow"];
+const gemDataConfig = { "vampireGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "攻击时有几率触发吸血效果，根据等级不同触发几率恢复效果都不同。", "triggerProbability": [50, 60, 70, 80, 95], "CDTime": [10, 8, 6, 4, 2], "relatedData": [20, 30, 40, 50, 60], "successProbability": [8.5, 6.3, 4.2, 1.2, 0.5], "DropEntityList": ["minecraft:drowned"] }, "powerGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "攻击时有几率触发暴击效果，暴击将对被攻击者造成真实伤害。", "triggerProbability": [10, 20, 30, 50], "CDTime": [1200, 800, 400, 100], "relatedData": [1, 2, 4, 8], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"] }, "explosiveGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "使用弓箭攻击时有几率触发爆炸！", "triggerProbability": [10, 20, 60, 80], "CDTime": [120, 80, 40, 10], "relatedData": [1, 2, 3, 4], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"] }, "experienceGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "获得额外的经验", "triggerProbability": [1, 10, 15, 20, 30], "CDTime": [10, 5, 3, 2, 1], "relatedData": [10, 20, 30, 40, 50], "successProbability": [10, 5, 2.5, 1, 0.1], "DropEntityList": ["minecraft:witch"] }, "durableGem": { "maxLevel": 1, "droppingProbability": 0.0001, "describe": "崛起吧,我的金套!", "successProbability": [100], "relatedData": [1], "DropEntityList": ["minecraft:wither", "minecraft:warden"] } };
 const reelDataConfig = { "maxLevel": 5, "blockList": ["minecraft:diamond_ore", "minecraft:deepslate_diamond_ore", "minecraft:emerald_ore", "minecraft:deepslate_emerald_ore", "minecraft:gold_ore", "minecraft:deepslate_gold_ore"], "droppingProbability": 0.15, "DataEachLevel": [{ "level": 1, "equipProbability": 8.5965, "nextLevelProbability": 4.3654, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 0 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 0 }] }, { "level": 2, "equipProbability": 3.5875, "nextLevelProbability": 2.5874, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 1 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 1 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 1 }] }, { "level": 3, "equipProbability": 2.86, "nextLevelProbability": 1.85, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 2 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 2 }] }, { "level": 4, "equipProbability": 1.58, "nextLevelProbability": 0.58, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 3 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 2 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 2 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 3 }] }, { "level": 5, "equipProbability": 0.5, "nextLevelProbability": 0, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }, { "buffName": "潮涌能量", "buffId": "conduit_power", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 4 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 4 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 9 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }, { "buffName": "缓降", "buffId": "slow_falling", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 4 }] }] };
 const initialConfig = {
     "randomNumber": {
@@ -31,7 +32,8 @@ const ItemRoute = {
     "leggingsBuff": pluginPath + "data/itemData/leggingsData.json",
     "bootsBuff": pluginPath + "data/itemData/bootsData.json",
     "toolBuff": pluginPath + "data/itemData/toolData.json",
-    "swordBuff": pluginPath + "data/itemData/swordData.json"
+    "swordBuff": pluginPath + "data/itemData/swordData.json",
+    "longRangeBuff": pluginPath + "data/itemData/longRangeData.json"
 }
 //------插件信息注册
 ll.registerPlugin(pluginName, pluginsIntroduction, pluginsVersion, pluginsOtherInformation);
@@ -59,12 +61,17 @@ if (!File.exists(ItemRoute.helmetBuff)) {
     File.writeTo(ItemRoute.bootsBuff, JSON.stringify(bootsItemArray, null, "\t"));
     File.writeTo(ItemRoute.toolBuff, JSON.stringify(toolItemArray, null, "\t"));
     File.writeTo(ItemRoute.swordBuff, JSON.stringify(swordItemArray, null, "\t"));
+    File.writeTo(ItemRoute.longRangeBuff, JSON.stringify(longRangeWeaponArray, null, "\t"));
+}
+if (!File.exists(ItemRoute.longRangeBuff)) {
+    File.writeTo(ItemRoute.longRangeBuff, JSON.stringify(longRangeWeaponArray, null, "\t"));
 }
 
+let playerRemoteInjuryData = {}
 let playerHandItemEvent = {};
 let playerGemCountDown = {};
 let playerOnlineState = {};
-let swordDataArray, helmetDataArray, chestplateDataArray, leggingsDataArray, bootsDataArray, toolDataArray, availableItemJson;
+let swordDataArray, helmetDataArray, chestplateDataArray, leggingsDataArray, bootsDataArray, toolDataArray, availableItemJson, longRangeDataArray;
 
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 
@@ -82,7 +89,8 @@ function readItemFile() {
     leggingsDataArray = JSON.parse(File.readFrom(pluginPath + "data/itemData/leggingsData.json"));
     bootsDataArray = JSON.parse(File.readFrom(pluginPath + "data/itemData/bootsData.json"));
     toolDataArray = JSON.parse(File.readFrom(pluginPath + "data/itemData/toolData.json"));
-    availableItemJson = { "swordDataArray": swordDataArray, "helmetDataArray": helmetDataArray, "chestplateDataArray": chestplateDataArray, "leggingsDataArray": leggingsDataArray, "bootsDataArray": bootsDataArray, "toolDataArray": toolDataArray };
+    longRangeDataArray = JSON.parse(File.readFrom(pluginPath + "data/itemData/longRangeData.json"));
+    availableItemJson = { "swordDataArray": swordDataArray, "helmetDataArray": helmetDataArray, "chestplateDataArray": chestplateDataArray, "leggingsDataArray": leggingsDataArray, "bootsDataArray": bootsDataArray, "toolDataArray": toolDataArray, "longRangeDataArray": longRangeDataArray };
 }
 
 i18n.load(pluginPath + "language/language.json", "zh_CN", {
@@ -95,6 +103,10 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
         "durableGemEffect": "无限耐久",
         "transferGem": "转移宝石",
         "transferGemEffect": "转移物品属性",
+        "explosiveGem": "爆炸宝石",
+        "explosiveGemEffect": "爆炸：+{0}",
+        "experienceGem": "经验宝石",
+        "experienceGemEffect": "经验：+{0}%",
         "reel": "强化卷轴",
         "ordinary": "普通",
         "rare": "稀有",
@@ -115,8 +127,8 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
         "reelLore2": JSON.stringify(["§1卷轴名称： §2{0}", "§3卷轴类型： §a{1}", "当前等级：{5}", "最高等级：{2}", "合成成功率： {3}", "§6强化成功率：{4}", "卷轴效果："]),
         "tooManyTips": "你放得太多了，请一个一个放置吧！",
         "itemGemMsgLore": ">>>>>>>-宝石-<<<<<<<",
-        "itemGemLore1": JSON.stringify(["§7------槽位{3}#------", "§g宝石名称：{0}", "§g宝石等级：{1}", "§g宝石效果：", "§g  {2}"]),
-        "itemGemLore": JSON.stringify(["§7------槽位{3}#------", "§g宝石名称：{0}", "§g宝石等级：{1}", "§gCD时间：{4}", "§g触发几率：{5}", "§g宝石效果：", "§g  {2}"]),
+        "itemGemLore1": JSON.stringify(["§7------槽位{3}#------", "§g宝石名称：{0}", "§g宝石等级： +{1}", "§g宝石效果：", "§g  {2}"]),
+        "itemGemLore": JSON.stringify(["§7------槽位{3}#------", "§g宝石名称：{0}", "§g宝石等级： +{1}", "§gCD时间：{4}", "§g触发几率：{5}", "§g宝石效果：", "§g  {2}"]),
         "itemReelLore": JSON.stringify([">>>>>>>-卷轴-<<<<<<<", "§6卷轴类型：{0}", "§6卷轴等级： +{1}", "§6当前效果："]),
         "forgingInformation": JSON.stringify([">>>>>>-锻造信息-<<<<<<", "锻造玩家：", "   {0}", "锻造时间：", "   {1}"]),
         "command": "强化装备插件",
@@ -138,6 +150,10 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
         "durableGemEffect": "Infinite durability",
         "transferGem": "transfer Gem",
         "transferGemEffect": "Transfer item attributes",
+        "explosiveGem": "Explosive gem",
+        "explosiveGemEffect": "Explosive：+{0}",
+        "experienceGem": "Experience gem",
+        "experienceGemEffect": "Experience：+{0}%",
         "reel": "Enhanced scroll",
         "ordinary": "ordinary",
         "rare": "rare",
@@ -237,10 +253,11 @@ function openContainerEvent(player, block) {
                 }
             }
         }
-    } else if (ConfigJson.removeOldItems) {
-        let block = mc.getBlock(pos);
+    } else if (ConfigJson.removeOldItems && block.type != "minecraft:ender_chest") {
         let container = block.getContainer();
-        other.checkAllItemsContainer(container);
+        if (container != undefined) {
+            other.checkAllItemsContainer(container);
+        }
     }
 }
 
@@ -249,6 +266,7 @@ function openContainerEvent(player, block) {
  */
 function serverStartedEvent() {
     readItemFile();
+    versionUpdateModifyProfile();
     qingYi.playerSwitchHandheld();
     other.scheduledTasks();
     other.commandRegistration();
@@ -319,7 +337,9 @@ function preJoinEvent(player) {
         if (playerGemCountDown[xuid] == undefined) {
             playerGemCountDown[xuid] = {
                 "vampireGem": 0,
-                "powerGem": 0
+                "powerGem": 0,
+                "explosiveGem": 0,
+                "experienceGem": 0
             }
         }
     }
@@ -359,6 +379,65 @@ function attackEntityEvent(player, entity) {
 }
 
 /**
+ * 弹射物命中实体事件处理
+ * @param {Entity} entity 被命中的实体对象
+ * @param {Entity} source 弹射物实体对象
+ */
+function projectileHitEntityEvent(entity, source) {
+    if (playerRemoteInjuryData[source.uniqueId] != undefined) {
+        let player = mc.getPlayer(playerRemoteInjuryData[source.uniqueId]);
+        let playerHandItem = player.getHand();
+        let handItemGemData = queryData.getItemGemData(playerHandItem);
+        if (handItemGemData.gemState && handItemGemData.explosiveGem != undefined) {
+            gemSetData.explosiveGemOperation(player, entity.pos, handItemGemData);
+        }
+        delete playerRemoteInjuryData[source.uniqueId];
+    }
+}
+
+/**
+ * 弹射物命中方块事件处理
+ * @param {Block} block 被命中的方块对象
+ * @param {Entity} source 弹射物实体对象
+ */
+function projectileHitBlockEvent(block, source) {
+    if (playerRemoteInjuryData[source.uniqueId] != undefined) {
+        let player = mc.getPlayer(playerRemoteInjuryData[source.uniqueId]);
+        let playerHandItem = player.getHand();
+        let handItemGemData = queryData.getItemGemData(playerHandItem);
+        if (handItemGemData.gemState && handItemGemData.explosiveGem != undefined) {
+            gemSetData.explosiveGemOperation(player, block.pos, handItemGemData);
+        }
+        delete playerRemoteInjuryData[source.uniqueId]
+    }
+}
+
+/**
+ * 弹射物创建事件处理.
+ * @param {Entity} shooter 创建弹射物的对象
+ * @param {Entity} entity 弹射物实体对象
+ */
+function projectileCreatedEvent(shooter, entity) {
+    if (shooter.isPlayer()) {
+        playerRemoteInjuryData[entity.uniqueId] = shooter.toPlayer().xuid;
+        setTimeout(() => {
+            delete playerRemoteInjuryData[entity.uniqueId];
+        }, 1000 * 5);
+    }
+}
+
+/**
+ * 玩家获得经验值事件处理
+ * @param {Player} player 玩家对象
+ * @param {Integer} exp 获得的经验值
+ */
+function experienceAddEvent(player, exp) {
+    if (!player.isSimulatedPlayer()) {
+        gemSetData.experienceGemOperation(player, exp);
+    }
+}
+
+/**
  * 其他
  */
 const other = {
@@ -377,6 +456,12 @@ const other = {
                 if (playerGemCountDown[i].powerGem > 0) {
                     playerGemCountDown[i].powerGem -= 1;
                 }
+                if (playerGemCountDown[i].explosiveGem > 0) {
+                    playerGemCountDown[i].explosiveGem -= 1;
+                }
+                if (playerGemCountDown[i].experienceGem > 0) {
+                    playerGemCountDown[i].experienceGem -= 1;
+                }
             }
         }, 1000);
     },
@@ -389,7 +474,7 @@ const other = {
         Command.setEnum("resetAction", ["reset"]);
         Command.setEnum("giveAction", ["give"]);
         Command.setEnum("intensifyAction", ["reel"]);
-        Command.setEnum("GemStoneAction", ["vampiregem", "powergem", "durablegem"]);
+        Command.setEnum("GemStoneAction", ["vampiregem", "powergem", "durablegem", "explosivegem", "experiencegem"]);
         Command.mandatory("pattern", ParamType.Enum, "openAction", 1);
         Command.mandatory("pattern", ParamType.Enum, "resetAction", 1);
         Command.mandatory("pattern", ParamType.Enum, "giveAction", 1);
@@ -445,6 +530,14 @@ const other = {
                                 getPlayerGem = true;
                             } else if (results.GemStone == "durablegem") {
                                 let gemItem = generate.setGemItem("durableGem", player, parseInt(results.amount), 0);
+                                player.giveItem(gemItem);
+                                getPlayerGem = true;
+                            } else if (results.GemStone == "explosivegem") {
+                                let gemItem = generate.setGemItem("explosiveGem", player, parseInt(results.amount), 0);
+                                player.giveItem(gemItem);
+                                getPlayerGem = true;
+                            } else if (results.GemStone == "experiencegem") {
+                                let gemItem = generate.setGemItem("experienceGem", player, parseInt(results.amount), 0);
                                 player.giveItem(gemItem);
                                 getPlayerGem = true;
                             }
@@ -795,6 +888,27 @@ const gemSetData = {
         }
     },
     /**
+     * 处理爆炸宝石.
+     * @param {Player} player 玩家对象
+     * @param {Pos} pos 坐标对象
+     * @param {Object} handItemGemData 手持物品宝石数据
+     */
+    explosiveGemOperation: function (player, pos, handItemGemData) {
+        let randomNumber = qingYi.getRandomNum(0, 100);
+        if (randomNumber < GemConfig.explosiveGem.triggerProbability[handItemGemData.explosiveGem - 1]) {
+            let xuid = player.xuid;
+            let cdTime = GemConfig.explosiveGem.CDTime[handItemGemData.explosiveGem - 1];
+            let countDown = playerGemCountDown[xuid].explosiveGem;
+            if (countDown == 0) {
+                setTimeout(() => {
+                    let explosionValue = GemConfig.explosiveGem.relatedData[handItemGemData.explosiveGem - 1];
+                    mc.explode(pos, undefined, explosionValue, explosionValue, false, false);
+                }, 100);
+                playerGemCountDown[xuid].explosiveGem = cdTime;
+            }
+        }
+    },
+    /**
      * 处理暴击宝石.
      * @param {Player} player 玩家对象
      * @param {Entity} entity 实体对象
@@ -815,6 +929,40 @@ const gemSetData = {
                     }
                 }, 100);
                 playerGemCountDown[xuid].powerGem = cdTime;
+            }
+        }
+    },
+    /**
+     * 经验宝石处理
+     * @param {Player} player 玩家对象
+     * @param {Integer} exp 获得的经验值
+     */
+    experienceGemOperation: function (player, exp) {
+        let allTriggerProbability = 0;
+        let increaseProportion = 0;
+        let cumulativeCDTime = 0;
+        let playerArmor = player.getArmor();
+        let playerArmorAllItem = playerArmor.getAllItems();
+        playerArmorAllItem.forEach(item => {
+            let itemGem = queryData.getItemGemData(item);
+            if (itemGem.gemState && itemGem.experienceGem != undefined) {
+                allTriggerProbability += GemConfig.experienceGem.triggerProbability[itemGem.experienceGem - 1];
+                increaseProportion += GemConfig.experienceGem.relatedData[itemGem.experienceGem - 1];
+                cumulativeCDTime += GemConfig.experienceGem.CDTime[itemGem.experienceGem - 1];
+            }
+        });
+        if (allTriggerProbability > 0) {
+            let randomNumber = qingYi.getRandomNum(0, 100);
+            if (allTriggerProbability > randomNumber) {
+                let xuid = player.xuid;
+                let countDown = playerGemCountDown[xuid].experienceGem;
+                if (countDown == 0) {
+                    let gemRecoveryRatio = increaseProportion / 100;
+                    let recoveryAmount = Math.round(exp * gemRecoveryRatio);
+                    playerGemCountDown[xuid].experienceGem = cumulativeCDTime;
+                    player.addExperience(parseInt(recoveryAmount));
+                    log('add经验值' + parseInt(recoveryAmount));
+                }
             }
         }
     }
@@ -851,8 +999,8 @@ const reelRelevant = {
             let firstData = queryData.getItemIntensifyData(firstItem);
             let secondData = queryData.getItemIntensifyData(secondItem);
             if (firstData.boolean && firstData.type == "reel") {
-                let allItem = queryData.getAllAvailableItems();
-                if (allItem.includes(secondItem.type)) {
+                let ReelAvailableItem = queryData.getReelAvailableItems();
+                if (ReelAvailableItem.includes(secondItem.type)) {
                     if (!secondData.boolean || secondData.type == "otherItems") {
                         let permittedEeinforcement = true;
                         if (secondData.boolean && secondData.reel != undefined) {
@@ -998,13 +1146,14 @@ const gemRelevant = {
             if (firstData.boolean && firstData.type == "gem") {
                 if (queryData.getGemNameAvailableItems(firstData.gemtype).includes(secondItem.type)) {
                     if (!secondData.boolean || secondData.type == "otherItems") {
-                        if (secondData.boolean && queryData.getItemGemLvL(firstData.gemtype, secondData.gem) >= GemConfig[firstData.gemtype].maxLevel) {
+                        let itemGemLvl = queryData.getItemGemLvL(firstData.gemtype, secondData.gem);
+                        if (secondData.boolean && itemGemLvl >= GemConfig[firstData.gemtype].maxLevel) {
                             qingYi.setPlaySound(player, 2);
                             return;
                         } else {
                             let container = mc.getBlock(pos).getContainer();
                             let randomNumber = qingYi.getRandomNum(0, 100);
-                            let gemSuccessPr = GemConfig[firstData.gemtype].successProbability[parseInt(firstData.lvl) - 1];
+                            let gemSuccessPr = GemConfig[firstData.gemtype].successProbability[itemGemLvl];
                             if (randomNumber < gemSuccessPr) {
                                 let item = this.setItemGemData(secondItem, firstData.gemtype, parseInt(firstData.lvl));
                                 item = loreSet.setItemLore(item, player);
@@ -1149,7 +1298,7 @@ const loreSet = {
                     gemLore.push(i18n.get("itemGemMsgLore", player.langCode));
                     secondData.gem.forEach(gemNbtData => {
                         let currentLore = []
-                        if (gemNbtData.gemName == "vampireGem" || gemNbtData.gemName == "powerGem") {
+                        if (gemNbtData.gemName == "vampireGem" || gemNbtData.gemName == "powerGem" || gemNbtData.gemName == "explosiveGem" || gemNbtData.gemName == "experienceGem") {
                             let gemCDTime = GemConfig[gemNbtData.gemName].CDTime[parseInt(gemNbtData.lvl) - 1];
                             let gemTriggerProbability = GemConfig[gemNbtData.gemName].triggerProbability[parseInt(gemNbtData.lvl) - 1];
                             currentLore = JSON.parse(i18n.trl(player.langCode, "itemGemLore", i18n.get(gemNbtData.gemName, player.langCode), gemNbtData.lvl, i18n.trl(player.langCode, gemNbtData.gemName + "Effect", GemConfig[gemNbtData.gemName].relatedData[parseInt(gemNbtData.lvl) - 1]), slotPosition, gemCDTime, gemTriggerProbability));
@@ -1261,7 +1410,9 @@ const queryData = {
         let gemEntityJson = {
             "vampireGem": GemConfig.vampireGem.DropEntityList,
             "powerGem": GemConfig.powerGem.DropEntityList,
-            "durableGem": GemConfig.durableGem.DropEntityList
+            "durableGem": GemConfig.durableGem.DropEntityList,
+            "explosiveGem": GemConfig.explosiveGem.DropEntityList,
+            "experienceGem": GemConfig.experienceGem.DropEntityList
         };
         for (let gemName in gemEntityJson) {
             let currentGem = gemEntityJson[gemName];
@@ -1379,6 +1530,21 @@ const queryData = {
         return returnArray;
     },
     /**
+     * 查询卷轴可用的物品列表.
+     * @returns 卷轴可用的物品列表
+     */
+    getReelAvailableItems: function () {
+        let returnData = []
+        returnData.push.apply(returnData, swordDataArray);
+        returnData.push.apply(returnData, helmetDataArray);
+        returnData.push.apply(returnData, chestplateDataArray);
+        returnData.push.apply(returnData, leggingsDataArray);
+        returnData.push.apply(returnData, bootsDataArray);
+        returnData.push.apply(returnData, toolDataArray);
+        returnData = Array.from(new Set(returnData));
+        return returnData;
+    },
+    /**
      * 查询此宝石id能用的物品列表.
      * @param {String} gemName 宝石id
      * @returns 此宝石可用的物品列表
@@ -1391,6 +1557,10 @@ const queryData = {
                 return swordDataArray;
             case "durableGem":
                 return this.getAllAvailableItems();
+            case "explosiveGem":
+                return longRangeDataArray;
+            case "experienceGem":
+                return this.getAllArmorItems();
         }
     },
     /**
@@ -1411,6 +1581,8 @@ const queryData = {
             return "boots";
         } else if (toolDataArray.includes(item.type)) {
             return "tool";
+        } else if (longRangeDataArray.includes(item.type)) {
+            return "longRange";
         }
     },
     /**
@@ -1437,7 +1609,7 @@ const queryData = {
     getItemReelBuff: function (item) {
         let buffArray = [];
         let itemData = queryData.getItemIntensifyData(item);
-        if (itemData.boolean && itemData.type == "otherItems") {
+        if (itemData.boolean && itemData.type == "otherItems" && itemData.reel != undefined) {
             let itemConfig = this.getReelLevelToData(itemData.reel.lvl);
             let buffArrayConfig = itemConfig[`${itemData.reel.position}Buff`];
             buffArrayConfig.forEach(buffData => {
@@ -1619,6 +1791,7 @@ const qingYi = {
                     }
 
                     if (playerHandItemEvent[player.xuid] == undefined) {
+
                         if (!playerHand.isNull()) {
                             playerHandItemEvent[player.xuid] = {
                                 "item": playerHand,
@@ -1627,6 +1800,7 @@ const qingYi = {
                             playerSwitchHandheldEvent(player, undefined, playerHand);
                         }
                     } else {
+
                         if (playerHandItemEvent[player.xuid].itemUid != itemUid) {
                             playerSwitchHandheldEvent(player, playerHandItemEvent[player.xuid].item, playerHand);
                             playerHandItemEvent[player.xuid] = {
@@ -1762,23 +1936,31 @@ const shareFunction = {
         return gemItem;
     },
     getGemName: function () {
-        return ["vampiregem", "powergem", "durablegem"];
+        return ["vampiregem", "powergem", "durablegem", "explosiveGem"];
     }
 }
 
 function versionUpdateModifyProfile() {
-    let UPConfig = false;
+    let Config = false;
     //135版本更新
     if (ConfigJson.removeOldItems == undefined) {
         ConfigJson.removeOldItems = false;
-        UPConfig = true;
+        Config = true;
     }
-
-    if (UPConfig) {
+    //136版本更新
+    if (GemConfig.explosiveGem == undefined) {
+        GemConfig.explosiveGem = { "maxLevel": 4, "droppingProbability": 0.15, "describe": "使用弓箭攻击时有几率触发爆炸！", "triggerProbability": [10, 20, 60, 80], "CDTime": [120, 80, 40, 10], "relatedData": [1, 2, 3, 4], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"] };
+        File.writeTo(pluginPath + "data/gemDataConfig.json", JSON.stringify(GemConfig, null, "\t"));
+    }
+    //137版本更新
+    if (GemConfig.experienceGem == undefined) {
+        GemConfig.experienceGem = { "maxLevel": 5, "droppingProbability": 0.15, "describe": "获得额外的经验", "triggerProbability": [10, 20, 60, 80, 100], "CDTime": [10, 5, 3, 2, 1], "relatedData": [10, 20, 30, 40, 50], "successProbability": [10, 5, 2.5, 1, 0.1], "DropEntityList": ["minecraft:witch"] };
+        File.writeTo(pluginPath + "data/gemDataConfig.json", JSON.stringify(GemConfig, null, "\t"));
+    }
+    if (Config) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
     }
 }
-
 
 /**
  * 判断是否启用卷轴
@@ -1796,6 +1978,10 @@ mc.listen("onRespawn", respawnEvent);
 mc.listen("onPreJoin", preJoinEvent);
 mc.listen("onJoin", joinEvent);
 mc.listen("onLeft", leftEvent)
+mc.listen("onProjectileHitEntity", projectileHitEntityEvent);
+mc.listen("onProjectileCreated", projectileCreatedEvent);
+mc.listen("onProjectileHitBlock", projectileHitBlockEvent);
+mc.listen("onExperienceAdd", experienceAddEvent);
 
 //共享接口
 ll.export(shareFunction.getPlayerCD, "intensify", "cd");
@@ -1815,6 +2001,10 @@ ll.export(shareFunction.getReelItem, "intensify", "reel");
  * "onDestroyBlock"-玩家破坏方块完成监听
  * "onJoin"-玩家完全进入游戏监听
  * "onLeft"-玩家离开游戏监听
+ * "onProjectileHitBlock"-弹射物命中方块监听
+ * "onProjectileHitEntity"-弹射物命中实体监听
+ * "onProjectileCreated"-弹射物创建监听
+ * "onExperienceAdd"-玩家获得经验事件
  * 
  * 版本相关
  * 134
@@ -1837,4 +2027,15 @@ ll.export(shareFunction.getReelItem, "intensify", "reel");
  * 135
  * 新增移除旧版强化装备插件的物品nbt开关.
  * 修复物品只有宝石数据时导致的报错.
+ * 136
+ * 修复打开其他容器报错.
+ * 增加爆炸宝石，可用于弓.
+ * 137
+ * 修复昨天更新爆炸宝石时移除了的吸血宝石.
+ * 修复宝石装备上物品时获取到的几率错误的问题.
+ * 修复一个刷屏报错的bug.
+ * 新增经验宝石.
+ * 1，此宝石所有护甲可用。
+ * 2，身穿多个装备包含有此宝石的时候数据将会叠加
+ * 包括：触发概率增加，增加量增加，cd时间增加。
  */

@@ -4,7 +4,7 @@
 const pluginName = "IntensifyEnderDragon";
 const PluginsIntroduction = '强化末影龙!';
 const pluginPath = "./plugins/IntensifyEnderDragon/";
-const PluginsVersion = [0, 0, 7];
+const PluginsVersion = [0, 0, 8];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const ConfigDataJson = {
     "DockingGives": false,
@@ -188,16 +188,18 @@ if (Config.DockingGives) {
  */
 mc.listen("onMobHurt", (mob, source, damage, cause) => {
     let WhetherIntercept = true;
-    if (mob.type == "minecraft:ender_dragon") {
-        if (parseInt(damage) >= mob.health && enderDragonState != 3) {
-            if (BloodReturnTask != undefined) {
-                clearInterval(BloodReturnTask);
+    if(cause != 18){
+        if (mob.type == "minecraft:ender_dragon") {
+            if (parseInt(damage) >= mob.health && enderDragonState != 3) {
+                if (BloodReturnTask != undefined) {
+                    clearInterval(BloodReturnTask);
+                }
             }
-        }
-        WhetherIntercept = EnderDragonInjuryTreatment(mob, source, cause);
-    } else if (mob.isPlayer() && source != undefined) {
-        if (source.type == "minecraft:ender_dragon") {
-            PlayerInjuryTreatment(mob, source);
+            WhetherIntercept = EnderDragonInjuryTreatment(mob, source, cause);
+        } else if (mob.isPlayer() && source != undefined) {
+            if (source.type == "minecraft:ender_dragon") {
+                PlayerInjuryTreatment(mob, source);
+            }
         }
     }
     return WhetherIntercept;
@@ -823,6 +825,8 @@ ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherI
  * 007
  * 适配新版强化装备插件.
  * 移除多余语言文件. 
+ * 008
+ * 尝试屏蔽荆棘伤害处理.
  * 
  * 待修复bug
  * 龙死亡接着放水晶召唤有几率生成出来的龙是不会给爆炸和起飞。
