@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 2, 7];
+const PluginsVersion = [0, 2, 8];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -47,6 +47,12 @@ const EntityNbtJsonData = {
             "KillPlayerRecovery": 10,
             "addTalentValue": 1.1234,
             "UniqueName": "zombie1",
+            "economy": {
+                "moneyName": "llmoney",
+                "probability": 1,
+                "quantity": 10,
+                "describe": "金币"
+            },
             "ListSpoils": [
                 {
                     "Spoils": "ordinary",
@@ -111,7 +117,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "entityInformation": "实体名称:{0}\n实体最大生命值:{1}\n实体移动速度:{2}\n实体追踪距离:{3}\n实体抗性:{1}",
         "CmdOutpError1": "没有找到这个生物相关的配置文件",
         "BlastTips": "因你击杀了{0},即将在{1}秒后发生爆炸!",
-        "IntensifySurvivalerr": "未找到前置插件IntensifySurvival.js，请前往下载或者在配置文件Config.json中将DockingIntensifySurvival设置为false"
+        "IntensifySurvivalerr": "未找到前置插件IntensifySurvival.js，请前往下载或者在配置文件Config.json中将DockingIntensifySurvival设置为false",
+        "economyTips": "你获得了{0} {1}"
     },
     "zh_TW": {
         "formTitle": "選擇實體",
@@ -122,10 +129,11 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "entityInformation": "實體名稱:{0}\n實體最大生命值:{1}\n實體移動速度:{2}\n實體追跡距離:{3}\n實體抗性:{4}",
         "CmdOutpError1": "沒有找到這個生物相關的設定檔",
         "BlastTips": "因你擊殺了{0}，即將在{1}秒後發生爆炸！",
-        "IntensifySurvivalerr": "未找到前置挿件IntensifySurvival.js，請前往下載或者在設定檔Config.json中將DockingIntensifySurvival設定為false"
+        "IntensifySurvivalerr": "未找到前置挿件IntensifySurvival.js，請前往下載或者在設定檔Config.json中將DockingIntensifySurvival設定為false",
+        "economyTips": "你獲得了{0} {1}"
     },
     "en": {
-       "formTitle": "Select Entity",
+        "formTitle": "Select Entity",
         "configUp": "Please go to data/EntityData.json to view the updated configuration file!",
         "cmdExplain": "Hey hey, strengthen your monster!",
         "Intensifyerr": "The front-end plug-in Intensify.js is not found. Please go to download it or set DockingIntensify to false in the configuration file Config.json",
@@ -133,7 +141,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "entityInformation": "Entity name: {0}  nMaximum HP of entity: {1}  nMoving speed of entity: {2}  nEntity tracking distance: {3}  nEntity resistance: {4}",
         "CmdOutpError1": "This biological related configuration file was not found",
         "BlastTips": "Because you killed {0}, it will explode in {1} seconds!",
-        "IntensifySurvivalerr": "The front-end plug-in IntensifySurvivor.js was not found. Please go to download or set DockingIntensifySurvivor.js to false in the configuration file Config.json"
+        "IntensifySurvivalerr": "The front-end plug-in IntensifySurvivor.js was not found. Please go to download or set DockingIntensifySurvivor.js to false in the configuration file Config.json",
+        "economyTips": "You got {0} {1}"
     }
 });
 
@@ -222,10 +231,10 @@ mc.listen("onPlayerDie", (_player, source) => {
 });
 
 /**
- * 实体转化监听.
- * 判断是否是强化怪物并拦截其转化.
+ * 实体骑乘监听.
+ * 判断是否是强化怪物并拦截其骑乘.
  */
-mc.listen("onRide", (entity1, entity2) => {
+mc.listen("onRide", (entity1, _entity2) => {
     if (entity1.hasTag("Intensify")) {
         return false;
     }
@@ -349,6 +358,18 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                         }
                     }
                 }
+                let economicCore = entityDataJson.economy.moneyName;
+
+                let randomInt = specifiedRangeRandomNumber(0, 100);
+                if (randomInt < entityDataJson.economy.probability) {
+                    if (economicCore == "llmoney") {
+                        player.addMoney(entityDataJson.economy.quantity);
+                    } else {
+                        mc.runcmdEx(`scoreboard players add ${player.realName} ${randomInt} ${entityDataJson.economy.quantity}`);
+                    }
+                    player.tell(player.langCode, i18n.trl("economyTips"), entityDataJson.economy.quantity, entityDataJson.economy.describe);
+                }
+
                 if (Config.DockingIntensifySurvival) {
                     AddTalentValue(player.xuid, entityDataJson.addTalentValue);
                 }
@@ -446,7 +467,7 @@ mc.listen("onServerStarted", () => {
     Command.mandatory("Uname", ParamType.Enum, "EntityUName");
     Command.overload(["mode"]);
     Command.overload(["mode", "entity", "Uname", "pos"]);
-    Command.setCallback((cmd, origin, output, results) => {
+    Command.setCallback((_cmd, origin, output, results) => {
         if (results.mode == "query" && origin.player != undefined) {
             PlayerCmdHandle(origin.player);
         } else if (results.mode == "spawn") {
@@ -826,7 +847,7 @@ function FourProfileUpdate() {
     if (Config.ProfileVersion == "0.0.3") {
         Config.ProfileVersion = "0.0.4";
         for (let key in EntityNbtJson) {
-            EntityNbtJson[key].forEach((EntityDataJson, position) => {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
                 EntityNbtJson[key][position].ArmorBreaker = false;
                 EntityNbtJson[key][position].ArmorBreakerToSE = false;
                 EntityNbtJson[key][position].ArmorProbability = 10;
@@ -839,7 +860,7 @@ function FourProfileUpdate() {
         Config.PressurePlate = true;
         Config.ParticleEffect = true;
         for (let key in EntityNbtJson) {
-            EntityNbtJson[key].forEach((EntityDataJson, position) => {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
                 EntityNbtJson[key][position].LongRangeDamage = true;
             });
         }
@@ -892,6 +913,23 @@ function FourProfileUpdate() {
             EntityNbtJson[key].forEach((_EntityDataJson, position) => {
                 if (EntityNbtJson[key][position].reelLvl == undefined) {
                     EntityNbtJson[key][position].reelLvl = 1;
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
+
+    if (Config.ProfileVersion == "0.0.7") {
+        Config.ProfileVersion = "0.0.8";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].economy == undefined) {
+                    EntityNbtJson[key][position].economy = {
+                        "moneyName": "llmoney",
+                        "probability": 1,
+                        "quantity": 10,
+                        "describe": "金币"
+                    };
                 }
             });
         }
@@ -975,6 +1013,8 @@ function FourProfileUpdate() {
  * 027
  * 对接新版强化装备插件.
  * 移除多余语言文件.
+ * 028
+ * 新增对接llmoney或者计分板经济.
  * 
  * 待添加功能
  */
