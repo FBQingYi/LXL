@@ -1,7 +1,7 @@
 const pluginName = "Intensify";
 const pluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const pluginsVersion = [1, 3, 7];
+const pluginsVersion = [1, 3, 8];
 const pluginsOtherInformation = { "插件作者": "清漪花开" };
 
 const soundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"];
@@ -434,6 +434,39 @@ function projectileCreatedEvent(shooter, entity) {
 function experienceAddEvent(player, exp) {
     if (!player.isSimulatedPlayer()) {
         gemSetData.experienceGemOperation(player, exp);
+    }
+}
+
+/**
+ * 实体受伤事件处理.
+ * @param {Entity} mob 受伤的实体对象
+ * @param {Entity} _source 发起攻击的实体对象
+ * @param {Integer} _damage 伤害值
+ * @param {Integer} _cause 伤害类型
+ */
+function mobHurtEvent(mob, _source, _damage, _cause) {
+    if (mob.isPlayer()) {
+        let player = mob.toPlayer();
+        if (!player.isSimulatedPlayer()) {
+            let playerArmor = player.getArmor();
+            let playerArmorAllItem = playerArmor.getAllItems();
+            playerArmorAllItem.forEach(item => {
+                let itemtemGemData = queryData.getItemGemData(item);
+                if (itemtemGemData.gemState && itemtemGemData.durableGem != undefined) {
+                    if (playerHandItem.damage > 10) {
+                        item.setDamage(0);
+                    }
+                }
+            });
+
+            let playerOffHandItem = player.getOffHand();
+            let itemtemGemData = queryData.getItemGemData(playerOffHandItem);
+            if (itemtemGemData.gemState && itemtemGemData.durableGem != undefined) {
+                if (playerHandItem.damage > 10) {
+                    item.setDamage(0);
+                }
+            }
+        }
     }
 }
 
@@ -1936,7 +1969,7 @@ const shareFunction = {
         return gemItem;
     },
     getGemName: function () {
-        return ["vampiregem", "powergem", "durablegem", "explosiveGem"];
+        return ["vampiregem", "powergem", "durablegem", "explosiveGem", "experienceGem"];
     }
 }
 
@@ -1982,6 +2015,7 @@ mc.listen("onProjectileHitEntity", projectileHitEntityEvent);
 mc.listen("onProjectileCreated", projectileCreatedEvent);
 mc.listen("onProjectileHitBlock", projectileHitBlockEvent);
 mc.listen("onExperienceAdd", experienceAddEvent);
+mc.listen("onMobHurt", mobHurtEvent);
 
 //共享接口
 ll.export(shareFunction.getPlayerCD, "intensify", "cd");
@@ -2004,7 +2038,8 @@ ll.export(shareFunction.getReelItem, "intensify", "reel");
  * "onProjectileHitBlock"-弹射物命中方块监听
  * "onProjectileHitEntity"-弹射物命中实体监听
  * "onProjectileCreated"-弹射物创建监听
- * "onExperienceAdd"-玩家获得经验事件
+ * "onExperienceAdd"-玩家获得经验事件监听
+ * "onMobHurt"-实体受伤事件监听
  * 
  * 版本相关
  * 134
@@ -2038,4 +2073,6 @@ ll.export(shareFunction.getReelItem, "intensify", "reel");
  * 1，此宝石所有护甲可用。
  * 2，身穿多个装备包含有此宝石的时候数据将会叠加
  * 包括：触发概率增加，增加量增加，cd时间增加。
+ * 138
+ * 修复耐久宝石在护甲上无效的bug.
  */
