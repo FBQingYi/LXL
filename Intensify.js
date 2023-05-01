@@ -1,7 +1,7 @@
 const pluginName = "Intensify";
 const pluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const pluginsVersion = [1, 4, 0];
+const pluginsVersion = [1, 4, 4];
 const pluginsOtherInformation = { "插件作者": "清漪花开" };
 
 const soundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"];
@@ -18,6 +18,8 @@ const toolItemArray = ["minecraft:wooden_axe", "minecraft:wooden_pickaxe", "mine
 const longRangeWeaponArray = ["minecraft:bow"];
 const gemDataConfig = { "vampireGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "攻击时有几率触发吸血效果，根据等级不同触发几率恢复效果都不同。", "triggerProbability": [50, 60, 70, 80, 95], "CDTime": [10, 8, 6, 4, 2], "relatedData": [20, 30, 40, 50, 60], "successProbability": [8.5, 6.3, 4.2, 1.2, 0.5], "DropEntityList": ["minecraft:drowned"] }, "powerGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "攻击时有几率触发暴击效果，暴击将对被攻击者造成真实伤害。", "triggerProbability": [10, 20, 30, 50], "CDTime": [1200, 800, 400, 100], "relatedData": [1, 2, 4, 8], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"] }, "explosiveGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "使用弓箭攻击时有几率触发爆炸！", "triggerProbability": [10, 20, 60, 80], "CDTime": [120, 80, 40, 10], "relatedData": [1, 2, 3, 4], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"] }, "experienceGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "获得额外的经验", "triggerProbability": [1, 10, 15, 20, 30], "CDTime": [10, 5, 3, 2, 1], "relatedData": [10, 20, 30, 40, 50], "successProbability": [10, 5, 2.5, 1, 0.1], "DropEntityList": ["minecraft:witch"] }, "durableGem": { "maxLevel": 1, "droppingProbability": 0.0001, "describe": "崛起吧,我的金套!", "successProbability": [100], "relatedData": [1], "DropEntityList": ["minecraft:wither", "minecraft:warden"] }, "transferGem": { "maxLevel": 1, "droppingProbability": 0, "describe": "迁移数据!", "successProbability": [100], "relatedData": [1], "DropEntityList": [] } };
 const reelDataConfig = { "maxLevel": 5, "blockList": ["minecraft:diamond_ore", "minecraft:deepslate_diamond_ore", "minecraft:emerald_ore", "minecraft:deepslate_emerald_ore", "minecraft:gold_ore", "minecraft:deepslate_gold_ore"], "droppingProbability": 0.15, "DataEachLevel": [{ "level": 1, "equipProbability": 8.5965, "nextLevelProbability": 4.3654, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 0 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 0 }] }, { "level": 2, "equipProbability": 3.5875, "nextLevelProbability": 2.5874, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 1 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 1 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 1 }] }, { "level": 3, "equipProbability": 2.86, "nextLevelProbability": 1.85, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 2 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 2 }] }, { "level": 4, "equipProbability": 1.58, "nextLevelProbability": 0.58, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 3 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 2 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 2 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 3 }] }, { "level": 5, "equipProbability": 0.5, "nextLevelProbability": 0, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }, { "buffName": "潮涌能量", "buffId": "conduit_power", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 4 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 4 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 9 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }, { "buffName": "缓降", "buffId": "slow_falling", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 4 }] }] };
+const buffIdCompare={"absorption":22,"bad_omen":26,"blindness":15,"conduit_power":29,"nausea":9,"fire_resistance":12,"glowing":24,"haste":3,"health_boost":21,"hunger":17,"instant_damage":7,"instant_health":6,"invisibility":14,"jump_boost":8,"levitation":25,"luck":26,"mining_fatigue":4,"nautilus":30,"night_vision":16,"poison":19,"regeneration":10,"resistance":11,"saturation":23,"slow_falling":27,"slowness":2,"speed":1,"strength":5,"water_breathing":13,"weakness":18,"wither":20};
+
 const initialConfig = {
     "randomNumber": {
         "DecimalsSupported": true,//支持的小数
@@ -35,6 +37,26 @@ const ItemRoute = {
     "swordBuff": pluginPath + "data/itemData/swordData.json",
     "longRangeBuff": pluginPath + "data/itemData/longRangeData.json"
 }
+const artifactStoneArray = {
+    "神一级石": {
+        "debrisName": "神一级石碎片",
+        "debrisNumber": 15,
+        "successProbability": 10,
+        "attribute": [
+            {
+                "CurseID": 1,
+                "CurseLvl": 10,
+                "CurseName": "火焰保护"
+            },
+            {
+                "CurseID": 2,
+                "CurseLvl": 10,
+                "CurseName": "摔落保护"
+            }
+        ]
+    }
+}
+
 //------插件信息注册
 ll.registerPlugin(pluginName, pluginsIntroduction, pluginsVersion, pluginsOtherInformation);
 
@@ -53,6 +75,9 @@ if (!File.exists(pluginPath + "data/player/playerData.json")) {
 }
 if (!File.exists(pluginPath + "data/reelDataConfig.json")) {
     File.writeTo(pluginPath + "data/reelDataConfig.json", JSON.stringify(reelDataConfig, null, "\t"));
+}
+if (!File.exists(pluginPath + "data/artifactStoneDataConfig.json")) {
+    File.writeTo(pluginPath + "data/artifactStoneDataConfig.json", JSON.stringify(artifactStoneArray, null, "\t"));
 }
 if (!File.exists(ItemRoute.helmetBuff)) {
     File.writeTo(ItemRoute.helmetBuff, JSON.stringify(helmetItemArray, null, "\t"));
@@ -77,6 +102,7 @@ let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 
 let GemConfig = JSON.parse(File.readFrom(pluginPath + "data/gemDataConfig.json"));
 let ReelConfig = JSON.parse(File.readFrom(pluginPath + "data/reelDataConfig.json"));
+let ArtifactConfig = JSON.parse(File.readFrom(pluginPath + "data/artifactStoneDataConfig.json"));
 let PlayerData = JSON.parse(File.readFrom(pluginPath + "data/player/playerData.json"));
 
 /**
@@ -142,6 +168,8 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
         "setPlayerHPTips": "设置生命值成功！",
         "getPlayerReelTips": "给予{0}卷轴执行完成！",
         "getPlayerGemTips": "给予{0}宝石执行完成！",
+        "artifactFragmentsLore": JSON.stringify(["§1碎片类型： §2{0}", "§3合成所需数量： §a{1} 个", "初始成功率： {2}", "§6最终效果："]),
+        "artifactStoneLore": JSON.stringify(["§6效果："])
     },
     "en": {
         "vampireGem": "vampire Gem",
@@ -190,7 +218,9 @@ i18n.load(pluginPath + "language/language.json", "zh_CN", {
         "addItemsToConfig": "Item added successfully!",
         "setPlayerHPTips": "Set HP successfully!",
         "getPlayerReelTips": "Give {0} scroll execution completed!",
-        "getPlayerGemTips": "Give {0} gem to execute!"
+        "getPlayerGemTips": "Give {0} gem to execute!",
+        "artifactFragmentsLore": JSON.stringify(["§1Fragment type： §2{0}", "§3Required quantity： §a{1} individual", "Initial success rate: {2}", "§6Final effect:"]),
+        "artifactStoneLore": JSON.stringify(["§6effect:"])
     }
 });
 
@@ -221,6 +251,14 @@ function playerDestroyBlockEvent(player, block) {
                 reelRelevant.playerDestroyBlockGetReel(player, block);
             }
         }, 20);
+
+        let playerHandItem = player.getHand();
+        let handItemGemData = queryData.getItemGemData(playerHandItem);
+        if (handItemGemData.gemState && handItemGemData.durableGem != undefined) {
+            if (playerHandItem.damage > -100) {
+                gemSetData.setItemDamage(playerHandItem);
+            }
+        }
     }
 }
 
@@ -249,12 +287,23 @@ function openContainerEvent(player, block) {
                         } else {
                             reelRelevant.playerReelItem(player, block.pos);
                         }
+                    } else if (judgmentResult.type == "artifact") {
+                        artifactRelevant.artifactStongToItem(player, block.pos);
                     }
                 } else {
-                    qingYi.setPlaySound(player, 2);
-                    player.tell(i18n.get("tooManyTips", player.langCode));
-                    return;
+                    if (judgmentResult.type == "fragments") {
+                        artifactRelevant.fragmentsSynthesis(player, block.pos);
+                    } else {
+                        qingYi.setPlaySound(player, 2);
+                        player.tell(i18n.get("tooManyTips", player.langCode));
+                        return;
+                    }
                 }
+            }
+        } else if (!firstItem.isNull()) {
+            let judgmentResult = queryData.getItemIntensifyData(firstItem);
+            if (judgmentResult.type == "fragments") {
+                artifactRelevant.fragmentsSynthesis(player, block.pos);
             }
         }
     } else if (ConfigJson.removeOldItems && block.type != "minecraft:ender_chest") {
@@ -671,6 +720,8 @@ const other = {
                     }
                 }
             }
+        } else if (item.type == "minecraft:disc_fragment_5" || item.type == "minecraft:music_disc_11") {
+            returnData = { "state": false };
         } else {
             let itemNbt = item.getNbt();
             let tag = itemNbt.getTag("tag");
@@ -855,8 +906,7 @@ const reelBuff = {
         allBuffArray.forEach(buffData => {
             let buffId = buffData.buffId;
             let buffLevel = buffData.buffLevel;
-            let cmd = `effect "${player.realName}" ${buffId} 9999 ${buffLevel} true`;
-            mc.runcmdEx(cmd);
+            player.addEffect(buffIdCompare[buffId], 9999 * 20, buffLevel, false);
         });
     },
     /**
@@ -869,14 +919,12 @@ const reelBuff = {
         delElem.forEach(buffData => {
             let buffId = buffData.buffId;
             let buffLevel = buffData.buffLevel;
-            let cmd = `effect "${player.realName}" ${buffId} 0 ${buffLevel} true`;
-            mc.runcmdEx(cmd);
+            pl.removeEffect(buffIdCompare[buffId]);
         });
         addElem.forEach(buffData => {
             let buffId = buffData.buffId;
             let buffLevel = buffData.buffLevel;
-            let cmd = `effect "${player.realName}" ${buffId} 999999 ${buffLevel} true`;
-            mc.runcmdEx(cmd);
+            player.addEffect(buffIdCompare[buffId], 999999 * 20, buffLevel, false);
         });
         PlayerData[player.xuid] = allBuffArray;
     }
@@ -946,7 +994,7 @@ const gemSetData = {
             if (countDown == 0) {
                 setTimeout(() => {
                     let explosionValue = GemConfig.explosiveGem.relatedData[handItemGemData.explosiveGem - 1];
-                    mc.explode(pos, undefined, explosionValue, explosionValue, false, false);
+                    mc.explode(pos, player, explosionValue, false, false);
                 }, 100);
                 playerGemCountDown[xuid].explosiveGem = cdTime;
             }
@@ -1047,20 +1095,28 @@ const gemSetData = {
                             qingYi.setPlaySound(player, 2);
                         }
                     } else {
-                        let secondItemNbt = secondItem.getNbt();
-                        let secondItemNbtInTag = secondItemNbt.getTag("tag").getTag("intensify");
-                        let firstItemNbt = firstItem.getNbt();
-                        if (secondItemNbtInTag != undefined) {
-                            firstItemNbt.getTag("tag").setTag("transferGem", secondItemNbtInTag);
-                            firstItemNbt.getTag("tag").setString("transferGemType", queryData.getItemAttribute(secondItem));
-                            firstItem.setNbt(firstItemNbt);
-                            secondItemNbt.getTag("tag").removeTag("intensify");
-                            secondItem.setNbt(secondItemNbt);
-                            secondItem.setLore([""]);
-                            firstItem.set(loreSet.setTransferGemLore(player, firstItem));
-                            qingYi.setPlaySound(player, 0);
+                        let container = mc.getBlock(pos).getContainer();
+                        let randomNumber = qingYi.getRandomNum(0, 100);
+                        let gemSuccessPr = GemConfig[firstData.gemtype].successProbability[parseInt(firstData.lvl) - 1];
+                        if (gemSuccessPr > randomNumber) {
+                            let secondItemNbt = secondItem.getNbt();
+                            let secondItemNbtInTag = secondItemNbt.getTag("tag").getTag("intensify");
+                            let firstItemNbt = firstItem.getNbt();
+                            if (secondItemNbtInTag != undefined) {
+                                firstItemNbt.getTag("tag").setTag("transferGem", secondItemNbtInTag);
+                                firstItemNbt.getTag("tag").setString("transferGemType", queryData.getItemAttribute(secondItem));
+                                firstItem.setNbt(firstItemNbt);
+                                secondItemNbt.getTag("tag").removeTag("intensify");
+                                secondItem.setNbt(secondItemNbt);
+                                secondItem.setLore([""]);
+                                firstItem.set(loreSet.setTransferGemLore(player, firstItem));
+                                qingYi.setPlaySound(player, 0);
+                            } else {
+                                qingYi.setPlaySound(player, 2);
+                            }
                         } else {
-                            qingYi.setPlaySound(player, 2);
+                            container.removeItem(0, 1);
+                            qingYi.setPlaySound(player, 1);
                         }
                     }
                 }
@@ -1201,9 +1257,9 @@ const reelRelevant = {
                     Scroll1.setNbt(item.getNbt());
                     qingYi.setPlaySound(player, 0);
                 } else {
+                    container.removeItem(0, 1);
                     container.removeItem(1, 1);
                     container.removeItem(2, 1);
-                    container.removeItem(3, 1);
                     qingYi.setPlaySound(player, 1);
                 }
             }
@@ -1226,9 +1282,11 @@ const gemRelevant = {
             let gemRandomly = gemNameArray[qingYi.getRandomInt(0, gemNameArray.length)];
             let randomNumber = qingYi.getRandomNum(0, 100);
             let selectGemConfig = GemConfig[gemRandomly];
-            if (randomNumber < selectGemConfig.droppingProbability) {
-                let gemItem = generate.setGemItem(gemRandomly, source.toPlayer(), 1, 0);
-                mc.spawnItem(gemItem, entity.pos);
+            if (selectGemConfig != undefined) {
+                if (randomNumber < selectGemConfig.droppingProbability) {
+                    let gemItem = generate.setGemItem(gemRandomly, source.toPlayer(), 1, 0);
+                    mc.spawnItem(gemItem, entity.pos);
+                }
             }
         }
     },
@@ -1314,6 +1372,129 @@ const gemRelevant = {
             }
         }
         return item;
+    }
+}
+
+/**
+ * 神器石相关函数
+ */
+const artifactRelevant = {
+    /**
+     * 神器碎片合成处理
+     * @param {Player} player 玩家对象
+     * @param {Pos} pos 坐标对象
+     */
+    fragmentsSynthesis: function (player, pos) {
+        let containerAllItem = queryData.getContainerAllItem(pos);
+        let firstItem = containerAllItem[0];
+        if (!firstItem.isNull()) {
+            let firstData = queryData.getItemIntensifyData(firstItem);
+            if (firstData.boolean && firstData.type == "fragments") {
+                let fragmentConfig = queryData.getArtifactDebrisData(firstData.name);
+                if (fragmentConfig.artifactState) {
+                    let quantityRequired = fragmentConfig.artifactData.debrisNumber;
+                    let configProbability = fragmentConfig.artifactData.successProbability;
+                    let artifactName = fragmentConfig.artifactName;
+                    if (firstItem.count >= quantityRequired) {
+                        let container = mc.getBlock(pos).getContainer();
+                        let item = generate.setArtifactStone(player, artifactName, 1);
+                        let randomNumber = qingYi.getRandomNum(0, 100);
+                        if (configProbability >= randomNumber) {
+                            if (container.removeItem(0, quantityRequired)) {
+                                container.addItem(item);
+                                qingYi.setPlaySound(player, 0);
+                            }
+                        } else {
+                            container.removeItem(0, quantityRequired);
+                            qingYi.setPlaySound(player, 1);
+                        }
+
+                    } else {
+                        qingYi.setPlaySound(player, 2);
+                        return;
+                    }
+                }
+            }
+
+        }
+    },
+    /**
+     * 神器石上物品处理
+     * @param {Player} player 玩家对象
+     * @param {Pos} pos 坐标对象
+     */
+    artifactStongToItem: function (player, pos) {
+        let containerAllItem = queryData.getContainerAllItem(pos);
+        let firstItem = containerAllItem[0];
+        let secondItem = containerAllItem[1];
+        if (!firstItem.isNull() && !secondItem.isNull()) {
+            let firstData = queryData.getItemIntensifyData(firstItem);
+            if (firstData.boolean && firstData.type == "artifact") {
+                let secondItemNbt = secondItem.getNbt();
+                let secondItemTag = secondItemNbt.getTag("tag");
+                let container = mc.getBlock(pos).getContainer();
+                let artifactConfig = queryData.getArtifactData(firstData.name);
+                if (secondItemTag != undefined) {
+                    let secondItemEnch = secondItemTag.getTag("ench");
+                    if (secondItemEnch != undefined) {
+                        let enchArray = secondItemEnch.toArray();
+                        artifactConfig.artifactData.attribute.forEach(data => {
+                            let check = false;
+                            enchArray.forEach(enchData => {
+                                if (data.CurseID == enchData.id) {
+                                    if (data.CurseLvl > enchData.lvl) {
+                                        enchData.lvl = data.CurseLvl;
+                                    }
+                                    check = true;
+                                }
+                            });
+                            if (!check) {
+                                let nbt = new NbtCompound({
+                                    "id": new NbtShort(parseInt(data.CurseID)),
+                                    "lvl": new NbtShort(parseInt(data.CurseLvl))
+                                });
+                                secondItemEnch.addTag(nbt);
+                            }
+                        });
+                        let newNbt = secondItemNbt.setTag("tag", secondItemTag.setTag("ench", secondItemEnch));
+                        container.setItem(1, mc.newItem(newNbt));
+                        container.removeItem(0, firstItem.count);
+                        qingYi.setPlaySound(player, 0);
+                    } else {
+                        let nbt = new NbtList([]);
+                        artifactConfig.artifactData.attribute.forEach(data => {
+                            let nbt1 = new NbtCompound({
+                                "id": new NbtShort(parseInt(data.CurseID)),
+                                "lvl": new NbtShort(parseInt(data.CurseLvl))
+                            });
+                            nbt.addTag(nbt1);
+                        });
+                        let newNbt = secondItemNbt.setTag("tag", secondItemTag.setTag("ench", nbt))
+                        container.setItem(1, mc.newItem(newNbt));
+                        container.removeItem(0, firstItem.count);
+                        qingYi.setPlaySound(player, 0);
+                    }
+                } else {
+                    let nbt = new NbtCompound({
+                        "Damage": new NbtInt(0),
+                        "RepairCost": new NbtInt(1),
+                        "ench": new NbtList([]),
+                    })
+                    artifactConfig.artifactData.attribute.forEach(data => {
+                        let nbt1 = new NbtCompound({
+                            "id": new NbtShort(parseInt(data.CurseID)),
+                            "lvl": new NbtShort(parseInt(data.CurseLvl))
+                        });
+                        let ench = nbt.getTag("ench");
+                        ench.addTag(nbt1);
+                    });
+                    let newNbt = secondItem.getNbt().setTag("tag", nbt);
+                    container.setItem(1, mc.newItem(newNbt));
+                    container.removeItem(0, firstItem.count);
+                    qingYi.setPlaySound(player, 0);
+                }
+            }
+        }
     }
 }
 
@@ -1430,7 +1611,13 @@ const loreSet = {
      */
     setTransferGemLore: function (player, item) {
         let itemNbtTransferGem = item.getNbt().getTag("tag").getData("transferGem").toObject();
-        let lore = JSON.parse(i18n.trl(player.langCode, "transferGemLore", i18n.get(`${item.getNbt().getTag("tag").getData('transferGemType')}Buff`)));
+        let lore;
+        if (item.getNbt().getTag("tag").getData('transferGemType') == "longRange") {
+            lore = JSON.parse(i18n.trl(player.langCode, "transferGemLore", i18n.get(item.getNbt().getTag("tag").getData('transferGemType'), player.langCode)));
+        } else {
+            lore = JSON.parse(i18n.trl(player.langCode, "transferGemLore", i18n.get(`${item.getNbt().getTag("tag").getData('transferGemType')}Buff`), player.langCode));
+        }
+
         if (itemNbtTransferGem.gem != undefined) {
             lore.push(i18n.get("itemGemMsgLore", player.langCode));
             for (let key in itemNbtTransferGem.gem) {
@@ -1443,6 +1630,40 @@ const loreSet = {
                 lore.push(`${i18n.get(key + "Buff", player.langCode)} : ${itemNbtTransferGem.reel[key]}`);
             }
         }
+        item.setLore(lore);
+        return item;
+    },
+    /**
+     * 设置神器石碎片的Lore数据.
+     * @param {Player} player 玩家对象
+     * @param {Item} item 神器石碎片物品对象
+     * @returns 设置好的物品对象
+     */
+    setartifactFragmentsLore: function (player, item) {
+        let itemNbtTransferGem = item.getNbt().getTag("tag").getData("addon").toObject();
+        let lore;
+        let fragmentsData = queryData.getArtifactDebrisData(itemNbtTransferGem.fragmentstype).artifactData;
+        lore = JSON.parse(i18n.trl(player.langCode, "artifactFragmentsLore", itemNbtTransferGem.fragmentstype, fragmentsData.debrisNumber, fragmentsData.successProbability));
+        fragmentsData.attribute.forEach(data => {
+            lore.push(`${data.CurseName} ${data.CurseLvl} ${i18n.get("level", player.langCode)}`);
+        });
+        item.setLore(lore);
+        return item;
+    },
+    /**
+     * 设置神器石的Lore数据.
+     * @param {Player} player 玩家对象
+     * @param {Item} item 神器石物品对象
+     * @returns 设置好的物品对象
+     */
+    setArtifactStoneLore: function (player, item) {
+        let itemNbtTransferGem = item.getNbt().getTag("tag").getData("addon").toObject();
+        let lore;
+        let fragmentsData = queryData.getArtifactData(itemNbtTransferGem.fragmentstype).artifactData;
+        lore = JSON.parse(i18n.get("artifactStoneLore", player.langCode));
+        fragmentsData.attribute.forEach(data => {
+            lore.push(`${data.CurseName} ${data.CurseLvl} ${i18n.get("level", player.langCode)}`);
+        });
         item.setLore(lore);
         return item;
     }
@@ -1510,6 +1731,64 @@ const generate = {
         nbt.setByte("Count", amount);
         let newItem = mc.newItem(nbt);
         return loreSet.setReelLore(newItem, player, lvl, quality);
+    },
+    /**
+     * 生成一个神器碎片.
+     * @param {Player} player 玩家对象
+     * @param {String} name 碎片内部及显示名称
+     * @param {Integer} amount 生成数量
+     * @returns 生成好的神器碎片对象
+     */
+    setFragments: function (player, name, amount) {
+        if (queryData.getArtifactDebrisData(name).artifactState) {
+            let item = mc.newItem("minecraft:disc_fragment_5", 1);
+            let nbt1 = new NbtCompound({
+                "Damage": new NbtInt(0),
+                "RepairCost": new NbtInt(1),
+                "display": new NbtCompound({
+                    "Name": new NbtString(name)
+                }),
+                "ench": new NbtList([]),
+                "addon": new NbtCompound({
+                    "type": new NbtString("fragments"),
+                    "fragmentstype": new NbtString(name),
+                })
+            })
+            let nbt = item.getNbt();
+            nbt.setTag("tag", nbt1);
+            nbt.setByte("Count", amount);
+            let newItem = mc.newItem(nbt);
+            return loreSet.setartifactFragmentsLore(player, newItem);
+        } else {
+            return false;
+        }
+    },
+    /**
+     * 生成一个神器石.
+     * @param {Player} player 玩家对象
+     * @param {String} name 神器石名称
+     * @param {Integer} amount 生成数量
+     * @returns 生成好的神器石对象
+     */
+    setArtifactStone: function (player, name, amount) {
+        let item = mc.newItem("minecraft:music_disc_11", 1);
+        let nbt1 = new NbtCompound({
+            "Damage": new NbtInt(0),
+            "RepairCost": new NbtInt(1),
+            "display": new NbtCompound({
+                "Name": new NbtString(name)
+            }),
+            "ench": new NbtList([]),
+            "addon": new NbtCompound({
+                "type": new NbtString("artifact"),
+                "fragmentstype": new NbtString(name),
+            })
+        })
+        let nbt = item.getNbt();
+        nbt.setTag("tag", nbt1);
+        nbt.setByte("Count", amount);
+        let newItem = mc.newItem(nbt);
+        return loreSet.setArtifactStoneLore(player, newItem);
     }
 }
 
@@ -1541,7 +1820,8 @@ const queryData = {
             "powerGem": GemConfig.powerGem.DropEntityList,
             "durableGem": GemConfig.durableGem.DropEntityList,
             "explosiveGem": GemConfig.explosiveGem.DropEntityList,
-            "experienceGem": GemConfig.experienceGem.DropEntityList
+            "experienceGem": GemConfig.experienceGem.DropEntityList,
+            "transferGem": GemConfig.transferGem.DropEntityList
         };
         for (let gemName in gemEntityJson) {
             let currentGem = gemEntityJson[gemName];
@@ -1606,6 +1886,10 @@ const queryData = {
                     };
                 } else if (item.type == "minecraft:field_masoned_banner_pattern") {
                     initialData = { "boolean": true, "type": handItemNbtTagAddon.getTag("type").toString(), "reeltype": handItemNbtTagAddon.getTag("reeltype").toString(), "lvl": handItemNbtTagAddon.getTag("lvl").toString(), "itemType": item.type };
+                } else if (item.type == "minecraft:disc_fragment_5") {
+                    initialData = { "boolean": true, "type": handItemNbtTagAddon.getTag("type").toString(), "name": handItemNbtTagAddon.getTag("fragmentstype"), "itemType": item.type };
+                } else if (item.type == "minecraft:music_disc_11") {
+                    initialData = { "boolean": true, "type": handItemNbtTagAddon.getTag("type").toString(), "name": handItemNbtTagAddon.getTag("fragmentstype"), "itemType": item.type };
                 }
             } else {
                 let handItemNbtTagIntensify = handItemNbtTag.getTag("intensify");
@@ -1807,6 +2091,36 @@ const queryData = {
                     itemGemData.gemState = true;
                     itemGemData[gemData.gemName] = gemData.lvl;
                 });
+            }
+        }
+        return itemGemData;
+    },
+    /**
+     * 根据传来的名称获取神器碎片的相关数据
+     * @param {String} name 碎片名称
+     * @returns Json对象
+     */
+    getArtifactDebrisData: function (name) {
+        let itemGemData = { "artifactState": false };
+        for (let key in ArtifactConfig) {
+            let currentItem = ArtifactConfig[key];
+            if (currentItem.debrisName == name) {
+                itemGemData = { "artifactState": true, "artifactData": currentItem, "artifactName": key }
+            }
+        }
+        return itemGemData;
+    },
+    /**
+     * 根据传来的名称获取神器石的相关数据
+     * @param {String} name 神器石名称
+     * @returns Json对象
+     */
+    getArtifactData: function (name) {
+        let itemGemData = { "artifactState": false };
+        for (let key in ArtifactConfig) {
+            if (key == name) {
+                let currentItem = ArtifactConfig[key];
+                itemGemData = { "artifactState": true, "artifactData": currentItem }
             }
         }
         return itemGemData;
@@ -2032,10 +2346,10 @@ const arrayContrast = {
  */
 mc.listen("onPlayerCmd", (player1, cmd) => {
     if (player1.isOP() && cmd == 'cc') {
+        player1.giveItem(generate.setArtifactStone(player1, "神一级石", 1))
+        player1.refreshItems()
         let LLVision = ll.versionString();
         let item = player1.getHand();
-        item = loreSet.setItemLore(player1.getHand(), player1)
-        player1.refreshItems()
         let DebugMsg;
         if (item != undefined && item.name != "") {
             let nbt = item.getNbt();
@@ -2066,6 +2380,12 @@ const shareFunction = {
     },
     getGemName: function () {
         return ["vampiregem", "powergem", "durablegem", "explosiveGem", "experienceGem", "transferGem"];
+    },
+    getArtifactStoneItem: function (player, name, amount) {
+        return generate.setArtifactStone(player, name, amount);
+    },
+    getFragmentsItem: function (player, name, amount) {
+        return generate.setFragments(player, name, amount);
     }
 }
 
@@ -2123,6 +2443,8 @@ ll.export(shareFunction.getPlayerCD, "intensify", "cd");
 ll.export(shareFunction.getGemName, "intensify", "gemname");
 ll.export(shareFunction.getGemItem, "intensify", "gem");
 ll.export(shareFunction.getReelItem, "intensify", "reel");
+ll.export(shareFunction.getFragmentsItem, "intensify", "fragments");
+ll.export(shareFunction.getArtifactStoneItem, "intensify", "artifactStone");
 
 /**
  * 监听使用情况.
@@ -2183,5 +2505,16 @@ ll.export(shareFunction.getReelItem, "intensify", "reel");
  * 140
  * 尝试修复玩家重生后buff设置的问题.
  * 新增转移宝石.
- * 
+ * 141
+ * 修复转移宝石对远程物品的显示错误.
+ * 修复耐久宝石在工具上无效的问题.
+ * 转移宝石支持自定义概率和掉落的生物.
+ * 142
+ * 修复卷轴升级时清除错误格子的问题.
+ * 适配新Api，避免报错.
+ * 143
+ * 新增神器石和神器碎片，暂时只提供api生成.
+ * 144
+ * 给buff变更为使用LLSE的Api.
+ * 爆炸增加爆炸源.
  */

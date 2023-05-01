@@ -4,7 +4,7 @@
 const pluginName = "IntensifyEnderDragon";
 const PluginsIntroduction = '强化末影龙!';
 const pluginPath = "./plugins/IntensifyEnderDragon/";
-const PluginsVersion = [0, 0, 8];
+const PluginsVersion = [0, 0, 10];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const ConfigDataJson = {
     "DockingGives": false,
@@ -16,7 +16,6 @@ const ConfigDataJson = {
     "DragonReturnTime": 10,
     "DragonReturnhpr": 2,
     "ExplosivePower": 5,
-    "ExplosionRadius": 10,
     "ExplosiveDamageBlock": false,
     "ExplosiveCountDown": 10,
     "ShareDamageDistance": 10,
@@ -114,47 +113,68 @@ if (!File.exists(pluginPath + "Config.json")) {
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 
 i18n.load(pluginPath + "language/language.json", "zh_CN", {
-    "zh_CN": {
-        "phase2Tips": "§l§2末影龙进入第二阶段\n此阶段爆炸无法对其造成伤害。",
-        "phase3Tips": "§l§5末影龙进入终极阶段\n此阶段只有近战才能对其造成伤害。",
-        "UnableCauseDamage": "§l§4此物品无法对末影龙造成伤害!",
-        "SharedDamageTips": "§l§6你收到了来自{0}的共享伤害{1}点",
-        "LastShadowDragonStage": "§l§4因末地未检出玩家，末影龙阶段和生命已重置!",
-        "TakeOffBlessing": "§l§3你收到了末影龙的起飞祝福!",
-        "blastTips": "§l§3末影龙{0}秒后即将在{1}处召唤爆炸，请注意!",
-        "RemovePlayerTakeOff": "§l§g因末影龙惊扰到了HIM，已经移除其让玩家起飞的功能!",
-        "YuzhuBlessingTips": "§l§g因受到腐竹的祝福，末影龙已经停止回血。加把劲，干翻他！！！",
-        "StopRandomExplosion": "§l§g你们受到了插件开发者的祝福，末影龙已经停止随机造成爆炸!",
-        "SetDebuffTips": "§l§c你受到了魔影龙的仇视，获得{0} {1}级 {2}秒",
-        "WhetherDisarmTips": "§l§c你被末影龙使用了去你武器技能，物品掉落点{0}",
-        "AdvancedTips": "§l§6末影龙开始进阶，获得无敌金身直至进阶结束!",
-        "InsufficientPeopleTips": "§l§c因攻击人数不足，暂不能对末影龙造成伤害。\n至少需要{0}人！",
-        "Intensifyerr": "未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false",
-        "giveserr": "未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false",
-        "configUp": "版本配置文件更新，请前往Config.json查看！",
-        "getScoreObjErr": "获取计分板对象出错，请检测是否有此名称的计分板!",
-        "rewardTips": "§l§6{0}杀末影龙获得了\n{1}经验值\n{2} {3}，\n其他奖励已生成掉落物！",
-    },
     "en": {
-        "phase2Tips": "§l§2Last Shadow Dragon enters the second stage \n Explosion at this stage cannot cause damage to them.",
-        "phase3Tips": "§l§5Last Shadow Dragon enters the final stage\nOnly melee can damage them at this stage.",
-        "UnableCauseDamage": "§l§4This item cannot cause damage to the Shadow Dragon!",
-        "SharedDamageTips": "§l§6You received {1} points of shared damage from {0}",
-        "LastShadowDragonStage": "§l§4Since no player has been detected in the end place, the end shadow dragon stage and life have been reset!",
-        "TakeOffBlessing": "§l§3You have received the blessing of the last shadow dragon!",
-        "blastTips": "§l§3The last shadow dragon will summon an explosion at {1} in {0} seconds, please pay attention!",
-        "RemovePlayerTakeOff": "§l§gBecause the last shadow dragon disturbed HIM, its function of letting players take off has been removed!",
-        "YuzhuBlessingTips": "§l§gWith the blessing of the rotten bamboo, the last shadow dragon has stopped returning blood. Come on, kill him!!!",
-        "StopRandomExplosion": "§l§gYou have received the blessing of the plug-in developer. The end shadow dragon has stopped random explosion!",
-        "SetDebuffTips": "§l§cYou are hated by the Shadow Dragon, and gain {0} {1} level {2} seconds",
-        "WhetherDisarmTips": "§l§cYou have been used by the last shadow dragon to destroy your weapon skill, and the drop point of the item {0}",
         "AdvancedTips": "§l§6The last shadow dragon starts to advance, and gains the invincible golden body until the end of the advance!",
         "InsufficientPeopleTips": "§l§cDue to the insufficient number of attackers, you can't cause damage to the end shadow dragon temporarily.\nAt least {0} people are required!",
         "Intensifyerr": "The front-end plug-in Intensify.js was not found. Please go to download or set DockingIntensify to false in the configuration file Config.json",
-        "giveserr": "The front plug-in gives.js is not found. Please go to download or set DockingGives to false in the configuration file Config.json",
+        "LastShadowDragonStage": "§l§4Since no player has been detected in the end place, the end shadow dragon stage and life have been reset!",
+        "RemovePlayerTakeOff": "§l§gBecause the last shadow dragon disturbed HIM, its function of letting players take off has been removed!",
+        "SetDebuffTips": "§l§cYou are hated by the Shadow Dragon, and gain {0} {1} level {2} seconds",
+        "SharedDamageTips": "§l§6You received {1} points of shared damage from {0}",
+        "StopRandomExplosion": "§l§gYou have received the blessing of the plug-in developer. The end shadow dragon has stopped random explosion!",
+        "TakeOffBlessing": "§l§3You have received the blessing of the last shadow dragon!",
+        "UnableCauseDamage": "§l§4This item cannot cause damage to the Shadow Dragon!",
+        "WhetherDisarmTips": "§l§cYou have been used by the last shadow dragon to destroy your weapon skill, and the drop point of the item {0}",
+        "YuzhuBlessingTips": "§l§gWith the blessing of the rotten bamboo, the last shadow dragon has stopped returning blood. Come on, kill him!!!",
+        "blastTips": "§l§3The last shadow dragon will summon an explosion at {1} in {0} seconds, please pay attention!",
         "configUp": "Version configuration file update, please go to Config.json to check!",
         "getScoreObjErr": "Error getting scoreboard object, please check whether there is a scoreboard with this name!",
-        "rewardTips": "§l§6{0} Kill the Shadow Dragon and gain  n {1} experience value  n {2} {3}.  n Other rewards have generated dropped objects!",
+        "giveserr": "The front plug-in gives.js is not found. Please go to download or set DockingGives to false in the configuration file Config.json",
+        "phase2Tips": "§l§2Last Shadow Dragon enters the second stage \n Explosion at this stage cannot cause damage to them.",
+        "phase3Tips": "§l§5Last Shadow Dragon enters the final stage\nOnly melee can damage them at this stage.",
+        "rewardTips": "§l§6{0} Kill the Shadow Dragon and gain  n {1} experience value  n {2} {3}.  n Other rewards have generated dropped objects!"
+    },
+    "zh_CN": {
+        "AdvancedTips": "§l§6末影龙开始进阶，获得无敌金身直至进阶结束!",
+        "InsufficientPeopleTips": "§l§c因攻击人数不足，暂不能对末影龙造成伤害。\n至少需要{0}人！",
+        "Intensifyerr": "未找到前置插件Intensify.js，请前往下载或者在配置文件Config.json中将DockingIntensify设置为false",
+        "LastShadowDragonStage": "§l§4因末地未检出玩家，末影龙阶段和生命已重置!",
+        "RemovePlayerTakeOff": "§l§g因末影龙惊扰到了HIM，已经移除其让玩家起飞的功能!",
+        "SetDebuffTips": "§l§c你受到了魔影龙的仇视，获得{0} {1}级 {2}秒",
+        "SharedDamageTips": "§l§6你收到了来自{0}的共享伤害{1}点",
+        "StopRandomExplosion": "§l§g你们受到了插件开发者的祝福，末影龙已经停止随机造成爆炸!",
+        "TakeOffBlessing": "§l§3你收到了末影龙的起飞祝福!",
+        "UnableCauseDamage": "§l§4此物品无法对末影龙造成伤害!",
+        "WhetherDisarmTips": "§l§c你被末影龙使用了去你武器技能，物品掉落点{0}",
+        "YuzhuBlessingTips": "§l§g因受到腐竹的祝福，末影龙已经停止回血。加把劲，干翻他！！！",
+        "blastTips": "§l§3末影龙{0}秒后即将在{1}处召唤爆炸，请注意!",
+        "configUp": "版本配置文件更新，请前往Config.json查看！",
+        "getScoreObjErr": "获取计分板对象出错，请检测是否有此名称的计分板!",
+        "giveserr": "未找到前置插件gives.js，请前往下载或者在配置文件Config.json中将DockingGives设置为false",
+        "phase2Tips": "§l§2末影龙进入第二阶段\n此阶段爆炸无法对其造成伤害。",
+        "phase3Tips": "§l§5末影龙进入终极阶段\n此阶段只有近战才能对其造成伤害。",
+        "rewardTips": "§l§6{0}杀末影龙获得了\n{1}经验值\n{2} {3}，\n其他奖励已生成掉落物！"
+    },
+    "vi_VN": {
+        "AdvancedTips": "§6Bắt đầu giai đoạn tiến hóa của Rồng Kết Thúc, nhận được vỏ bọc bất tử cho đến khi giai đoạn kết thúc!",
+        "InsufficientPeopleTips": "§cKhông thể gây sát thương cho Rồng Kết Thúc do số lượng người tấn công không đủ.\nCần ít nhất {0} người!",
+        "Intensifyerr": "Không tìm thấy plugin liền kề Intensify.js, vui lòng tải xuống hoặc đặt DockingIntensify thành false trong tệp cấu hình Config.json",
+        "LastShadowDragonStage": "§4Vì không phát hiện được người chơi trong Kết Thúc, giai đoạn và máu của Rồng Kết Thúc đã được đặt lại!",
+        "RemovePlayerTakeOff": "§gVì Rồng Kết Thúc đã làm phiền HIM, chức năng cho phép người chơi bay đã được xóa bỏ!",
+        "SetDebuffTips": "§cBạn bị Rồng Ma quỷ tấn công, nhận được hiệu ứng {0} cấp {1} trong {2} giây",
+        "SharedDamageTips": "§6Bạn nhận được sát thương chia sẻ từ {0} với số lượng {1} điểm",
+        "StopRandomExplosion": "§gBạn đã nhận được lời chúc phúc từ nhà phát triển plugin, Rồng Kết Thúc đã dừng lại việc tạo ra các vụ nổ ngẫu nhiên!",
+        "TakeOffBlessing": "§3Bạn nhận được lời chúc phúc của Rồng Kết Thúc để bay lên trời!",
+        "UnableCauseDamage": "§4Vật phẩm này không thể gây sát thương cho Rồng Kết Thúc!",
+        "WhetherDisarmTips": "§cRồng Kết Thúc đã sử dụng kỹ năng để tước bạn vũ khí, vật phẩm rơi tại điểm {0}",
+        "YuzhuBlessingTips": "§gNhận được lời chúc phúc từ Yuzhu, Rồng Kết Thúc đã ngừng hồi phục sức khỏe. Hãy cố gắng và đánh bại nó !!!",
+        "blastTips": "§3Rồng Kết Thúc sẽ triệu hồi một vụ nổ tại điểm {1} sau {0} giây, hãy chú ý!",
+        "configUp": "Cập nhật tệp cấu hình phiên bản, vui lòng kiểm tra Config.json!",
+        "getScoreObjErr": "Lỗi khi lấy đối tượng bảng điểm, vui lòng kiểm tra xem có bảng điểm nào với tên này không!",
+        "giveserr": "Không tìm thấy plugin liền kề gives.js, vui lòng tải xuống hoặc đặt DockingGives thành false trong tệp cấu hình Config.json",
+        "phase2Tips": "§2Rồng Kết Thúc đã vào giai đoạn thứ hai\nTrong giai đoạn này, các vụ nổ không thể gây sát thương cho nó.",
+        "phase3Tips": "§5Rồng Kết Thúc đã vào giai đoạn cuối cùng\nTrong giai đoạn này, chỉ có tấn công gần mới có thể gây sát thương cho nó.",
+        "rewardTips": "§6{0} đã giết Rồng Kết Thúc và nhận được:\n{1} điểm kinh nghiệm\n{2} {3},\nCác phần thưởng khác đã được tạo ra và rơi xuống!"
     }
 });
 
@@ -188,11 +208,11 @@ if (Config.DockingGives) {
  */
 mc.listen("onMobHurt", (mob, source, damage, cause) => {
     let WhetherIntercept = true;
-    if(cause != 18){
+    if (cause != 18) {
         if (mob.type == "minecraft:ender_dragon") {
             if (parseInt(damage) >= mob.health && enderDragonState != 3) {
                 if (BloodReturnTask != undefined) {
-                    clearInterval(BloodReturnTask);
+                    clearIntervalFunction(BloodReturnTask);
                 }
             }
             WhetherIntercept = EnderDragonInjuryTreatment(mob, source, cause);
@@ -201,6 +221,8 @@ mc.listen("onMobHurt", (mob, source, damage, cause) => {
                 PlayerInjuryTreatment(mob, source);
             }
         }
+    }else{
+        WhetherIntercept = false;
     }
     return WhetherIntercept;
 })
@@ -354,17 +376,17 @@ function EnderDragonInjuryTreatment(mob, source, cause) {
         if (mob.health < 80 && StagePrompt.YuzhuBlessingTips) {
             StagePrompt.YuzhuBlessingTips = false;
             TerminalBroadcasting(i18n.get("YuzhuBlessingTips", ll.language));
-            clearInterval(BloodReturnTask);
+            clearIntervalFunction(BloodReturnTask);
         }
         if (mob.health < 50 && StagePrompt.RemovePlayerTakeOff) {
             StagePrompt.RemovePlayerTakeOff = false;
             TerminalBroadcasting(i18n.get("RemovePlayerTakeOff", ll.language));
-            clearInterval(PlayerTakeoffMission);
+            clearIntervalFunction(PlayerTakeoffMission);
         }
         if (mob.health < 30 && StagePrompt.StopRandomExplosion) {
             StagePrompt.StopRandomExplosion = false;
             TerminalBroadcasting(i18n.get("StopRandomExplosion", ll.language));
-            clearInterval(ExplosiveMission);
+            clearIntervalFunction(ExplosiveMission);
         }
         if (cause != 2) {
             WhetherIntercept = false;
@@ -379,7 +401,7 @@ function EnderDragonInjuryTreatment(mob, source, cause) {
 mc.listen("onMobDie", (mob, source, cause) => {
     if (mob.type == "minecraft:ender_dragon") {
         if (BloodReturnTask != undefined) {
-            clearInterval(BloodReturnTask);
+            clearIntervalFunction(BloodReturnTask);
         }
         if (enderDragonState == 3) {
             if (source != undefined && source.isPlayer()) {
@@ -400,7 +422,7 @@ mc.listen("onMobDie", (mob, source, cause) => {
                     TerminalBroadcasting(i18n.trl(player.langCode, "rewardTips", player.realName, rewardJson.xp, Config.KillerReward.LLmoney, Config.KillerReward.NameEconomicSystem));
                 }
 
-                AwardGeneration(mob, rewardJson,player);
+                AwardGeneration(mob, rewardJson, player);
             }
         }
         LastShadowDragonReturnsBlood();
@@ -415,7 +437,7 @@ mc.listen("onMobDie", (mob, source, cause) => {
  * @param {JSONObj} rewardJson 奖励配置文件
  * @param {player} player 玩家对象
  */
-function AwardGeneration(entity, rewardJson,player) {
+function AwardGeneration(entity, rewardJson, player) {
     let DropsArray = rewardJson.DropItemArray;
     if (rewardJson.DropMode == 0) {
         DropsArray.forEach(ItemJson => {
@@ -527,7 +549,7 @@ function CycleReset() {
                     entity.setHealth(200);
                     entity.setMaxHealth(200);
                     ResetRecord = 1;
-                    clearInterval(pid);
+                    clearIntervalFunction(pid);
                 }
             });
         }
@@ -657,16 +679,16 @@ function ScheduledTasks() {
  */
 function StopScheduledTask() {
     if (PlayerSetectionTask != undefined) {
-        clearInterval(PlayerSetectionTask);
+        clearIntervalFunction(PlayerSetectionTask);
     }
     if (ExplosiveMission != undefined) {
-        clearInterval(ExplosiveMission);
+        clearIntervalFunction(ExplosiveMission);
     }
     if (PlayerTakeoffMission != undefined) {
-        clearInterval(PlayerTakeoffMission);
+        clearIntervalFunction(PlayerTakeoffMission);
     }
     if (BloodReturnTask != undefined) {
-        clearInterval(BloodReturnTask);
+        clearIntervalFunction(BloodReturnTask);
     }
 }
 
@@ -688,7 +710,7 @@ function RandomPlayerExplodesTheHead(entity) {
         TerminalBroadcasting(i18n.trl(player1.langCode, "blastTips", Config.ExplosiveCountDown, `${parseInt(player1.pos.x)} ,${parseInt(player1.pos.y)} ,${parseInt(player1.pos.z)}`));
         setTimeout(() => {
             if (pos != undefined && pos.dimid == 2 && enderDragonState != 0) {
-                mc.explode(pos, null, Config.ExplosivePower, Config.ExplosionRadius, Config.ExplosiveDamageBlock, false);
+                mc.explode(pos, null, Config.ExplosivePower, Config.ExplosiveDamageBlock, false);
             }
         }, 1000 * Config.ExplosiveCountDown);
     }
@@ -725,8 +747,8 @@ function LimitPositionTheLastShadowDragon(entity, time) {
         mc.spawnParticle(pos, 'minecraft:mob_block_spawn_emitter');
     }, 20);
     setTimeout(() => {
-        mc.explode(entity.pos, null, 1, 10, false, false);
-        clearInterval(pid);
+        mc.explode(entity.pos, null, 10, false, false);
+        clearIntervalFunction(pid);
     }, 1000 * time);
 }
 
@@ -772,11 +794,18 @@ function EconomicCalculation(num1, num2, symbol) {
     return result
 }
 
+function clearIntervalFunction(id) {
+    if (id != undefined) {
+        clearInterval(id);
+    }
+}
+
 /**
  * 版本配置更新
  */
 FourProfileUpdate();
 function FourProfileUpdate() {
+    
     let UPEntityConfig = false;
     if (Config.KillerReward.LLmoney == undefined) {
         Config.KillerReward.LLmoney = 0;
@@ -797,6 +826,10 @@ function FourProfileUpdate() {
         Config.ProfileVersion = "0.0.5";
         UPEntityConfig = true;
     }
+    if (Config.ExplosionRadius != undefined) {
+        delete Config.ExplosionRadius;
+        UPEntityConfig = true;
+    }
 
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
@@ -805,6 +838,8 @@ function FourProfileUpdate() {
         }, 1000 * 6);
     }
 }
+
+log(`当前服务器配置语言为:${ll.language}`);
 ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherInformation);
 
 /**
@@ -827,6 +862,10 @@ ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherI
  * 移除多余语言文件. 
  * 008
  * 尝试屏蔽荆棘伤害处理.
+ * 009
+ * 适配新的爆炸api.
+ * 0010
+ * 拦截荆棘伤害.
  * 
  * 待修复bug
  * 龙死亡接着放水晶召唤有几率生成出来的龙是不会给爆炸和起飞。
