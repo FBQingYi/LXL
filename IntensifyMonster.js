@@ -3,7 +3,7 @@ const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 3, 3];
+const PluginsVersion = [0, 3, 6];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -25,7 +25,11 @@ const EntityNbtJsonData = {
                 "KillPlayerRecovery": 10,
                 "brambles": false,
                 "bramblesHurt": 1,
-                "LongRangeDamage": true
+                "LongRangeDamage": true,
+                "DeathSoundEffect": "ambient.weather.lightning.impact",
+                "ParticleRadius": 1,
+                "DeathParticleRadius": 3,
+                "RelativeEntity_Y": 3
             },
             "buff": {
                 "state": true,
@@ -106,16 +110,36 @@ const EntityNbtJsonData = {
                         }
                     }
                 ]
+            },
+            "callEntity": {
+                "callEntityState": false,
+                "entityArray": [
+                    {
+                        "SummoningLife": 20,
+                        "entityData": [
+                            {
+                                "type": "ordinary",
+                                "entityType": "minecraft:zombie",
+                                "callNumber": 5
+                            },
+                            {
+                                "type": "intensify",
+                                "entityType": "minecraft:zombie",
+                                "entityUniqueName": "zombie1",
+                                "callNumber": 5
+                            }
+                        ]
+                    }
+                ]
             }
         }
     ]
 };
 
-const InitializedTemplate = { "OriginalData": { "health": 40, "movement": 0.35, "underwater_movement": 0.2, "lava_movement": 0.2, "follow_range": 20, "knockback_resistance": 6, "scale": 2, "customName": "宝藏僵尸", "UniqueName": "zombie1" }, "OtherAbility": { "SpawnProbability": 100, "Additionaldamage": 2, "KillPlayerRecovery": 10, "brambles": false, "bramblesHurt": 1, "LongRangeDamage": true }, "buff": { "state": true, "buffArray": [{ "id": "resistance", "lvl": 1, "time": 10000 }] }, "Disarm": { "WhetherDisarm": false, "DisarmingProbability": 1, "DropOffset": { "x": 3, "z": 2 } }, "Explosion": { "dieBlast": false, "BlastDestroy": false, "BlastPower": 1, "BlastTime": 10 }, "BeFire": { "playerFire": true, "FireTime": 10 }, "Scabbing": { "ArmorBreaker": false, "ArmorBreakerToSE": false, "ArmorProbability": 10, "SingleReductionDamage": 2 }, "trophy": { "OtherDrops": true, "OtherDropsMode": 0, "GiveXpToPlayer": 5, "addTalentValue": 1.1234, "reel": { "reel": true, "reelLvl": 1, "probability": 10 }, "economy": { "moneyName": "llmoney", "probability": 1, "quantity": 10, "describe": "金币" }, "fragmentsArtifactStones": { "state": true, "name": "神一级石碎片", "number": 1, "probability": 100 }, "ListSpoils": [{ "Spoils": "ordinary", "SpoilsTypeName": "minecraft:stone", "SpoilsProbability": 10, "SpoilsqQantity": 1 }, { "Spoils": "gives", "SpoilsTypeName": "minecraft:wooden_sword", "DisplayName": "", "SpoilsProbability": 1, "SpoilsqQantity": 1, "Curse": { "Enchantments": [{ "n": 16, "l": 5 }] } }] } };
-const ConfigDataJson = { "DockingIntensifySurvival": false, "ForceEntitySize": false, "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "0.0.1" };
+const InitializedTemplate = EntityNbtJsonData["minecraft:zombie"][0];
+const ConfigDataJson = { "DockingIntensifySurvival": false, "ForceEntitySize": false, "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "1.1.1" };
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
-const buffIdCompare = { "absorption": 22, "bad_omen": 26, "blindness": 15, "conduit_power": 29, "nausea": 9, "fire_resistance": 12, "glowing": 24, "haste": 3, "health_boost": 21, "hunger": 17, "instant_damage": 7, "instant_health": 6, "invisibility": 14, "jump_boost": 8, "levitation": 25, "luck": 26, "mining_fatigue": 4, "nautilus": 30, "night_vision": 16, "poison": 19, "regeneration": 10, "resistance": 11, "saturation": 23, "slow_falling": 27, "slowness": 2, "speed": 1, "strength": 5, "water_breathing": 13, "weakness": 18, "wither": 20 };
-
+const buffIdCompare = { "speed": 1, "slowness": 2, "haste": 3, "mining_fatigue": 4, "strength": 5, "instant_health": 6, "instant_damage": 7, "jump_boost": 8, "nausea": 9, "regeneration": 10, "resistance": 11, "fire_resistance": 12, "water_breathing": 13, "invisibility": 14, "blindness": 15, "night_vision": 16, "hunger": 17, "weakness": 18, "poison": 19, "wither": 20, "health_boost": 21, "absorption": 22, "saturation": 23, "levitation": 24, "fatal_poison": 25, "conduit_power": 26, "slow_falling": 27, "bad_omen": 28, "village_hero": 29, "darkness": 30 };
 //------插件信息注册
 ll.registerPlugin(pluginName, PluginsIntroduction, PluginsVersion, PluginsOtherInformation)
 
@@ -136,6 +160,8 @@ let EntityNbtJson = JSON.parse(File.readFrom(pluginPath + "data/EntityData.json"
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 let getReelNbt, GetNewItemNbt, ParticleSpawner, AddTalentValue, getFragmentsNbt;
 let Generate = true;
+let entityCallEntity = {};
+let generateCooling = {};
 logger.setConsole(true);
 
 /**
@@ -238,7 +264,17 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "removeBuff_1": "移除buff",
         "set_buff_id": "buff英文id",
         "set_buff_lvl": "buff等级",
-        "set_buff_time": "buff持续时间"
+        "set_buff_time": "buff持续时间",
+
+        "scabbingMsg": "§4碎甲：§3耐久减少{0}",
+        "TrueInjuryMsg": "§4真伤：§3血量减少{0}",
+        "disarmMsg": "§4缴械：§3{0}\n掉落位置：{1}",
+
+        "DeathSoundEffect": "死亡音效",
+        "ParticleRadius": "粒子半径",
+        "DeathParticleRadius": "死亡粒子半径",
+        "PerformanceTips": "此插件粒子效果有大量计算，如果配置低请关闭粒子选项。Config.json中將ParticleEffect和ForceEntitySize设置为false"
+
     },
     "zh_TW": {
         "formTitle": "選擇實體",
@@ -335,7 +371,15 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "removeBuff_1": "移除buff",
         "set_buff_id": "buff英文id",
         "set_buff_lvl": "buff等級",
-        "set_buff_time": "buff持續時間"
+        "set_buff_time": "buff持續時間",
+        "scabbingMsg": "§4碎甲：§3耐久减少{0}",
+        "TrueInjuryMsg": "§4真伤：§3血量减少{0}",
+        "disarmMsg": "§4缴械：§3{0}\n掉落位置：{1}",
+        "DeathSoundEffect": "死亡音效",
+        "ParticleRadius": "粒子半徑",
+        "DeathParticleRadius": "死亡粒子半徑",
+        "PerformanceTips": "此挿件粒子效果有大量計算，如果配寘低請關閉粒子選項。 Config.json中將ParticleEffect和ForceEntitySize設定為false"
+
     },
     "en": {
         "formTitle": "Select Entity",
@@ -432,7 +476,15 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "removeBuff_1": "Remove buff",
         "set_buff_id": "buff id",
         "set_buff_lvl": "buff level",
-        "set_buff_time": "buff duration"
+        "set_buff_time": "buff duration",
+        "scabbingMsg": "§4Armor fragmentation: § 3 durability reduction{0}",
+        "TrueInjuryMsg": "§4True Damage: § 3 Reduced Health{0}",
+        "disarmMsg": "§4Disarm: § 3 {0}  \nFalling position:{1}",
+        "DeathSoundEffect": "Death sound effect",
+        "ParticleRadius": "Particle Radius",
+        "DeathParticleRadius": "Death particle radius",
+        "PerformanceTips": "This plugin has a large amount of calculation for particle effects. If the configuration is low, please turn off the particle option. Set ParticleEffect and ForceEntitySize to false in Config.json"
+
     }
 });
 
@@ -561,7 +613,7 @@ mc.listen("onStepOnPressurePlate", (entity, _pressurePlate) => {
  * 然后随机判断是否生成强化生物.
  */
 mc.listen("onMobSpawned", (entity, pos) => {
-    if (entity != undefined) {
+    if (entity != undefined && generateCooling[pos] == undefined) {
         let typeName = entity.type;
         if (EntityNbtJson[typeName] != undefined) {
             let ConfigureRandom = specifiedRangeRandomNumber(0, EntityNbtJson[typeName].length);
@@ -585,178 +637,67 @@ mc.listen("onMobSpawned", (entity, pos) => {
 });
 
 /**
- * 监听生物死亡.
- * 判断生物是否是强化生物并且是否开启掉落.
- * 然后调用前置插件生成新的卷轴nbt.
- * 004后新增普通掉落.
- * 005后可对接gives掉落附魔物品.
+ * 监听生物死亡并分发.
  */
 mc.listen("onMobDie", (mob, source, _cause) => {
     if (source != undefined && source.isPlayer() && mob.hasTag("Intensify")) {
         let entityJson = EntityNbtJson[mob.type];
         if (entityJson != undefined) {
-            let entityDataJson = {};
-            let pos = mob.pos;
-            for (let i = 0; i < entityJson.length; i++) {
-                let EntityJsonUniqueName = entityJson[i].OriginalData.UniqueName;
-                if (mob.hasTag(EntityJsonUniqueName)) {
-                    entityDataJson = entityJson[i];
-                    break;
-                }
-            }
+            let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(mob);
             if (entityDataJson != {}) {
+                let pos = mob.pos;
                 let player = source.toPlayer();
                 if (entityDataJson.Explosion.dieBlast) {
-                    player.tell(i18n.trl(player.langCode, "BlastTips", mob.name, entityDataJson.BlastTime));
-                    setTimeout(() => {
-                        mc.explode(pos, mob, entityDataJson.Explosion.BlastPower, entityDataJson.Explosion.BlastDestroy, false);
-                    }, entityDataJson.Explosion.BlastTime * 1000);
+                    MobDieEvent.explode(entityDataJson, pos, player, mob);
                 }
                 if (Config.DockingIntensify) {
-                    let randomInt = specifiedRangeRandomNumber(0, 100, 4);
-                    if (entityDataJson.trophy.reel.reel) {
-                        if (randomInt <= entityDataJson.trophy.reel.probability) {
-                            let newItem = getReelNbt(player, entityDataJson.trophy.reel.reelLvl);
-                            mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
-                        }
-                    }
-                    let artifactFragmentsConfig = entityDataJson.trophy.fragmentsArtifactStones;
-                    if (artifactFragmentsConfig.state) {
-                        let randomInt = specifiedRangeRandomNumber(0, 100, 4);
-                        if (randomInt <= artifactFragmentsConfig.probability) {
-                            let newItem = getFragmentsNbt(player, artifactFragmentsConfig.name, artifactFragmentsConfig.number);
-                            mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
-                        }
-                    }
+                    MobDieEvent.DockingIntensify(entityDataJson, pos, player);
                 }
                 if (entityDataJson.trophy.OtherDrops) {
-                    if (entityDataJson.trophy.OtherDropsMode == 0 && entityDataJson.trophy.ListSpoils != []) {
-                        let SpoilsList = entityDataJson.trophy.ListSpoils;
-                        SpoilsList.forEach(CurrentOptions => {
-                            let randomInt = specifiedRangeRandomNumber(0, 100, 4);
-                            if (randomInt <= CurrentOptions.SpoilsProbability) {
-                                if (CurrentOptions.Spoils == "ordinary") {
-                                    let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
-                                    mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
-                                } else if (CurrentOptions.Spoils == "gives" && Config.DockingGives) {
-                                    let itemDIsplayName = undefined;
-                                    let initialItem = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
-                                    if (CurrentOptions.DisplayName != "") {
-                                        itemDIsplayName = CurrentOptions.DisplayName;
-                                    }
-                                    let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, CurrentOptions.Curse, CurrentOptions.SpoilsqQantity);
-                                    let item = mc.newItem(itemNewNbt);
-                                    mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
-                                }
-                            }
-                        });
-                    } else if (entityDataJson.trophy.OtherDropsMode == 1 && entityDataJson.trophy.ListSpoils != []) {
-                        let SpoilsList = entityDataJson.trophy.ListSpoils;
-                        let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length);
-                        let itemData = SpoilsList[randomInt];
-                        if (itemData.Spoils == "ordinary") {
-                            let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
-                            mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
-                        } else if (itemData.Spoils == "gives" && Config.DockingGives) {
-                            let itemDIsplayName = undefined;
-                            let initialItem = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
-                            if (itemData.DisplayName != "") {
-                                itemDIsplayName = itemData.DisplayName;
-                            }
-                            let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, itemData.Curse, itemData.SpoilsqQantity);
-                            let item = mc.newItem(itemNewNbt);
-                            mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
-                        }
-                    }
+                    MobDieEvent.OtherDrops(entityDataJson, pos);
                 }
-                let randomInt = specifiedRangeRandomNumber(0, 100, 4);
-                let economyConfig = entityDataJson.trophy.economy;
-                if (randomInt <= economyConfig.probability) {
-                    if (economyConfig.moneyName == "llmoney") {
-                        player.addMoney(economyConfig.quantity);
-                    } else {
-                        mc.runcmdEx(`scoreboard players add "${player.realName}" ${randomInt} ${economyConfig.quantity}`);
-                    }
-                    player.tell(i18n.trl(player.langCode, "economyTips", economyConfig.quantity, economyConfig.describe));
-                }
-
-                if (Config.DockingIntensifySurvival) {
-                    AddTalentValue(player.xuid, entityDataJson.trophy.addTalentValue);
-                }
-                player.addExperience(entityDataJson.trophy.GiveXpToPlayer);
+                MobDieEvent.comprehensiveEvents(entityDataJson, player, mob);
+            }
+            if (entityCallEntity[mob.uniqueId] != undefined) {
+                delete entityCallEntity[mob.uniqueId];
             }
         }
     }
 })
 
 /**
- * 监听生物受伤事件.
- * 判断是否是玩家受伤及造成伤害的是否是强化生物.
- * 对玩家造成额外的真实伤害以及着火.
+ * 监听生物受伤事件分发处理.
  */
 mc.listen("onMobHurt", (mob, source, _damage, cause) => {
     if (mob.isPlayer() && source != undefined) {
         let entityJson = EntityNbtJson[source.type];
         if (entityJson != undefined && source.hasTag("Intensify")) {
-            let entityDataJson = {};
-            for (let i = 0; i < entityJson.length; i++) {
-                let EntityJsonUniqueName = entityJson[i].OriginalData.UniqueName;
-                if (source.hasTag(EntityJsonUniqueName)) {
-                    entityDataJson = entityJson[i];
-                    break;
-                }
-            }
+            let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(source);
             if (entityDataJson != {}) {
                 if (cause == 3) {
                     if (!entityDataJson.OtherAbility.LongRangeDamage) {
                         return false;
                     }
                 }
-                let damage = 0;
-                if (entityDataJson.OtherAbility.brambles) {
-                    damage += entityDataJson.OtherAbility.bramblesHurt;
-                }
-                damage += entityDataJson.OtherAbility.Additionaldamage;
                 let player = mob.toPlayer();
+
                 if (entityDataJson.Disarm.WhetherDisarm) {
-                    let random = specifiedRangeRandomNumber(0, 100, 4);
-                    if (random <= entityDataJson.Disarm.DisarmingProbability) {
-                        let playerHand = player.getHand();
-                        if (!playerHand.isNull()) {
-                            let DropOffsetX = entityDataJson.Disarm.DropOffset.x;
-                            let DropOffsetZ = entityDataJson.Disarm.DropOffset.z;
-                            if (mc.spawnItem(playerHand, player.pos.x + DropOffsetX, player.pos.y, player.pos.z + DropOffsetZ, player.pos.dimid)) {
-                                playerHand.setNull()
-                                player.refreshItems()
-                            }
-                        }
-                    }
-                }
-                if (entityDataJson.Scabbing.ArmorBreaker) {
-                    let playerArmor = player.getArmor();
-                    let playerArmorAllItem = playerArmor.getAllItems();
-                    playerArmorAllItem.forEach(item => {
-                        if (!item.isNull()) {
-                            let random = specifiedRangeRandomNumber(0, 100, 4);
-                            if (entityDataJson.Scabbing.ArmorBreakerToSE) {
-                                if (random <= entityDataJson.Scabbing.ArmorProbability) {
-                                    item.setDamage(item.damage + entityDataJson.Scabbing.SingleReductionDamage);
-                                }
-                            } else if (!queryClass.isIntensify(item)) {
-                                if (random <= entityDataJson.Scabbing.ArmorProbability) {
-                                    item.setDamage(item.damage + entityDataJson.Scabbing.SingleReductionDamage);
-                                }
-                            }
-                        }
-                    });
+                    entityHurtEvent.WhetherDisarm(entityDataJson, player);
                 }
 
-                setTimeout(() => {
-                    player.hurt(damage);
-                    if (entityDataJson.BeFire.playerFire) {
-                        player.setFire(entityDataJson.BeFire.FireTime, false);
-                    }
-                }, 500);
+                if (entityDataJson.Scabbing.ArmorBreaker) {
+                    entityHurtEvent.ArmorBreaker(entityDataJson, player);
+                }
+
+                entityHurtEvent.Additionaldamage(entityDataJson, player);
+            }
+        }
+    } else if (!mob.isPlayer() && source != undefined) {
+        let entityJson = EntityNbtJson[mob.type];
+        if (entityJson != undefined && mob.hasTag("Intensify")) {
+            let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(mob);
+            if (entityDataJson.callEntity.callEntityState) {
+                entityHurtEvent.SummonedCreature(entityDataJson, mob);
             }
         }
     }
@@ -800,9 +741,243 @@ mc.listen("onServerStarted", () => {
     });
     Command.setup();
     if (Config.ParticleEffect) {
-        ParticleScheduledTasks();
+        particles.particleScheduledTasks();
     }
 });
+
+/**
+ * 生物受伤事件处理
+ */
+const entityHurtEvent = {
+    /**
+     * 抢夺技能处理.
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Player} player 玩家对象
+     */
+    WhetherDisarm: function (entityDataJson, player) {
+        let random = specifiedRangeRandomNumber(0, 100, 4);
+        if (random <= entityDataJson.Disarm.DisarmingProbability) {
+            let playerHand = player.getHand();
+            if (!playerHand.isNull()) {
+                let DropOffsetX = entityDataJson.Disarm.DropOffset.x;
+                let DropOffsetZ = entityDataJson.Disarm.DropOffset.z;
+                if (mc.spawnItem(playerHand, player.pos.x + DropOffsetX, player.pos.y, player.pos.z + DropOffsetZ, player.pos.dimid)) {
+                    player.tell(i18n.trl(player.langCode, "disarmMsg", playerHand.name, `${player.pos.x + DropOffsetX},${player.pos.y},${player.pos.z + DropOffsetZ}`));
+                    playerHand.setNull()
+                    player.refreshItems()
+                }
+            }
+        }
+    },
+    /**
+     * 碎甲技能处理.
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Player} player 玩家对象
+     */
+    ArmorBreaker: function (entityDataJson, player) {
+        let playerArmor = player.getArmor();
+        let playerArmorAllItem = playerArmor.getAllItems();
+        playerArmorAllItem.forEach(item => {
+            if (!item.isNull()) {
+                let random = specifiedRangeRandomNumber(0, 100, 4);
+                let scabbing = entityDataJson.Scabbing.SingleReductionDamage;
+                if (entityDataJson.Scabbing.ArmorBreakerToSE) {
+                    if (random <= scabbing) {
+                        item.setDamage(item.damage + entityDataJson.Scabbing.SingleReductionDamage);
+                        player.tell(i18n.trl(player.langCode, "scabbingMsg", scabbing));
+                    }
+                } else if (!queryClass.isIntensify(item)) {
+                    if (random <= scabbing) {
+                        item.setDamage(item.damage + entityDataJson.Scabbing.SingleReductionDamage);
+                        player.tell(i18n.trl(player.langCode, "scabbingMsg", scabbing));
+                    }
+                }
+            }
+        });
+    },
+    /**
+     * 额外伤害和着火处理.
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Player} player 玩家对象
+     */
+    Additionaldamage: function (entityDataJson, player) {
+        let damage = 0;
+        if (entityDataJson.OtherAbility.brambles) {
+            damage += entityDataJson.OtherAbility.bramblesHurt;
+        }
+        damage += entityDataJson.OtherAbility.Additionaldamage;
+        setTimeout(() => {
+            player.hurt(damage);
+            player.tell(i18n.trl(player.langCode, "TrueInjuryMsg", damage));
+            if (entityDataJson.BeFire.playerFire) {
+                player.setFire(entityDataJson.BeFire.FireTime, false);
+            }
+        }, 500);
+    },
+    /**
+     * 召唤生物.
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Entity} mob 实体对象
+     */
+    SummonedCreature: function (entityDataJson, mob) {
+        let generateEntityCooling = false;
+        if (entityCallEntity[mob.uniqueId] == undefined) {
+            entityCallEntity[mob.uniqueId] = {};
+        }
+        let entityHealth = queryClass.getEntityHealth(mob.uniqueId)
+        if (entityHealth != 0) {
+            let entityCallArray = entityDataJson.callEntity.entityArray;
+            entityCallArray.forEach(data => {
+                if (entityHealth <= data.SummoningLife) {
+                    let record = entityCallEntity[mob.uniqueId][data.SummoningLife.toString()];
+                    if (record == undefined) {
+                        entityCallEntity[mob.uniqueId][data.SummoningLife.toString()] = true;
+                        let entityData = data.entityData;
+                        entityData.forEach(entityJson => {
+                            if (entityJson.type == "ordinary") {
+                                for (let i = 0; i < entityJson.callNumber; i++) {
+                                    mc.spawnMob(entityJson.entityType, mob.pos);
+                                    generateEntityCooling = true;
+                                }
+                            } else if (entityJson.type == "intensify") {
+                                let EntityDataJson = queryClass.UniqueNameGetEntityJson(entityJson.entityUniqueName, entityJson.entityType);
+                                if (EntityDataJson != {}) {
+                                    for (let i = 0; i < entityJson.callNumber; i++) {
+                                        let entity = mc.spawnMob(entityJson.entityType, mob.pos);
+                                        setNewEntity(entity, EntityDataJson);
+                                        generateEntityCooling = true;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            if (generateEntityCooling) {
+                generateIntensifyCooling(mob);
+            }
+        }
+    }
+}
+
+/**
+ * 实体死亡处理.
+ */
+const MobDieEvent = {
+    /**
+     * 综合处理，包含给金币、天赋、经验值.
+     * 播放死亡音效和粒子.
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Player} player 玩家对象
+     * @param {Entity} mob 实体对象
+     */
+    comprehensiveEvents: function (entityDataJson, player, mob) {
+        let randomInt = specifiedRangeRandomNumber(0, 100, 4);
+        let economyConfig = entityDataJson.trophy.economy;
+        if (randomInt <= economyConfig.probability) {
+            if (economyConfig.moneyName == "llmoney") {
+                player.addMoney(economyConfig.quantity);
+            } else {
+                mc.runcmdEx(`scoreboard players add "${player.realName}" ${randomInt} ${economyConfig.quantity}`);
+            }
+            player.tell(i18n.trl(player.langCode, "economyTips", economyConfig.quantity, economyConfig.describe));
+        }
+        if (Config.DockingIntensifySurvival) {
+            AddTalentValue(player.xuid, entityDataJson.trophy.addTalentValue);
+        }
+        if (entityDataJson.OtherAbility.DeathSoundEffect != "") {
+            mc.runcmdEx(`playsound ${entityDataJson.OtherAbility.DeathSoundEffect} "${player.realName}"`);
+        }
+        if (Config.ParticleEffect) {
+            let radius = entityDataJson.OtherAbility.DeathParticleRadius;
+            let relativePosition = entityDataJson.OtherAbility.RelativeEntity_Y;
+            particles.deathParticles(mob.pos, radius, relativePosition);
+        }
+        player.addExperience(entityDataJson.trophy.GiveXpToPlayer);
+    },
+    /**
+     * 战利品掉落
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Pos} pos 实体死亡坐标对象
+     */
+    OtherDrops: function (entityDataJson, pos) {
+        if (entityDataJson.trophy.OtherDropsMode == 0 && entityDataJson.trophy.ListSpoils != []) {
+            let SpoilsList = entityDataJson.trophy.ListSpoils;
+            SpoilsList.forEach(CurrentOptions => {
+                let randomInt = specifiedRangeRandomNumber(0, 100, 4);
+                if (randomInt <= CurrentOptions.SpoilsProbability) {
+                    if (CurrentOptions.Spoils == "ordinary") {
+                        let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                        mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                    } else if (CurrentOptions.Spoils == "gives" && Config.DockingGives) {
+                        let itemDIsplayName = undefined;
+                        let initialItem = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
+                        if (CurrentOptions.DisplayName != "") {
+                            itemDIsplayName = CurrentOptions.DisplayName;
+                        }
+                        let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, CurrentOptions.Curse, CurrentOptions.SpoilsqQantity);
+                        let item = mc.newItem(itemNewNbt);
+                        mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                    }
+                }
+            });
+        } else if (entityDataJson.trophy.OtherDropsMode == 1 && entityDataJson.trophy.ListSpoils != []) {
+            let SpoilsList = entityDataJson.trophy.ListSpoils;
+            let randomInt = specifiedRangeRandomNumber(0, SpoilsList.length);
+            let itemData = SpoilsList[randomInt];
+            if (itemData.Spoils == "ordinary") {
+                let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+            } else if (itemData.Spoils == "gives" && Config.DockingGives) {
+                let itemDIsplayName = undefined;
+                let initialItem = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
+                if (itemData.DisplayName != "") {
+                    itemDIsplayName = itemData.DisplayName;
+                }
+                let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, itemData.Curse, itemData.SpoilsqQantity);
+                let item = mc.newItem(itemNewNbt);
+                mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+            }
+        }
+    },
+    /**
+     * 强化物品掉落
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Pos} pos 实体死亡坐标对象
+     * @param {Player} player 玩家对象
+     */
+    DockingIntensify: function (entityDataJson, pos, player) {
+        let randomInt = specifiedRangeRandomNumber(0, 100, 4);
+        if (entityDataJson.trophy.reel.reel) {
+            if (randomInt <= entityDataJson.trophy.reel.probability) {
+                let newItem = getReelNbt(player, entityDataJson.trophy.reel.reelLvl);
+                mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
+            }
+        }
+        let artifactFragmentsConfig = entityDataJson.trophy.fragmentsArtifactStones;
+        if (artifactFragmentsConfig.state) {
+            let randomInt = specifiedRangeRandomNumber(0, 100, 4);
+            if (randomInt <= artifactFragmentsConfig.probability) {
+                let newItem = getFragmentsNbt(player, artifactFragmentsConfig.name, artifactFragmentsConfig.number);
+                mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
+            }
+        }
+    },
+    /**
+     * 
+     * @param {JSON} entityDataJson 实体配置文件
+     * @param {Pos} pos 实体死亡坐标对象
+     * @param {Player} player 玩家对象
+     * @param {Entity} mob 死亡实体对象
+     */
+    explode: function (entityDataJson, pos, player, mob) {
+        player.tell(i18n.trl(player.langCode, "BlastTips", mob.name, entityDataJson.BlastTime));
+        setTimeout(() => {
+            mc.explode(pos, mob, entityDataJson.Explosion.BlastPower, entityDataJson.Explosion.BlastDestroy, false);
+        }, entityDataJson.Explosion.BlastTime * 1000);
+    }
+}
 
 /**
  * 表单处理
@@ -1154,6 +1329,7 @@ const addEntityToConfig = {
                         }
                     ]
                 }
+                TemporaryRecords[enType].callEntity = InitializedTemplate[enType].callEntity;
                 this.addEntity_Summary(TemporaryRecords, player, enName, enType);
             } else {
                 return false;
@@ -1217,8 +1393,11 @@ const modifyEntityToConfig = {
             .setTitle(i18n.get("modifyEntity_1", player.langCode))
             .setContent(i18n.get("smallitem", player.langCode));
         for (let key in ConfigJson) {
-            fm.addButton(i18n.get(key, player.langCode));
-            smallitemArray.push(key);
+            if (key != "callEntity") {
+                fm.addButton(i18n.get(key, player.langCode));
+                smallitemArray.push(key);
+            }
+
         }
         player.sendForm(fm, (player, id) => {
             if (id != undefined) {
@@ -1543,7 +1722,7 @@ const buffSetRelated = {
 }
 
 /**
- * 查询实体数据
+ * 查询实体数据表单
  */
 const queryEntityData = {
     /**
@@ -1766,34 +1945,172 @@ const queryClass = {
             QueryResults.push(buffData.id);
         });
         return QueryResults;
+    },
+    /**
+     * 获取圆的所有坐标
+     * @param {Number} centerX 中心点坐标
+     * @param {Number} centerZ 中心点坐标
+     * @param {Number} radius 半径
+     * @param {Number} numPoints 密度
+     * @returns Array
+     */
+    getCirclePoints: function (centerX, centerZ, radius, numPoints = 20) {
+        let points = [];
+        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI * 2 / numPoints) {
+            let x = centerX + radius * Math.cos(angle);
+            let z = centerZ + radius * Math.sin(angle);
+            points.push({ x, z });
+        }
+        return points;
+    },
+    /**
+     * 六芒星顶点坐标位置
+     * @param {Number} centerX 中心点坐标
+     * @param {Number} centerY 中心点坐标
+     * @param {Number} radius 半径
+     * @returns array
+     */
+    getHexagramPoints: function (centerX, centerY, radius) {
+        let points = [];
+        for (let i = 0; i < 6; i++) {
+            let angle_deg = 60 * i - 30;
+            let angle_rad = Math.PI / 180 * angle_deg;
+            let pointX = centerX + radius * Math.cos(angle_rad);
+            let pointY = centerY + radius * Math.sin(angle_rad);
+            points.push([pointX, pointY]);
+        }
+        return points;
+    },
+    /**
+     * 六芒星所有坐标位置
+     * @param {Number} centerX 中心点坐标
+     * @param {Number} centerY 中心点坐标
+     * @param {Number} radius 半径
+     * @returns array
+     */
+    getHexagramEdges: function (centerX, centerY, radius) {
+        let edges = [];
+        let centerPoints = this.getHexagramPoints(centerX, centerY, radius);
+        for (let i = 0; i < 6; i++) {
+            let startPoint = centerPoints[i];
+            let endPoint = centerPoints[(i + 2) % 6];
+            let edge = [];
+            let dx = endPoint[0] - startPoint[0];
+            let dy = endPoint[1] - startPoint[1];
+            let length = Math.sqrt(dx * dx + dy * dy);
+            let scaleX = dx / length;
+            let scaleY = dy / length;
+            for (let j = 0; j <= length; j++) {
+                let pointX = startPoint[0] + j * scaleX;
+                let pointY = startPoint[1] + j * scaleY;
+                edge.push([pointX, pointY]);
+            }
+            edges.push(edge);
+        }
+        return edges;
+    },
+    /**
+     * 根据实体对象插件配置文件.
+     * @param {Entity} entity 实体对象
+     * @returns JSon
+     */
+    basedBiologicalAcquisitionConfig: function (entity) {
+        let entityDataJson = {};
+        let entityJson = EntityNbtJson[entity.type];
+        for (let i = 0; i < entityJson.length; i++) {
+            let EntityJsonUniqueName = entityJson[i].OriginalData.UniqueName;
+            if (entity.hasTag(EntityJsonUniqueName)) {
+                entityDataJson = entityJson[i];
+                break;
+            }
+        }
+        return entityDataJson;
+    },
+    /**
+     * 查询实体实时血量.
+     * @param {String} uniqueId 实体唯一标识符（mc）
+     * @returns 查询结果
+     */
+    getEntityHealth: function (uniqueId) {
+        let entityHealth = 0;
+        let allEntity = mc.getAllEntities();
+        allEntity.forEach(entity => {
+            if (uniqueId == entity.uniqueId) {
+                entityHealth = entity.health;
+            }
+        });
+        return entityHealth;
     }
 }
 
 /**
- * 粒子生成循环任务.
+ * 粒子任务
  */
-function ParticleScheduledTasks() {
-    setInterval(() => {
-        if (Config.ParticleEffect) {
-            let AllEntityArray = mc.getAllEntities();
-            AllEntityArray.forEach(entity => {
-                if (entity != undefined && entity.name != "") {
-                    if (entity.hasTag("Intensify")) {
-                        let pos = mc.newFloatPos(entity.pos.x, entity.pos.y + 2, entity.pos.z, entity.pos.dimid);
-                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
-                        pos = mc.newFloatPos(entity.pos.x, entity.pos.y + 1, entity.pos.z + 1, entity.pos.dimid);
-                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
-                        pos = mc.newFloatPos(entity.pos.x, entity.pos.y + 1, entity.pos.z - 1, entity.pos.dimid);
-                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
-                        pos = mc.newFloatPos(entity.pos.x + 1, entity.pos.y + 1, entity.pos.z, entity.pos.dimid);
-                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
-                        pos = mc.newFloatPos(entity.pos.x - 1, entity.pos.y + 1, entity.pos.z, entity.pos.dimid);
-                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
+const particles = {
+    /**
+     * 生成圆.
+     */
+    particleScheduledTasks: function () {
+        setInterval(() => {
+            if (Config.ParticleEffect) {
+                let AllEntityArray = mc.getAllEntities();
+                AllEntityArray.forEach(entity => {
+                    if (entity != undefined && entity.name != "") {
+                        if (entity.hasTag("Intensify")) {
+                            let entityJson = EntityNbtJson[entity.type];
+                            if (entityJson != undefined) {
+                                let entityDataJson = {};
+                                for (let i = 0; i < entityJson.length; i++) {
+                                    let EntityJsonUniqueName = entityJson[i].OriginalData.UniqueName;
+                                    if (entity.hasTag(EntityJsonUniqueName)) {
+                                        entityDataJson = entityJson[i];
+                                        break;
+                                    }
+                                }
+                                if (entityDataJson != {}) {
+                                    let posArray = queryClass.getCirclePoints(entity.pos.x, entity.pos.z, entityDataJson.OtherAbility.ParticleRadius, 10);
+                                    posArray.forEach(points => {
+                                        let pos = mc.newFloatPos(points.x, entity.pos.y + 0.5, points.z, entity.pos.dimid);
+                                        mc.spawnParticle(pos, 'minecraft:obsidian_glow_dust_particle');
+                                    });
+                                }
+                            }
+                        }
                     }
-                }
+                });
+            }
+        }, 20);
+    },
+    /**
+     * 生成六芒星
+     * @param {Object} pos2 坐标点对象
+     * @param {Number} r 半径
+     * @param {Number} relativePosition 粒子高度
+     */
+    deathParticles: function (pos2, r, relativePosition) {
+        let hexagram = queryClass.getHexagramEdges(pos2.x, pos2.z, r);
+        let liz = 'minecraft:lava_drip_particle';
+        let pid = setInterval(() => {
+            hexagram.forEach(element => {
+                element.forEach(pos1 => {
+                    let pos = mc.newFloatPos(pos1[0], pos2.y + relativePosition, pos1[1], 0);
+                    mc.spawnParticle(pos, liz)
+                });
             });
-        }
-    }, 20);
+        }, 50);
+        setTimeout(() => {
+            clearInterval(pid)
+            for (let i = 0; i < relativePosition; i++) {
+                let y = relativePosition - i;
+                hexagram.forEach(element => {
+                    element.forEach(pos1 => {
+                        let pos = mc.newFloatPos(pos1[0], pos2.y + y, pos1[1], 0);
+                        mc.spawnParticle(pos, liz)
+                    });
+                });
+            }
+        }, 1000 * 2);
+    }
 }
 
 /**
@@ -1848,8 +2165,8 @@ function setNewEntity(newEntity, NbtData) {
             newEntity.setScale(parseInt(NbtData.OriginalData.scale));
             if (NbtData.buff.state) {
                 NbtData.buff.buffArray.forEach(data => {
-                    newEntity.addEffect(buffIdCompare[data.id], data.time * 20, data.lvl, true);
-                    //mc.runcmdEx(`effect @e[tag=${tag}] ${data.id} ${data.time} ${data.lvl - 1} false`);
+                    //newEntity.addEffect(buffIdCompare[data.id], data.time * 20, data.lvl, true);
+                    mc.runcmdEx(`effect @e[tag=${tag}] ${data.id} ${data.time} ${data.lvl - 1} false`);
                 });
             }
         }, 200);
@@ -1895,6 +2212,17 @@ function specifiedRangeRandomNumber(min = 0, max = 0, decimal = 0) {
 */
 function getDecimalNum(data) {
     return Number(data.toString().split('.')[1]);
+}
+
+/**
+ * 强化生物生成冷却.
+ * @param {Entity} mob 实体对象
+ */
+function generateIntensifyCooling(mob) {
+    generateCooling[mob.pos] = true;
+    setTimeout(() => {
+        delete generateCooling[mob.pos];
+    }, 1000);
 }
 
 /**
@@ -2208,15 +2536,57 @@ function FourProfileUpdate() {
         }
         UPEntityConfig = true;
     }
+    if (Config.ProfileVersion == "1.1.1") {
+        Config.ProfileVersion = "1.1.2";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].OtherAbility.DeathSoundEffect == undefined) {
+                    EntityNbtJson[key][position].OtherAbility.DeathSoundEffect = "";
+                    EntityNbtJson[key][position].OtherAbility.ParticleRadius = 1;
+                    EntityNbtJson[key][position].OtherAbility.DeathParticleRadius = 3;
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
 
+    if (Config.ProfileVersion == "1.1.2") {
+        Config.ProfileVersion = "1.1.3";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].OtherAbility.RelativeEntity_Y == undefined) {
+                    EntityNbtJson[key][position].OtherAbility.RelativeEntity_Y = 3;
+                    EntityNbtJson[key][position].callEntity = {
+                        "callEntityState": false,
+                        "entityArray": [
+                            {
+                                "SummoningLife": 20,
+                                "entityData": [
+                                    {
+                                        "type": "ordinary",
+                                        "entityType": "minecraft:zombie",
+                                        "callNumber": 5
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
 
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
         File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
         setTimeout(() => {
-            logger.error(i18n.trl(ll.language, "configUp",));
+            logger.warn(i18n.trl(ll.language, "configUp",));
         }, 1000 * 6);
     }
+    setTimeout(() => {
+        logger.warn(i18n.trl(ll.language, "PerformanceTips",));
+    }, 1000 * 4);
 }
 
 
@@ -2306,6 +2676,17 @@ function FourProfileUpdate() {
  * 034
  * 新增部分配置功能表单.
  * 实体给buff使用LLSE的api.
+ * 修复新配置文件导致的问题.
+ * 035
+ * 粒子效果修改为圆.
+ * 增加强化怪死亡粒子效果.
+ * 增加死亡音效.
+ * 配置项新增粒子&死亡粒子半径，死亡音效.
+ * 提示：服务器配置较低请关闭粒子选项！
+ * 036
+ * 新增根据生命召唤其他生物.
+ * 可自定义死亡粒子距离生物高度.
+ * 修改死亡粒子样式.
  * 
  * 待添加功能
  */
