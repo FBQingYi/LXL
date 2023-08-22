@@ -1,93 +1,96 @@
 //-----基础信息定义
-const IntensifyPath = "./plugins/Intensify/";
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 3, 6];
+const PluginsVersion = [0, 5, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
         {
-            "OriginalData": {
-                "health": 40,
-                "movement": 0.35,
-                "underwater_movement": 0.2,
-                "lava_movement": 0.2,
-                "follow_range": 20,
-                "knockback_resistance": 6,
-                "scale": 2,
-                "customName": "宝藏僵尸",
-                "UniqueName": "zombie1"
+            "OriginalData": {//生物的原版数据修改项
+                "health": 40,//生命值
+                "movement": 0.35,//陆地移速
+                "underwater_movement": 0.2,//水中移速
+                "lava_movement": 0.2,//岩浆中移速
+                "follow_range": 20,//追踪距离
+                "knockback_resistance": 6,//击退抗性
+                "scale": 2,//模型大小
+                "customName": "宝藏僵尸",//显示名称
+                "UniqueName": "zombie1"//唯一name，每个配置文件不可出现重复
             },
-            "OtherAbility": {
-                "SpawnProbability": 100,
-                "Additionaldamage": 2,
-                "KillPlayerRecovery": 10,
-                "brambles": false,
-                "bramblesHurt": 1,
-                "LongRangeDamage": true,
-                "DeathSoundEffect": "ambient.weather.lightning.impact",
-                "ParticleRadius": 1,
-                "DeathParticleRadius": 3,
-                "RelativeEntity_Y": 3
+            "OtherAbility": {//其他能力
+                "SpawnProbability": 100,//此配置生物刷新概率
+                "Additionaldamage": 2,//对玩家额外真实伤害
+                "KillPlayerRecovery": 10,//击杀玩家恢复多少血量
+                "brambles": false,//是否开启反伤
+                "bramblesHurt": 1,//反伤对玩家造成的真实伤害
+                "LongRangeDamage": true,//是否能受到远程伤害
+                "DeathSoundEffect": "ambient.weather.lightning.impact",//死亡播放的声音
+                "ParticleRadius": 1,//粒子半径
+                "DeathParticleRadius": 3,//死亡粒子半径
+                "RelativeEntity_Y": 3//死亡粒子相对目标高度
             },
-            "buff": {
-                "state": true,
+            "buff": {//此配置生物生成时携带的buff数据
+                "state": true,//是否开启给生物buff
                 "buffArray": [
                     {
-                        "id": "resistance",
-                        "lvl": 1,
-                        "time": 10000
+                        "id": "resistance",//buff英文id
+                        "lvl": 1,//buff的等级
+                        "time": 10000//buff持续时间
                     }
                 ]
             },
-            "Disarm": {
-                "WhetherDisarm": false,
-                "DisarmingProbability": 1,
-                "DropOffset": {
+            "Disarm": {//此配置生物攻击玩家玩家掉落物品项
+                "WhetherDisarm": false,//是否开启掉落
+                "DisarmingProbability": 1,//玩家掉落物品的概率
+                "DropOffset": {//掉落的位置相对玩家坐标偏移值
                     "x": 3,
                     "z": 2
                 }
             },
-            "Explosion": {
-                "dieBlast": false,
-                "BlastDestroy": false,
-                "BlastPower": 1,
-                "BlastTime": 10
+            "Explosion": {//此配置生物死亡后爆炸项
+                "dieBlast": false,//是否开启爆炸
+                "BlastDestroy": false,//爆炸是否破坏方块
+                "BlastPower": 1,//爆炸威力
+                "BlastTime": 10//倒计时多久爆炸
             },
-            "BeFire": {
-                "playerFire": true,
-                "FireTime": 10
+            "BeFire": {//此配置项生物攻击玩家玩家着火项
+                "playerFire": true,//是否开启
+                "FireTime": 10//着火持续时间
             },
-            "Scabbing": {
-                "ArmorBreaker": false,
-                "ArmorBreakerToSE": false,
-                "ArmorProbability": 10,
-                "SingleReductionDamage": 2
+            "Scabbing": {//此配置项生物攻击玩家时玩家碎甲项
+                "ArmorBreaker": false,//是否开启碎甲
+                "ArmorBreakerToSE": false,//碎甲是否对强化装备有效
+                "ArmorProbability": 10,//碎甲几率
+                "SingleReductionDamage": 2//碎甲减少耐久
             },
-            "trophy": {
-                "OtherDrops": true,
-                "OtherDropsMode": 0,
-                "GiveXpToPlayer": 5,
-                "addTalentValue": 1.1234,
-                "reel": {
+            "trophy": {//此配置项生物被击杀时相关战利品项
+                "OtherDrops": true,//是否掉落其它物品（ListSpoils）里面的内容
+                "OtherDropsMode": 0,//0是全部随机掉落，1是随机走掉落列表里面选一个100%掉落
+                "GiveXpToPlayer": 5,//给予击杀者额外的额经验值
+                "addTalentValue": 1.1234,//给予击杀者天赋点（对接强化生存）
+                "reel": {//卷轴项-对接强化插件
                     "reel": true,
                     "reelLvl": 1,
                     "probability": 10
                 },
-                "economy": {
+                "economy": {//经济项
                     "moneyName": "llmoney",
                     "probability": 1,
                     "quantity": 10,
                     "describe": "金币"
                 },
-                "fragmentsArtifactStones": {
+                "fragmentsArtifactStones": {//神器石项-对接强化插件
                     "state": true,
-                    "name": "神一级石碎片",
-                    "number": 1,
-                    "probability": 100
+                    "data": [
+                        {
+                            "name": "神一级石碎片",
+                            "number": 1,
+                            "probability": 100
+                        }
+                    ]
                 },
-                "ListSpoils": [
+                "ListSpoils": [//原版物品掉落项
                     {
                         "Spoils": "ordinary",
                         "SpoilsTypeName": "minecraft:stone",
@@ -111,7 +114,7 @@ const EntityNbtJsonData = {
                     }
                 ]
             },
-            "callEntity": {
+            "callEntity": {//召唤实体
                 "callEntityState": false,
                 "entityArray": [
                     {
@@ -131,13 +134,63 @@ const EntityNbtJsonData = {
                         ]
                     }
                 ]
+            },
+            "equip": {//装备
+                "helmet": {//头盔
+                    "type": "gives",//对接gives
+                    "itemType": "minecraft:diamond_helmet",//物品标准类型名
+                    "DisplayName": "测试",//物品显示名称
+                    "Curse": {
+                        "Enchantments": [
+                            {
+                                "n": 16,//附魔id
+                                "l": 5//附魔等级
+                            }
+                        ]
+                    }
+                },
+                "armour": {//胸甲
+                    "type": "initial",//原版物品
+                    "itemType": "minecraft:diamond_chestplate"//物品标准类型名
+                },
+                "pants": {//护腿
+                    "type": "initial",
+                    "itemType": "minecraft:diamond_leggings"
+                },
+                "shoe": {//鞋子
+                    "type": "initial",
+                    "itemType": "minecraft:diamond_boots"
+                },
+                "hand": {//主手
+                    "type": "initial",
+                    "itemType": "minecraft:diamond_sword"
+                }
+            },
+            "bloodreturning": {//回血
+                "switch": false,//是否启用
+                "time": 10,//间隔时间
+                "measure": 10//恢复量
+            },
+            "flash": {//闪现突脸
+                "switch": false,//是否启用
+                "flashDistance": 6,//目标距离最远距离
+                "time": 20//间隔时间
             }
         }
     ]
 };
-
 const InitializedTemplate = EntityNbtJsonData["minecraft:zombie"][0];
-const ConfigDataJson = { "DockingIntensifySurvival": false, "ForceEntitySize": false, "ParticleEffect": true, "PressurePlate": true, "DockingIntensify": false, "DockingGives": false, "mobSpawner": false, "ProfileVersion": "1.1.1" };
+const ConfigDataJson = {
+    "DockingIntensifySurvival": false,
+    "ForceEntitySize": false,
+    "ParticleEffect": true,
+    "PressurePlate": true,
+    "DockingIntensify": false,
+    "DockingGives": false,
+    "mobSpawner": false,
+    "EquipmentCleaning": true,
+    "ProfileVersion": "1.1.6"
+};
 const LuminousItemsJson = { "minecraft:glowstone": 1, "minecraft:torch": 1, "minecraft:lantern": 1, "minecraft:lit_pumpkin": 1, "minecraft:lit_redstone_lamp": 1 };
 const buffIdCompare = { "speed": 1, "slowness": 2, "haste": 3, "mining_fatigue": 4, "strength": 5, "instant_health": 6, "instant_damage": 7, "jump_boost": 8, "nausea": 9, "regeneration": 10, "resistance": 11, "fire_resistance": 12, "water_breathing": 13, "invisibility": 14, "blindness": 15, "night_vision": 16, "hunger": 17, "weakness": 18, "poison": 19, "wither": 20, "health_boost": 21, "absorption": 22, "saturation": 23, "levitation": 24, "fatal_poison": 25, "conduit_power": 26, "slow_falling": 27, "bad_omen": 28, "village_hero": 29, "darkness": 30 };
 //------插件信息注册
@@ -156,12 +209,17 @@ if (!File.exists(pluginPath + "Config.json")) {
 if (!File.exists(pluginPath + "data/EntityData.json")) {
     File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJsonData, null, "\t"));
 }
+if (!File.exists(pluginPath + "data/PlayerOdds.json")) {
+    File.writeTo(pluginPath + "data/PlayerOdds.json", JSON.stringify({}, null, "\t"));
+}
 let EntityNbtJson = JSON.parse(File.readFrom(pluginPath + "data/EntityData.json").replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, ""));
 let Config = JSON.parse(File.readFrom(pluginPath + "Config.json"));
-let getReelNbt, GetNewItemNbt, ParticleSpawner, AddTalentValue, getFragmentsNbt;
+let PlayerOddsData = JSON.parse(File.readFrom(pluginPath + "data/PlayerOdds.json"));
+let getReelNbt, GetNewItemNbt, ParticleSpawner, AddTalentValue, getFragmentsNbt, LIGHTMoney;
 let Generate = true;
 let entityCallEntity = {};
 let generateCooling = {};
+let entityCDData = {};
 logger.setConsole(true);
 
 /**
@@ -265,16 +323,17 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "set_buff_id": "buff英文id",
         "set_buff_lvl": "buff等级",
         "set_buff_time": "buff持续时间",
-
         "scabbingMsg": "§4碎甲：§3耐久减少{0}",
         "TrueInjuryMsg": "§4真伤：§3血量减少{0}",
         "disarmMsg": "§4缴械：§3{0}\n掉落位置：{1}",
-
         "DeathSoundEffect": "死亡音效",
         "ParticleRadius": "粒子半径",
         "DeathParticleRadius": "死亡粒子半径",
-        "PerformanceTips": "此插件粒子效果有大量计算，如果配置低请关闭粒子选项。Config.json中將ParticleEffect和ForceEntitySize设置为false"
-
+        "PerformanceTips": "此插件粒子效果有大量计算，如果配置低请关闭粒子选项。Config.json中將ParticleEffect和ForceEntitySize设置为false",
+        "GodStoneErrTips": "强化石碎片生成错误！请检查强化插件中配置文件是否有：{0} 强化石碎片",
+        "givesErrTips": "检测到装备物品设置了需要gives，但是在配置文件未启用!",
+        "flashTips": "§4§l你被{0}盯上了，他已经传送到你这里了！",
+        "broadcastTips": "{0} 击杀了 {1}"
     },
     "zh_TW": {
         "formTitle": "選擇實體",
@@ -378,8 +437,11 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "DeathSoundEffect": "死亡音效",
         "ParticleRadius": "粒子半徑",
         "DeathParticleRadius": "死亡粒子半徑",
-        "PerformanceTips": "此挿件粒子效果有大量計算，如果配寘低請關閉粒子選項。 Config.json中將ParticleEffect和ForceEntitySize設定為false"
-
+        "PerformanceTips": "此挿件粒子效果有大量計算，如果配寘低請關閉粒子選項。 Config.json中將ParticleEffect和ForceEntitySize設定為false",
+        "GodStoneErrTips": "強化石碎片生成錯誤！請檢查強化插件中的設定檔是否含有： {0} 強化石碎片。",
+        "givesErrTips": "檢測到裝備物品設定了需要gives，但是在設定檔未啟用！",
+        "flashTips": "§4§l你被{0}盯上了，他已經傳送到你這裡了！",
+        "broadcastTips": "{0}擊殺了{1}"
     },
     "en": {
         "formTitle": "Select Entity",
@@ -483,8 +545,11 @@ i18n.load(pluginPath + "language/language.json", "en", {
         "DeathSoundEffect": "Death sound effect",
         "ParticleRadius": "Particle Radius",
         "DeathParticleRadius": "Death particle radius",
-        "PerformanceTips": "This plugin has a large amount of calculation for particle effects. If the configuration is low, please turn off the particle option. Set ParticleEffect and ForceEntitySize to false in Config.json"
-
+        "PerformanceTips": "This plugin has a large amount of calculation for particle effects. If the configuration is low, please turn off the particle option. Set ParticleEffect and ForceEntitySize to false in Config.json",
+        "GodStoneErrTips": "Error generating enhancement stone fragments! Please check if the configuration file in the enhancement plugin contains: {0} enhancement stone fragments.",
+        "givesErrTips": "We have detected that equipment items require gifts, but they are not enabled in the configuration file!",
+        "flashTips": "§4§lYou are being targeted by {0}, he has already teleported to you!",
+        "broadcastTips": "{0} killed {1}"
     }
 });
 
@@ -523,6 +588,10 @@ if (Config.DockingIntensifySurvival) {
         }, 1000 * 5);
     }
 }
+if (File.exists("./plugins/LIGHTMoney.js")) {
+    ll.require("LIGHTMoney.js");
+    LIGHTMoney = ll.import("LIGHTMoney");
+}
 FourProfileUpdate();
 
 /**
@@ -542,7 +611,7 @@ mc.listen("onEntityTransformation", (_uniqueId, entity) => {
  * 判定是否强制实体大小.
  */
 mc.listen("onTick", () => {
-    if (Config.ForceEntitySize) {
+    if (Config.ForceEntitySize) {//强制实体大小.
         let AllEntityArray = mc.getAllEntities();
         AllEntityArray.forEach(entity => {
             if (entity.hasTag("Intensify")) {
@@ -550,7 +619,23 @@ mc.listen("onTick", () => {
                 if (UniqueName != "") {
                     let DataJsonObj = queryClass.UniqueNameGetEntityJson(UniqueName, entity.type);
                     if (DataJsonObj != {}) {
-                        entity.setScale(parseInt(DataJsonObj.scale));
+                        entity.setScale(parseInt(DataJsonObj.OriginalData.scale));
+                    }
+                }
+            }
+        });
+    }
+    if (Config.EquipmentCleaning) {//清理带有标记的物品
+        let AllEntityArray = mc.getAllEntities();
+        AllEntityArray.forEach(entity => {
+            if (entity.isItemEntity()) {
+                let item = entity.toItem();
+                let itemNbt = item.getNbt();
+                let itemTagNbt = itemNbt.getTag("tag");
+                if (itemTagNbt != undefined) {
+                    let enhancedMonsterMarkers = itemTagNbt.getTag("mark");
+                    if (enhancedMonsterMarkers != undefined) {
+                        entity.remove();
                     }
                 }
             }
@@ -615,7 +700,35 @@ mc.listen("onStepOnPressurePlate", (entity, _pressurePlate) => {
 mc.listen("onMobSpawned", (entity, pos) => {
     if (entity != undefined && generateCooling[pos] == undefined) {
         let typeName = entity.type;
-        if (EntityNbtJson[typeName] != undefined) {
+        if (EntityNbtJson[typeName] != undefined && !entity.hasTag("Intensify")) {
+
+            let enData = SharingFunction.getEntityAllProbability(typeName);
+            let selectedOption = undefined;
+            if (enData != undefined) {
+                for (let key in enData) {
+                    let probability = specifiedRangeRandomNumber(0, 100, 4);
+                    let probabilityData = enData[key];
+                    if (probabilityData >= probability) {
+                        selectedOption = key;
+                    }
+                    if (selectedOption != undefined) {
+                        let EntityDataJson = queryClass.UniqueNameGetEntityJson(selectedOption, typeName);
+                        if (Config.mobSpawner) {
+                            setNewEntity(entity, EntityDataJson);
+                            setEquipment(entity, EntityDataJson);
+                            break;
+                        } else {
+                            let mobSpawnerBool = queryClass.findNearestBlock(pos);
+                            if (!mobSpawnerBool) {
+                                setNewEntity(entity, EntityDataJson);
+                                setEquipment(entity, EntityDataJson);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            /*
             let ConfigureRandom = specifiedRangeRandomNumber(0, EntityNbtJson[typeName].length);
             let SelectConfiguration = EntityNbtJson[typeName][ConfigureRandom];
             if (SelectConfiguration != undefined) {
@@ -630,8 +743,9 @@ mc.listen("onMobSpawned", (entity, pos) => {
                             setNewEntity(entity, SelectConfiguration);
                         }
                     }
+                    setEquipment(entity, SelectConfiguration);
                 }
-            }
+            }*/
         }
     }
 });
@@ -654,9 +768,10 @@ mc.listen("onMobDie", (mob, source, _cause) => {
                     MobDieEvent.DockingIntensify(entityDataJson, pos, player);
                 }
                 if (entityDataJson.trophy.OtherDrops) {
-                    MobDieEvent.OtherDrops(entityDataJson, pos);
+                    MobDieEvent.OtherDrops(entityDataJson, pos, player);
                 }
                 MobDieEvent.comprehensiveEvents(entityDataJson, player, mob);
+                mc.broadcast(i18n.trl(player.langCode, "broadcastTips", player.realName, mob.name));
             }
             if (entityCallEntity[mob.uniqueId] != undefined) {
                 delete entityCallEntity[mob.uniqueId];
@@ -669,36 +784,60 @@ mc.listen("onMobDie", (mob, source, _cause) => {
  * 监听生物受伤事件分发处理.
  */
 mc.listen("onMobHurt", (mob, source, _damage, cause) => {
-    if (mob.isPlayer() && source != undefined) {
-        let entityJson = EntityNbtJson[source.type];
-        if (entityJson != undefined && source.hasTag("Intensify")) {
-            let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(source);
-            if (entityDataJson != {}) {
+    if (cause == 2 || cause == 3) {
+        let Hurt = 0;
+        if (mob.isPlayer() && source != undefined) {
+            let entityJson = EntityNbtJson[source.type];
+            if (entityJson != undefined && source.hasTag("Intensify")) {
+                let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(source);
+                if (entityDataJson != {}) {
+                    let player = mob.toPlayer();
+                    if (entityDataJson.Disarm.WhetherDisarm) {
+                        entityHurtEvent.WhetherDisarm(entityDataJson, player);
+                    }
+                    if (entityDataJson.Scabbing.ArmorBreaker) {
+                        entityHurtEvent.ArmorBreaker(entityDataJson, player);
+                    }
+                    Hurt += entityDataJson.OtherAbility.Additionaldamage;
+                    player.tell(i18n.trl(player.langCode, "TrueInjuryMsg", Hurt), 5);
+                    setTimeout(() => {
+                        if (entityDataJson.BeFire.playerFire) {
+                            player.setFire(entityDataJson.BeFire.FireTime, false);
+                        }
+                    }, 20);
+                }
+            }
+        } else if (!mob.isPlayer() && source != undefined) {
+            let entityJson = EntityNbtJson[mob.type];
+            if (entityJson != undefined && mob.hasTag("Intensify")) {
+                let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(mob);
+                if (entityDataJson.callEntity.callEntityState) {
+                    entityHurtEvent.SummonedCreature(entityDataJson, mob);
+                }
                 if (cause == 3) {
                     if (!entityDataJson.OtherAbility.LongRangeDamage) {
                         return false;
                     }
                 }
-                let player = mob.toPlayer();
-
-                if (entityDataJson.Disarm.WhetherDisarm) {
-                    entityHurtEvent.WhetherDisarm(entityDataJson, player);
+                if (entityDataJson.OtherAbility.brambles && source.isPlayer()) {
+                    Hurt += entityDataJson.OtherAbility.bramblesHurt;
                 }
-
-                if (entityDataJson.Scabbing.ArmorBreaker) {
-                    entityHurtEvent.ArmorBreaker(entityDataJson, player);
-                }
-
-                entityHurtEvent.Additionaldamage(entityDataJson, player);
             }
         }
-    } else if (!mob.isPlayer() && source != undefined) {
-        let entityJson = EntityNbtJson[mob.type];
-        if (entityJson != undefined && mob.hasTag("Intensify")) {
-            let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(mob);
-            if (entityDataJson.callEntity.callEntityState) {
-                entityHurtEvent.SummonedCreature(entityDataJson, mob);
+        //额外伤害和反伤处理
+        if (Hurt > 0) {
+            let player;
+            if (mob.isPlayer()) {
+                player = mob.toPlayer();
+            } else if (source.isPlayer()) {
+                player = source.toPlayer();
             }
+            if (player != undefined) {
+                setTimeout(() => {
+                    playerHurt(player.xuid, Hurt);
+                }, 50);
+            }
+
         }
     }
 })
@@ -710,7 +849,8 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
 mc.listen("onServerStarted", () => {
     let UniqueNameArray = queryClass.EntityUniqueNameArraySet();
     let Command = mc.newCommand("intensifymonster", i18n.get("cmdExplain", ll.language), PermType.GameMasters);
-    Command.setEnum("type", ["query", "spawn"]);
+    Command.setAlias("im");
+    Command.setEnum("type", ["spawn"]);
     Command.setEnum("EntityUName", UniqueNameArray);
     Command.mandatory("mode", ParamType.Enum, "type");
     Command.mandatory("entity", ParamType.ActorType);
@@ -719,10 +859,7 @@ mc.listen("onServerStarted", () => {
     Command.overload(["mode"]);
     Command.overload(["mode", "entity", "Uname", "pos"]);
     Command.setCallback((_cmd, origin, output, results) => {
-        if (results.mode == "query" && origin.player != undefined) {
-            //PlayerCmdHandle(origin.player);
-            ConfigureForms.mainForm(origin.player);
-        } else if (results.mode == "spawn") {
+        if (results.mode == "spawn") {
             let pos = results.pos;
             let EntityType = results.entity;
             let uname = results.Uname;
@@ -730,7 +867,10 @@ mc.listen("onServerStarted", () => {
                 let EntityDataJson = queryClass.UniqueNameGetEntityJson(uname, EntityType);
                 if (EntityDataJson != {}) {
                     let entity = mc.spawnMob(EntityType, pos);
+                    generateIntensifyCooling(entity);
                     setNewEntity(entity, EntityDataJson);
+                    setEquipment(entity, EntityDataJson);
+
                 } else {
                     output.error(i18n.get("CmdOutpError1", ll.language));
                 }
@@ -740,9 +880,13 @@ mc.listen("onServerStarted", () => {
         }
     });
     Command.setup();
+
+
     if (Config.ParticleEffect) {
         particles.particleScheduledTasks();
     }
+    TimedRecurringTasks.Timer();
+    TimedRecurringTasks.CleanTheCDPool();
 });
 
 /**
@@ -762,9 +906,9 @@ const entityHurtEvent = {
                 let DropOffsetX = entityDataJson.Disarm.DropOffset.x;
                 let DropOffsetZ = entityDataJson.Disarm.DropOffset.z;
                 if (mc.spawnItem(playerHand, player.pos.x + DropOffsetX, player.pos.y, player.pos.z + DropOffsetZ, player.pos.dimid)) {
-                    player.tell(i18n.trl(player.langCode, "disarmMsg", playerHand.name, `${player.pos.x + DropOffsetX},${player.pos.y},${player.pos.z + DropOffsetZ}`));
-                    playerHand.setNull()
-                    player.refreshItems()
+                    player.tell(i18n.trl(player.langCode, "disarmMsg", playerHand.name, `${parseInt(player.pos.x) + DropOffsetX},${parseInt(player.pos.y)},${parseInt(player.pos.z) + DropOffsetZ}`));
+                    playerHand.setNull();
+                    player.refreshItems();
                 }
             }
         }
@@ -784,35 +928,16 @@ const entityHurtEvent = {
                 if (entityDataJson.Scabbing.ArmorBreakerToSE) {
                     if (random <= scabbing) {
                         item.setDamage(item.damage + entityDataJson.Scabbing.SingleReductionDamage);
-                        player.tell(i18n.trl(player.langCode, "scabbingMsg", scabbing));
+                        player.tell(i18n.trl(player.langCode, "scabbingMsg", scabbing), 5);
                     }
                 } else if (!queryClass.isIntensify(item)) {
                     if (random <= scabbing) {
                         item.setDamage(item.damage + entityDataJson.Scabbing.SingleReductionDamage);
-                        player.tell(i18n.trl(player.langCode, "scabbingMsg", scabbing));
+                        player.tell(i18n.trl(player.langCode, "scabbingMsg", scabbing), 5);
                     }
                 }
             }
         });
-    },
-    /**
-     * 额外伤害和着火处理.
-     * @param {JSON} entityDataJson 实体配置文件
-     * @param {Player} player 玩家对象
-     */
-    Additionaldamage: function (entityDataJson, player) {
-        let damage = 0;
-        if (entityDataJson.OtherAbility.brambles) {
-            damage += entityDataJson.OtherAbility.bramblesHurt;
-        }
-        damage += entityDataJson.OtherAbility.Additionaldamage;
-        setTimeout(() => {
-            player.hurt(damage);
-            player.tell(i18n.trl(player.langCode, "TrueInjuryMsg", damage));
-            if (entityDataJson.BeFire.playerFire) {
-                player.setFire(entityDataJson.BeFire.FireTime, false);
-            }
-        }, 500);
     },
     /**
      * 召唤生物.
@@ -845,6 +970,7 @@ const entityHurtEvent = {
                                     for (let i = 0; i < entityJson.callNumber; i++) {
                                         let entity = mc.spawnMob(entityJson.entityType, mob.pos);
                                         setNewEntity(entity, EntityDataJson);
+                                        setEquipment(entity, EntityDataJson);
                                         generateEntityCooling = true;
                                     }
                                 }
@@ -875,11 +1001,16 @@ const MobDieEvent = {
     comprehensiveEvents: function (entityDataJson, player, mob) {
         let randomInt = specifiedRangeRandomNumber(0, 100, 4);
         let economyConfig = entityDataJson.trophy.economy;
-        if (randomInt <= economyConfig.probability) {
+        let odds = queryClass.getPlayerOdds(player);
+        let probability = operation(economyConfig.probability, odds, "+");
+        if (randomInt <= probability) {
             if (economyConfig.moneyName == "llmoney") {
                 player.addMoney(economyConfig.quantity);
+            } else if (economyConfig.moneyName == "lmoney" && LIGHTMoney != undefined) {
+                LIGHTMoney("add", economyConfig.quantity, player.xuid);
             } else {
-                mc.runcmdEx(`scoreboard players add "${player.realName}" ${randomInt} ${economyConfig.quantity}`);
+                player.addScore(economyConfig.moneyName, economyConfig.quantity);
+                //mc.runcmdEx(`scoreboard players add "${player.realName}" ${randomInt} ${economyConfig.quantity}`);
             }
             player.tell(i18n.trl(player.langCode, "economyTips", economyConfig.quantity, economyConfig.describe));
         }
@@ -900,16 +1031,20 @@ const MobDieEvent = {
      * 战利品掉落
      * @param {JSON} entityDataJson 实体配置文件
      * @param {Pos} pos 实体死亡坐标对象
+     * @param {player} player 玩家对象
      */
-    OtherDrops: function (entityDataJson, pos) {
+    OtherDrops: function (entityDataJson, pos, player) {
         if (entityDataJson.trophy.OtherDropsMode == 0 && entityDataJson.trophy.ListSpoils != []) {
             let SpoilsList = entityDataJson.trophy.ListSpoils;
             SpoilsList.forEach(CurrentOptions => {
                 let randomInt = specifiedRangeRandomNumber(0, 100, 4);
-                if (randomInt <= CurrentOptions.SpoilsProbability) {
+                let odds = queryClass.getPlayerOdds(player);
+                let probability = operation(CurrentOptions.SpoilsProbability, odds, "+");
+                if (randomInt <= probability) {
                     if (CurrentOptions.Spoils == "ordinary") {
                         let item = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
                         mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                        LogFileWriting(player, pos, randomInt, CurrentOptions.SpoilsTypeName);
                     } else if (CurrentOptions.Spoils == "gives" && Config.DockingGives) {
                         let itemDIsplayName = undefined;
                         let initialItem = mc.newItem(CurrentOptions.SpoilsTypeName, CurrentOptions.SpoilsqQantity);
@@ -919,6 +1054,7 @@ const MobDieEvent = {
                         let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, CurrentOptions.Curse, CurrentOptions.SpoilsqQantity);
                         let item = mc.newItem(itemNewNbt);
                         mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                        LogFileWriting(player, pos, randomInt, itemDIsplayName);
                     }
                 }
             });
@@ -929,6 +1065,7 @@ const MobDieEvent = {
             if (itemData.Spoils == "ordinary") {
                 let item = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
                 mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                LogFileWriting(player, pos, randomInt, itemData.SpoilsTypeName);
             } else if (itemData.Spoils == "gives" && Config.DockingGives) {
                 let itemDIsplayName = undefined;
                 let initialItem = mc.newItem(itemData.SpoilsTypeName, itemData.SpoilsqQantity);
@@ -938,6 +1075,7 @@ const MobDieEvent = {
                 let itemNewNbt = GetNewItemNbt(initialItem, itemDIsplayName, itemData.Curse, itemData.SpoilsqQantity);
                 let item = mc.newItem(itemNewNbt);
                 mc.spawnItem(item, pos.x, pos.y + 1, pos.z, pos.dimid);
+                LogFileWriting(player, pos, randomInt, itemDIsplayName);
             }
         }
     },
@@ -948,20 +1086,33 @@ const MobDieEvent = {
      * @param {Player} player 玩家对象
      */
     DockingIntensify: function (entityDataJson, pos, player) {
-        let randomInt = specifiedRangeRandomNumber(0, 100, 4);
         if (entityDataJson.trophy.reel.reel) {
-            if (randomInt <= entityDataJson.trophy.reel.probability) {
+            let randomInt = specifiedRangeRandomNumber(0, 100, 4);
+            let odds = queryClass.getPlayerOdds(player);
+            let probability = operation(entityDataJson.trophy.reel.probability, odds, "+");
+            if (randomInt <= probability) {
                 let newItem = getReelNbt(player, entityDataJson.trophy.reel.reelLvl);
                 mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
+                LogFileWriting(player, pos, randomInt, "reel");
             }
         }
         let artifactFragmentsConfig = entityDataJson.trophy.fragmentsArtifactStones;
         if (artifactFragmentsConfig.state) {
-            let randomInt = specifiedRangeRandomNumber(0, 100, 4);
-            if (randomInt <= artifactFragmentsConfig.probability) {
-                let newItem = getFragmentsNbt(player, artifactFragmentsConfig.name, artifactFragmentsConfig.number);
-                mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
-            }
+            let artifactFragmentsData = artifactFragmentsConfig.data;
+            artifactFragmentsData.forEach(data => {
+                let randomInt = specifiedRangeRandomNumber(0, 100, 4);
+                let odds = queryClass.getPlayerOdds(player);
+                let probability = operation(data.probability, odds, "+");
+                if (randomInt <= probability) {
+                    let newItem = getFragmentsNbt(player, data.name, data.number);
+                    if (!newItem) {
+                        logger.error(i18n.trl(ll.language, "GodStoneErrTips", data.name));
+                    } else {
+                        mc.spawnItem(newItem, pos.x, pos.y + 1, pos.z, pos.dimid);
+                        LogFileWriting(player, pos, randomInt, data.name);
+                    }
+                }
+            });
         }
     },
     /**
@@ -972,808 +1123,10 @@ const MobDieEvent = {
      * @param {Entity} mob 死亡实体对象
      */
     explode: function (entityDataJson, pos, player, mob) {
-        player.tell(i18n.trl(player.langCode, "BlastTips", mob.name, entityDataJson.BlastTime));
+        player.tell(i18n.trl(player.langCode, "BlastTips", mob.name, entityDataJson.Explosion.BlastTime));
         setTimeout(() => {
             mc.explode(pos, mob, entityDataJson.Explosion.BlastPower, entityDataJson.Explosion.BlastDestroy, false);
         }, entityDataJson.Explosion.BlastTime * 1000);
-    }
-}
-
-/**
- * 表单处理
- */
-const ConfigureForms = {
-    /**
-     * 主表单处理.
-     * @param {Player} player 玩家对象
-     */
-    mainForm: function (player) {
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("mainFormTitle", player.langCode))
-            .setContent(i18n.get("mainFormContent", player.langCode))
-            .addButton(i18n.get("mainFormButton_1", player.langCode))
-            .addButton(i18n.get("mainFormButton_2", player.langCode))
-            .addButton(i18n.get("mainFormButton_3", player.langCode))
-            .addButton(i18n.get("mainFormButton_4", player.langCode))
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                switch (id) {
-                    case 0:
-                        addEntityToConfig.addEntity_Select(player);
-                        break;
-                    case 1:
-                        modifyEntityToConfig.modifyEntityMainForm(player);
-                        break;
-                    case 2:
-                        queryEntityData.PlayerCmdHandle(player);
-                        break;
-                    case 3:
-                        spoilsSndBuffs.mainForm(player);
-                        break;
-                }
-            } else {
-                return false;
-            }
-        })
-    },
-
-}
-
-/**
- * 添加实体表单
- */
-const addEntityToConfig = {
-    addEntity_Select: function (player) {
-        let allEntity = mc.getAllEntities();
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("addEntityConfigFormTitle", player.langCode))
-            .setContent(i18n.get("addEntityConfigFormContent", player.langCode));
-        allEntity.forEach(entity => {
-            fm.addButton(`${entity.name}\n${entity.type}`);
-        });
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.addEntity_OriginalData(allEntity, player, id);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_OriginalData: function (allEntity, player, id) {
-        let TemporaryRecords = {};
-        let enType = allEntity[id].type;
-        let enName = allEntity[id].name;
-        let OriginalData = InitializedTemplate.OriginalData;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_1", player.langCode)}`);
-        for (let key in OriginalData) {
-            fm.addInput(i18n.get(key, player.langCode), String(OriginalData[key]), String(OriginalData[key]));
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let ii = 0;
-                for (let i in OriginalData) {
-                    if (typeof OriginalData[i] === "boolean" || typeof OriginalData[i] === "string") {
-                        OriginalData[i] = id[ii];
-                    } else if (typeof OriginalData[i] === "number") {
-                        if (id[ii].indexOf('.') != -1) {
-                            OriginalData[i] = parseFloat(id[ii]);
-                        } else {
-                            OriginalData[i] = parseInt(id[ii]);
-                        }
-                    }
-                    ii += 1;
-                }
-                TemporaryRecords[enType] = {};
-                TemporaryRecords[enType].OriginalData = OriginalData;
-                this.addEntity_OtherAbility(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_OtherAbility: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.OtherAbility;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_2", player.langCode)}`);
-        for (let key in OtherAbility) {
-            if (typeof OtherAbility[key] === "boolean") {
-                fm.addSwitch(i18n.get(key, player.langCode), OtherAbility[key]);
-            } else {
-                fm.addInput(i18n.get(key, player.langCode), OtherAbility[key].toString(), OtherAbility[key].toString());
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let ii = 0;
-                for (let i in OtherAbility) {
-                    if (typeof OtherAbility[i] === "boolean" || typeof OtherAbility[i] === "string") {
-                        OtherAbility[i] = id[ii];
-                    } else if (typeof OtherAbility[i] === "number") {
-                        if (id[ii].indexOf('.') != -1) {
-                            OtherAbility[i] = parseFloat(id[ii]);
-                        } else {
-                            OtherAbility[i] = parseInt(id[ii]);
-                        }
-                    }
-                    ii += 1;
-                }
-
-                TemporaryRecords[enType].OtherAbility = OtherAbility;
-                this.addEntity_buff(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_buff: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.buff;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_3", player.langCode)}`)
-            .addLabel(i18n.get("addEntity_3Tips", player.langCode))
-            .addSwitch(i18n.get("state", player.langCode), OtherAbility["state"]);
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                TemporaryRecords[enType].buff = {
-                    "state": id[1],
-                    "buffArray": [
-                        {
-                            "id": "resistance",
-                            "lvl": 1,
-                            "time": 10000
-                        }
-                    ]
-                }
-                this.addEntity_Disarm(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_Disarm: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.Disarm;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_4", player.langCode)}`);
-        for (let key in OtherAbility) {
-            if (key == "DropOffset") {
-                for (let i in OtherAbility[key]) {
-                    fm.addInput(i18n.get(`DropOffset_${i}`, player.langCode), OtherAbility[key][i].toString(), OtherAbility[key][i].toString());
-                }
-            } else {
-                if (typeof OtherAbility[key] === "boolean") {
-                    fm.addSwitch(i18n.get(key, player.langCode), OtherAbility[key]);
-                } else {
-                    fm.addInput(i18n.get(key, player.langCode), OtherAbility[key].toString(), OtherAbility[key].toString());
-                }
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let temporary;
-                if (id[1].indexOf('.') != -1) {
-                    temporary = parseFloat(id[1]);
-                } else {
-                    temporary = parseInt(id[1]);
-                }
-                TemporaryRecords[enType].Disarm = {
-                    "WhetherDisarm": id[0],
-                    "DisarmingProbability": temporary,
-                    "DropOffset": {
-                        "x": parseInt(id[2]),
-                        "z": parseInt(id[3])
-                    }
-                }
-                this.addEntity_Explosion(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_Explosion: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.Explosion;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_5", player.langCode)}`);
-        for (let key in OtherAbility) {
-            if (typeof OtherAbility[key] === "boolean") {
-                fm.addSwitch(i18n.get(key, player.langCode), OtherAbility[key]);
-            } else {
-                fm.addInput(i18n.get(key, player.langCode), OtherAbility[key].toString(), OtherAbility[key].toString());
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let ii = 0;
-                for (let i in OtherAbility) {
-                    if (typeof OtherAbility[i] === "boolean" || typeof OtherAbility[i] === "string") {
-                        OtherAbility[i] = id[ii];
-                    } else if (typeof OtherAbility[i] === "number") {
-                        if (id[ii].indexOf('.') != -1) {
-                            OtherAbility[i] = parseFloat(id[ii]);
-                        } else {
-                            OtherAbility[i] = parseInt(id[ii]);
-                        }
-                    }
-                    ii += 1;
-                }
-                TemporaryRecords[enType].Explosion = OtherAbility;
-                this.addEntity_BeFire(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_BeFire: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.BeFire;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_6", player.langCode)}`);
-        for (let key in OtherAbility) {
-            if (typeof OtherAbility[key] === "boolean") {
-                fm.addSwitch(i18n.get(key, player.langCode), OtherAbility[key]);
-            } else {
-                fm.addInput(i18n.get(key, player.langCode), OtherAbility[key].toString(), OtherAbility[key].toString());
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                TemporaryRecords[enType].BeFire = {
-                    "playerFire": id[0],
-                    "FireTime": parseInt(id[1])
-                }
-                this.addEntity_Scabbing(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_Scabbing: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.Scabbing;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_7", player.langCode)}`);
-        for (let key in OtherAbility) {
-            if (typeof OtherAbility[key] === "boolean") {
-                fm.addSwitch(i18n.get(key, player.langCode), OtherAbility[key]);
-            } else {
-                fm.addInput(i18n.get(key, player.langCode), OtherAbility[key].toString(), OtherAbility[key].toString());
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let ii = 0;
-                for (let i in OtherAbility) {
-                    if (typeof OtherAbility[i] === "boolean" || typeof OtherAbility[i] === "string") {
-                        OtherAbility[i] = id[ii];
-                    } else if (typeof OtherAbility[i] === "number") {
-                        if (id[ii].indexOf('.') != -1) {
-                            OtherAbility[i] = parseFloat(id[ii]);
-                        } else {
-                            OtherAbility[i] = parseInt(id[ii]);
-                        }
-                    }
-                    ii += 1;
-                }
-                TemporaryRecords[enType].Scabbing = OtherAbility;
-                this.addEntity_trophy(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_trophy: function (TemporaryRecords, player, enName, enType) {
-        let OtherAbility = InitializedTemplate.trophy;
-        let fm = mc.newCustomForm()
-            .setTitle(`${enName}-${i18n.get("addEntity_8", player.langCode)}`);
-        for (let key in OtherAbility) {
-            if ("ListSpoils" != key) {
-                if (queryClass.JsonDetermine(key)) {
-                    for (let i in OtherAbility[key]) {
-                        if (typeof OtherAbility[key][i] === "boolean") {
-                            fm.addSwitch(i18n.get(`${key}_${i}`, player.langCode), OtherAbility[key][i]);
-                        } else {
-                            fm.addInput(i18n.get(`${key}_${i}`, player.langCode), OtherAbility[key][i].toString(), OtherAbility[key][i].toString());
-                        }
-                    }
-                } else {
-                    if (typeof OtherAbility[key] === "boolean") {
-                        fm.addSwitch(i18n.get(key, player.langCode), OtherAbility[key]);
-                    } else {
-                        fm.addInput(i18n.get(key, player.langCode), OtherAbility[key].toString(), OtherAbility[key].toString());
-                    }
-                }
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                TemporaryRecords[enType].trophy = {
-                    "OtherDrops": id[0],
-                    "OtherDropsMode": parseInt(id[1]),
-                    "GiveXpToPlayer": parseInt(id[2]),
-                    "addTalentValue": parseFloat(id[3]),
-                    "reel": {
-                        "reel": id[4],
-                        "reelLvl": parseInt(id[5]),
-                        "probability": parseInt(id[6])
-                    },
-                    "economy": {
-                        "moneyName": id[7],
-                        "probability": parseInt(id[8]),
-                        "quantity": parseInt(id[9]),
-                        "describe": id[10]
-                    },
-                    "fragmentsArtifactStones": {
-                        "state": id[11],
-                        "name": id[12],
-                        "number": parseInt(id[13]),
-                        "probability": parseInt(id[14])
-                    },
-                    "ListSpoils": [
-                        {
-                            "Spoils": "ordinary",
-                            "SpoilsTypeName": "minecraft:stone",
-                            "SpoilsProbability": 0,
-                            "SpoilsqQantity": 1
-                        },
-                        {
-                            "Spoils": "gives",
-                            "SpoilsTypeName": "minecraft:wooden_sword",
-                            "DisplayName": "",
-                            "SpoilsProbability": 0,
-                            "SpoilsqQantity": 1,
-                            "Curse": {
-                                "Enchantments": [
-                                    {
-                                        "n": 16,
-                                        "l": 5
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-                TemporaryRecords[enType].callEntity = InitializedTemplate[enType].callEntity;
-                this.addEntity_Summary(TemporaryRecords, player, enName, enType);
-            } else {
-                return false;
-            }
-        })
-    },
-    addEntity_Summary: function (TemporaryRecords, player, enName, enType) {
-        if (EntityNbtJson[enType] == undefined) {
-            EntityNbtJson[enType] = [];
-            EntityNbtJson[enType].push(TemporaryRecords[enType]);
-            File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-        } else {
-            EntityNbtJson[enType].push(TemporaryRecords[enType]);
-            File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-        }
-        player.tell(i18n.trl(player.langCode, "addEntityTips", enName));
-    }
-}
-
-/**
- * 修改实体配置
- */
-const modifyEntityToConfig = {
-    modifyEntityMainForm: function (player) {
-        let entityTypeArray = [];
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyEntity_1", player.langCode))
-            .setContent(i18n.get("modifyEntity_2", player.langCode));
-        for (let key in EntityNbtJson) {
-            fm.addButton(key);
-            entityTypeArray.push(key);
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.SelectConfigurationItem(player, entityTypeArray[id]);
-            } else {
-                return false;
-            }
-        })
-    },
-    SelectConfigurationItem: function (player, entityType) {
-        let uniqueNameArray = queryClass.getAppointEntityUniqueName(entityType);
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyEntity_1", player.langCode))
-            .setContent(i18n.get("UniqueNameTips", player.langCode));
-        uniqueNameArray.forEach(uniqueName => {
-            fm.addButton(uniqueName);
-        });
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.obtainSelectedConfiguration(player, id, uniqueNameArray, entityType)
-            } else {
-                return false;
-            }
-        })
-    },
-    obtainSelectedConfiguration: function (player, position, uniqueNameArray, entityType) {
-        let smallitemArray = [];
-        let ConfigJson = queryClass.UniqueNameGetEntityJson(uniqueNameArray[position], entityType);
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyEntity_1", player.langCode))
-            .setContent(i18n.get("smallitem", player.langCode));
-        for (let key in ConfigJson) {
-            if (key != "callEntity") {
-                fm.addButton(i18n.get(key, player.langCode));
-                smallitemArray.push(key);
-            }
-
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.changeOptions(player, position, ConfigJson, entityType, smallitemArray[id]);
-            } else {
-                return false;
-            }
-        })
-    },
-    changeOptions: function (player, position, ConfigJson, entityType, key) {
-        switch (key) {
-            case "trophy":
-                this.trophySpoils(player, position, ConfigJson, entityType, key);
-                break;
-            case "Disarm":
-                this.disarmSpoils(player, position, ConfigJson, entityType, key);
-                break;
-            case "buff":
-                this.buffSpoils(player, position, ConfigJson, entityType, key);
-                break;
-            default:
-                let current = ConfigJson[key];
-                let fm = mc.newCustomForm()
-                    .setTitle(`${entityType}-${i18n.get(key, player.langCode)}`);
-                for (let i in current) {
-                    if (typeof current[i] === "boolean") {
-                        fm.addSwitch(i18n.get(i, player.langCode), current[i]);
-                    } else {
-                        fm.addInput(i18n.get(i, player.langCode), current[i].toString(), current[i].toString());
-                    }
-                }
-                player.sendForm(fm, (player, id) => {
-                    if (id != undefined) {
-                        let ii = 0;
-                        for (let i in current) {
-                            if (typeof current[i] === "boolean" || typeof current[i] === "string") {
-                                current[i] = id[ii];
-                            } else if (typeof current[i] === "number") {
-                                if (id[ii].indexOf('.') != -1) {
-                                    current[i] = parseFloat(id[ii]);
-                                } else {
-                                    current[i] = parseInt(id[ii]);
-                                }
-                            }
-                            ii += 1;
-                        }
-                        EntityNbtJson[entityType][position][key] = current;
-                        File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                        player.tell(i18n.get("changesSaved", player.langCode));
-                    } else {
-                        return false;
-                    }
-                })
-        }
-
-    },
-    disarmSpoils: function (player, position, ConfigJson, entityType, key) {
-        let current = ConfigJson[key];
-        let fm = mc.newCustomForm()
-            .setTitle(`${entityType}-${i18n.get(key, player.langCode)}`);
-        for (let i in current) {
-            if (i == "DropOffset") {
-                for (let i1 in current[i]) {
-                    fm.addInput(i18n.get(`DropOffset_${i1}`, player.langCode), current[i][i1].toString(), current[i][i1].toString());
-                }
-            } else {
-                if (typeof current[key] === "boolean") {
-                    fm.addSwitch(i18n.get(i, player.langCode), current[i]);
-                } else {
-                    fm.addInput(i18n.get(i, player.langCode), current[i].toString(), current[i].toString());
-                }
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                EntityNbtJson[entityType][position].Disarm = {
-                    "WhetherDisarm": id[0],
-                    "DisarmingProbability": parseInt(id[1]),
-                    "DropOffset": {
-                        "x": parseInt(id[2]),
-                        "z": parseInt(id[3])
-                    }
-                }
-                File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                player.tell(i18n.get("changesSaved", player.langCode));
-            } else {
-                return false;
-            }
-        })
-    },
-    buffSpoils: function (player, position, ConfigJson, entityType, key) {
-        let fm = mc.newCustomForm()
-            .setTitle(`${entityType}-${i18n.get(key, player.langCode)}`)
-            .addLabel(i18n.get("addEntity_3Tips", player.langCode))
-            .addSwitch(i18n.get("state", player.langCode), ConfigJson.buff.state);
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                EntityNbtJson[entityType][position].buff = {
-                    "state": id[1],
-                    "buffArray": ConfigJson.buff.buffArray
-                }
-                File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                player.tell(i18n.get("changesSaved", player.langCode));
-            } else {
-                return false;
-            }
-        })
-    },
-    trophySpoils: function (player, position, ConfigJson, entityType, key) {
-        let current = ConfigJson[key];
-        let fm = mc.newCustomForm()
-            .setTitle(`${entityType}-${i18n.get(key, player.langCode)}`);
-        for (let i in current) {
-            if ("ListSpoils" != i) {
-                if (queryClass.JsonDetermine(i)) {
-                    for (let i1 in current[i]) {
-                        if (typeof current[i][i1] === "boolean") {
-                            fm.addSwitch(i18n.get(`${i}_${i1}`, player.langCode), current[i][i1]);
-                        } else {
-                            fm.addInput(i18n.get(`${i}_${i1}`, player.langCode), current[i][i1].toString(), current[i][i1].toString());
-                        }
-                    }
-                } else {
-                    if (typeof current[i] === "boolean") {
-                        fm.addSwitch(i18n.get(i, player.langCode), current[i]);
-                    } else {
-                        fm.addInput(i18n.get(i, player.langCode), current[i].toString(), current[i].toString());
-                    }
-                }
-            }
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                EntityNbtJson[entityType][position].trophy = {
-                    "OtherDrops": id[0],
-                    "OtherDropsMode": parseInt(id[1]),
-                    "GiveXpToPlayer": parseInt(id[2]),
-                    "addTalentValue": parseFloat(id[3]),
-                    "reel": {
-                        "reel": id[4],
-                        "reelLvl": parseInt(id[5]),
-                        "probability": parseInt(id[6])
-                    },
-                    "economy": {
-                        "moneyName": id[7],
-                        "probability": parseInt(id[8]),
-                        "quantity": parseInt(id[9]),
-                        "describe": id[10]
-                    },
-                    "fragmentsArtifactStones": {
-                        "state": id[11],
-                        "name": id[12],
-                        "number": parseInt(id[13]),
-                        "probability": parseInt(id[14])
-                    },
-                    "ListSpoils": ConfigJson.trophy.ListSpoils
-                }
-                File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                player.tell(i18n.get("changesSaved", player.langCode));
-            } else {
-                return false;
-            }
-        })
-    }
-
-}
-
-/**
- * buff及战利品相关配置
- */
-const spoilsSndBuffs = {
-    mainForm: function (player) {
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("editBuffsLoot", player.langCode))
-            .setContent(i18n.get("PleaseSelect", player.langCode))
-            .addButton(i18n.get("buff1", player.langCode));
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.modifyEntityMainForm(player, id);
-            } else {
-                return false;
-            }
-        })
-    },
-    modifyEntityMainForm: function (player, mode) {
-        let entityTypeArray = [];
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyEntity_1", player.langCode))
-            .setContent(i18n.get("modifyEntity_2", player.langCode));
-        for (let key in EntityNbtJson) {
-            fm.addButton(key);
-            entityTypeArray.push(key);
-        }
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.SelectConfigurationItem(player, entityTypeArray[id], mode);
-            } else {
-                return false;
-            }
-        })
-    },
-    SelectConfigurationItem: function (player, entityType, mode) {
-        let uniqueNameArray = queryClass.getAppointEntityUniqueName(entityType);
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyEntity_1", player.langCode))
-            .setContent(i18n.get("UniqueNameTips", player.langCode));
-        uniqueNameArray.forEach(uniqueName => {
-            fm.addButton(uniqueName);
-        });
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                this.obtainSelectedConfiguration(player, id, uniqueNameArray, entityType, mode)
-            } else {
-                return false;
-            }
-        })
-    },
-    obtainSelectedConfiguration: function (player, position, uniqueNameArray, entityType, mode) {
-        let ConfigJson = queryClass.UniqueNameGetEntityJson(uniqueNameArray[position], entityType);
-        if (mode == 0) {
-            let fm = mc.newSimpleForm()
-                .setTitle(i18n.get("buff1", player.langCode))
-                .addButton(i18n.get("addBuff_1", player.langCode))
-                .addButton(i18n.get("modifyBuff_1", player.langCode))
-                .addButton(i18n.get("removeBuff_1", player.langCode));
-            player.sendForm(fm, (player, id) => {
-                if (id != undefined) {
-                    switch (id) {
-                        case 0:
-                            buffSetRelated.addBuffConfig(player, position, entityType);
-                            break;
-                        case 1:
-                            buffSetRelated.modifyBuffConfig(player, position, ConfigJson, entityType);
-                            break;
-                        case 2:
-                            buffSetRelated.removeBuffConfig(player, position, ConfigJson, entityType);
-                            break;
-                    }
-                } else {
-                    return false;
-                }
-            })
-        }
-    }
-}
-/**
- * BUFF设置集合
- */
-const buffSetRelated = {
-    addBuffConfig: function (player, position, entityType) {
-        let fm = mc.newCustomForm()
-            .setTitle(i18n.get("addBuff_1", player.langCode))
-            .addInput(i18n.get("set_buff_id", player.langCode))
-            .addInput(i18n.get("set_buff_lvl", player.langCode))
-            .addInput(i18n.get("set_buff_time", player.langCode))
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let temporary = {
-                    "id": id[0],
-                    "lvl": parseInt(id[1]),
-                    "time": parseInt(id[2])
-                };
-                EntityNbtJson[entityType][position].buff.buffArray.push(temporary);
-                File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                player.tell(i18n.get("changesSaved", player.langCode));
-            } else {
-                return false;
-            }
-        })
-    },
-    modifyBuffConfig: function (player, position, ConfigJson, entityType) {
-        let buffNameArray = queryClass.getCurrentBuffID(ConfigJson);
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyBuff_1", player.langCode));
-        buffNameArray.forEach(buffName => {
-            fm.addButton(buffName);
-        });
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                let buffData = ConfigJson.buff.buffArray[id];
-                let fm = mc.newCustomForm()
-                    .setTitle(i18n.get("modifyBuff_1", player.langCode))
-                    .addInput(i18n.get("set_buff_id", player.langCode), buffData.id.toString(), buffData.id.toString())
-                    .addInput(i18n.get("set_buff_lvl", player.langCode), buffData.lvl.toString(), buffData.lvl.toString())
-                    .addInput(i18n.get("set_buff_time", player.langCode), buffData.time.toString(), buffData.time.toString());
-                player.sendForm(fm, (player, data) => {
-                    if (data != undefined) {
-                        let temporary = {
-                            "id": data[0],
-                            "lvl": parseInt(data[1]),
-                            "time": parseInt(data[2])
-                        };
-                        EntityNbtJson[entityType][position].buff.buffArray[id] = temporary;
-                        File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                        player.tell(i18n.get("changesSaved", player.langCode));
-                    } else {
-                        return false;
-                    }
-                })
-            } else {
-                return false;
-            }
-        })
-    },
-    removeBuffConfig: function (player, position, ConfigJson, entityType) {
-        let buffNameArray = queryClass.getCurrentBuffID(ConfigJson);
-        let fm = mc.newSimpleForm()
-            .setTitle(i18n.get("modifyBuff_1", player.langCode));
-        buffNameArray.forEach(buffName => {
-            fm.addButton(buffName);
-        });
-        player.sendForm(fm, (player, id) => {
-            if (id != undefined) {
-                EntityNbtJson[entityType][position].buff.buffArray.splice(id, 1);
-                File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
-                player.tell(i18n.get("changesSaved", player.langCode));
-            } else {
-                return false;
-            }
-        })
-    }
-}
-
-/**
- * 查询实体数据表单
- */
-const queryEntityData = {
-    /**
-    * 查询生物数据.
-    * @param {Player} player 玩家对象
-    */
-    PlayerCmdHandle: function (player) {
-        if (player.isOP()) {
-            let fm = mc.newSimpleForm();
-            let EntityArray = mc.getAllEntities();
-            if (JSON.stringify(EntityArray) != "[]") {
-                fm.setTitle(i18n.trl(player.langCode, "formTitle",))
-                EntityArray.forEach(entity => {
-                    fm.addButton(`${entity.name}\n${entity.type}`);
-                });
-                player.sendForm(fm, (player, id) => {
-                    if (id == undefined) {
-                        return false;
-                    } else {
-                        let en = EntityArray[id];
-                        let enDataJson = {};
-                        let EnNbt = en.getNbt();
-                        if (en != undefined && EnNbt != undefined) {
-                            let enNbtObj = EnNbt.toObject().Attributes;
-                            if (enNbtObj != undefined) {
-                                enNbtObj.forEach(Current => {
-                                    if (Current != undefined) {
-                                        switch (Current.Name) {
-                                            case "minecraft:health":
-                                                enDataJson.health = Current.DefaultMax;
-                                                break;
-                                            case "minecraft:movement":
-                                                enDataJson.movement = Current.Current;
-                                                break;
-                                            case "minecraft:follow_range":
-                                                enDataJson.follow_range = Current.Current;
-                                                break;
-                                            case "minecraft:knockback_resistance":
-                                                enDataJson.knockback_resistance = Current.Current;
-                                                break;
-                                        }
-                                    }
-                                });
-                            }
-                            let msg = i18n.trl(player.langCode, "entityInformation", en.name, enDataJson.health, enDataJson.movement, enDataJson.follow_range, enDataJson.knockback_resistance);
-                            player.tell(msg);
-                        }
-                    }
-                })
-            }
-        }
     }
 }
 
@@ -1787,7 +1140,7 @@ const queryClass = {
      * @returns 判断结果
      */
     JsonDetermine: function (key) {
-        if (key == "reel" || key == "economy" || key == "fragmentsArtifactStones") {
+        if (key == "reel" || key == "economy") {
             return true;
         } else {
             return false;
@@ -1837,7 +1190,7 @@ const queryClass = {
                 let entityDataJson = currentEntity[key];
                 if (entityDataJson.OriginalData.UniqueName == UniqueName) {
                     EntityJson = entityDataJson;
-                    return entityDataJson;
+                    break;
                 }
             }
         }
@@ -2017,11 +1370,13 @@ const queryClass = {
     basedBiologicalAcquisitionConfig: function (entity) {
         let entityDataJson = {};
         let entityJson = EntityNbtJson[entity.type];
-        for (let i = 0; i < entityJson.length; i++) {
-            let EntityJsonUniqueName = entityJson[i].OriginalData.UniqueName;
-            if (entity.hasTag(EntityJsonUniqueName)) {
-                entityDataJson = entityJson[i];
-                break;
+        if (entityJson != undefined) {
+            for (let i = 0; i < entityJson.length; i++) {
+                let EntityJsonUniqueName = entityJson[i].OriginalData.UniqueName;
+                if (entity.hasTag(EntityJsonUniqueName)) {
+                    entityDataJson = entityJson[i];
+                    break;
+                }
             }
         }
         return entityDataJson;
@@ -2040,6 +1395,50 @@ const queryClass = {
             }
         });
         return entityHealth;
+    },
+    /**
+     * 查询玩家附加概率.
+     * @param {Player} player 玩家对象.
+     * @returns 查询到的结果
+     */
+    getPlayerOdds: function (player) {
+        let differFrom = 0;
+        if (PlayerOddsData[player.xuid] != undefined) {
+            differFrom = PlayerOddsData[player.xuid];
+        }
+        return differFrom;
+    },
+    /**
+     * 查询里坐标最近的玩家.
+     * @param {Pos} pos 坐标对象
+     * @param {Int} radius 半径
+     * @returns 查询到的玩家对象
+     */
+    getRadiusRecentPlayer: function (pos, radius) {
+        let temporary = {};
+        let OnlinePlayerAll = mc.getOnlinePlayers();
+        OnlinePlayerAll.forEach(player => {
+            let distance = player.distanceTo(pos);
+            if (radius >= distance && player.gameMode != 1 && player.gameMode != 6) {
+                temporary[player.xuid] = distance;
+            }
+        });
+        if (temporary != {}) {
+            let minKey;
+            let minValue = Infinity;
+            for (let key in temporary) {
+                if (temporary.hasOwnProperty(key) && temporary[key] < minValue) {
+                    minKey = key;
+                }
+            }
+            if (minKey != undefined) {
+                return mc.getPlayer(minKey);
+            } else {
+                return undefined;
+            }
+        } else {
+            return undefined;
+        }
     }
 }
 
@@ -2174,6 +1573,94 @@ function setNewEntity(newEntity, NbtData) {
 }
 
 /**
+ * 修改实体盔甲
+ * @param {Entity} entity 实体对象
+ * @param {List} NbtData 实体修改的数据
+ */
+function setEquipment(entity, NbtData) {
+    if (entity != undefined) {
+        let equipData = NbtData.equip;
+        let enArmor = entity.getArmor();
+        for (let key in equipData) {
+            let currentData = equipData[key];
+            let itemType = currentData.itemType;
+            let type = currentData.type;
+            let position = 0;
+            switch (key) {
+                case "helmet":
+                    position = 0;
+                    break;
+                case "armour":
+                    position = 1;
+                    break;
+                case "pants":
+                    position = 2;
+                    break;
+                case "shoe":
+                    position = 3;
+                    break;
+                case "hand":
+                    if (itemType != "") {
+                        let enNbt = entity.getNbt();
+                        if (type == "initial") {
+                            let item = mc.newItem(itemType, 1);
+                            let MainhandNbt = enNbt.getTag("Mainhand").setTag(0, setItemMark(item).getNbt());
+                            let NewNbt = enNbt.setTag("Mainhand", MainhandNbt);
+                            entity.setNbt(NewNbt);
+                        } else if (type == "gives") {
+                            if (Config.DockingGives) {
+                                let item = mc.newItem(itemType, 1);
+                                let itemNewNbt = GetNewItemNbt(item, currentData.DisplayName, currentData.Curse, 1);
+                                let newItem = mc.newItem(itemNewNbt, 1);
+                                let MainhandNbt = enNbt.getTag("Mainhand").setTag(0, setItemMark(newItem).getNbt());
+                                let NewNbt = enNbt.setTag("Mainhand", MainhandNbt);
+                                entity.setNbt(NewNbt);
+                            } else {
+                                logger.error(i18n.get("givesErrTips", ll.language));
+                            }
+                        }
+                    }
+                    break;
+            }
+            if (itemType != "" && key != "hand") {
+                if (type == "initial") {
+                    let item = mc.newItem(itemType, 1)
+                    enArmor.setItem(position, setItemMark(item));
+                } else if (type == "gives") {
+                    if (Config.DockingGives) {
+                        let item = mc.newItem(itemType, 1);
+                        let itemNewNbt = GetNewItemNbt(item, currentData.DisplayName, currentData.Curse, 1);
+                        let newItem = mc.newItem(itemNewNbt, 1);
+                        enArmor.setItem(position, setItemMark(newItem));
+                    } else {
+                        logger.error(i18n.get("givesErrTips", ll.language));
+                    }
+                }
+            }
+        }
+        entity.refreshItems();
+    }
+}
+
+/**
+ * 给物品对象添加特定标记方便清理.
+ * @param {Item} item 物品对象
+ * @returns 物品对象
+ */
+function setItemMark(item) {
+    let itemNbt = item.getNbt();
+    if (itemNbt.getTag("tag") == undefined) {
+        itemNbt.setTag("tag", new NbtCompound({
+            "mark": new NbtInt(1)
+        }));
+    } else {
+        itemNbt.getTag("tag").setTag("mark", new NbtInt(1));
+    }
+    item.setNbt(itemNbt);
+    return item;
+}
+
+/**
 * 获取随机数（支持小数）
 * @param {Number} min 最小值
 * @param {Number} max 最大值
@@ -2206,6 +1693,39 @@ function specifiedRangeRandomNumber(min = 0, max = 0, decimal = 0) {
 }
 
 /**
+ * 解决小数点后数值漂移的运算
+ * @param {Number} num1 数值1
+ * @param {Number} num2 数值2
+ * @param {String} symbol 字符格式的运算符号
+ * @returns 计算结果.
+ */
+function operation(num1, num2, symbol) {
+    var str1 = num1.toString(), str2 = num2.toString(), result, str1Length, str2Length
+    //解决整数没有小数点方法
+    try { str1Length = str1.split('.')[1].length } catch (error) { str1Length = 0 }
+    try { str2Length = str2.split('.')[1].length } catch (error) { str2Length = 0 }
+    var step = Math.pow(10, Math.max(str1Length, str2Length))
+    switch (symbol) {
+        case "+":
+            result = (num1 * step + num2 * step) / step
+            break;
+        case "-":
+            result = (num1 * step - num2 * step) / step
+            break;
+        case "*":
+            result = ((num1 * step) * (num2 * step)) / step / step
+            break;
+        case "/":
+            result = (num1 * step) / (num2 * step)
+            break;
+        default:
+            break;
+    }
+    return result
+
+}
+
+/**
 * 获取数值的小数部分
 * @param {Integer} data 
 * @returns 范围内的小数
@@ -2223,6 +1743,119 @@ function generateIntensifyCooling(mob) {
     setTimeout(() => {
         delete generateCooling[mob.pos];
     }, 1000);
+}
+
+
+/**
+ * 定时循环任务.
+ */
+const TimedRecurringTasks = {
+    Timer: function () {
+        setInterval(() => {
+            this.ReducedCDPool();
+            this.EntityHematolysisTreatment();
+        }, 1000);
+    },
+    /**
+     * cd数据每秒减少.
+     */
+    ReducedCDPool: function () {
+        if (entityCDData != {}) {
+            for (let uniqueId in entityCDData) {
+                let entityData = entityCDData[uniqueId];
+                for (let term in entityData) {
+                    let current = entityData[term];
+                    if (current > 0) {
+                        entityCDData[uniqueId][term] = current - 1;
+                    }
+                }
+            }
+        }
+    },
+    /**
+     * 强化实体闪现和回血处理.
+     */
+    EntityHematolysisTreatment: function () {
+        let allEntity = mc.getAllEntities();
+        allEntity.forEach(entity => {
+            if (entity.hasTag("Intensify")) {
+                let enUniqueId = entity.uniqueId;
+                let entityDataJson = queryClass.basedBiologicalAcquisitionConfig(entity);
+                if (entityDataJson != {}) {
+                    if (entityCDData[enUniqueId] == undefined) {
+                        entityCDData[enUniqueId] = {
+                            "bloodreturning": 0,
+                            "flash": 0
+                        }
+                    }
+                    if (entityDataJson.bloodreturning.switch && entityCDData[enUniqueId].bloodreturning == 0 && entity.health >= 3) {
+                        let enMaxHealth = entity.maxHealth;
+                        let enHealth = entity.health;
+                        let phaseDifference = enMaxHealth - enHealth;
+                        let dataAddHealth = entityDataJson.bloodreturning.measure;
+                        if (phaseDifference >= dataAddHealth) {
+                            entity.setHealth(enHealth + dataAddHealth);
+                            entityCDData[enUniqueId].bloodreturning = entityDataJson.bloodreturning.time;
+                        } else {
+                            entity.setHealth(enHealth + phaseDifference);
+                            entityCDData[enUniqueId].bloodreturning = entityDataJson.bloodreturning.time;
+                        }
+                    }
+                    if (entityDataJson.flash.switch && entityCDData[enUniqueId].flash == 0) {
+                        let player = queryClass.getRadiusRecentPlayer(entity.pos, entityDataJson.flash.flashDistance);
+                        if (player != undefined) {
+                            player.tell(i18n.trl(player.langCode, "flashTips", entity.name));
+                            setTimeout(() => {
+                                entity.teleport(player.pos);
+                                entityCDData[enUniqueId].flash = entityDataJson.flash.time;
+                            }, 100);
+                        }
+                    }
+                }
+            }
+        });
+    },
+    /**
+     * 3分钟清理CD数据.
+     */
+    CleanTheCDPool: function () {
+        setInterval(() => {
+            let AllEntityArray = [];
+            let allEntity = mc.getAllEntities();
+            allEntity.forEach(entity => {
+                if (entity.hasTag("Intensify")) {
+                    AllEntityArray.push(entity.uniqueId);
+                }
+            });
+            if (AllEntityArray != []) {
+                let keysSet = new Set(AllEntityArray);
+                let missingKeys = Object.keys(entityCDData).filter(key => !keysSet.has(key));
+                missingKeys.forEach(key => {
+                    delete entityCDData[key];
+                });
+            } else {
+                entityCDData = {};
+            }
+        }, 1000 * 60 * 3);
+    }
+}
+
+/**
+ * 战利品记录日志
+ * @param {Player} player 玩家对象
+ * @param {Pos} _pos 坐标对象
+ * @param {Int} randomInt 随机数结果
+ * @param {String} itemName 物品名称/标准类型名 
+ */
+function LogFileWriting(player, _pos, randomInt, itemName) {
+    let time = system.getTimeObj();
+    let route = `${pluginPath}log/${time.Y}-${time.M}-${time.D}.txt`;
+    let logData = `${system.getTimeStr()} ：${player.realName} : ${randomInt} : ${itemName}\n`
+    if (!File.exists(route)) {
+        File.writeTo(route, logData);
+    } else {
+        File.writeLine(route, logData);
+    }
 }
 
 /**
@@ -2438,9 +2071,13 @@ function FourProfileUpdate() {
                 if (EntityNbtJson[key][position].fragmentsArtifactStones == undefined) {
                     EntityNbtJson[key][position].fragmentsArtifactStones = {
                         "state": false,
-                        "name": "神一级石碎片",
-                        "number": 1,
-                        "probability": 0.001
+                        "data": [
+                            {
+                                "name": "神一级石碎片",
+                                "number": 1,
+                                "probability": 100
+                            }
+                        ]
                     }
                 }
             });
@@ -2577,6 +2214,93 @@ function FourProfileUpdate() {
         UPEntityConfig = true;
     }
 
+    if (Config.ProfileVersion == "1.1.3") {
+        Config.ProfileVersion = "1.1.4";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].equip == undefined) {
+                    EntityNbtJson[key][position].equip = {
+                        "helmet": {
+                            "type": "gives",
+                            "itemType": "",
+                            "DisplayName": "测试",
+                            "Curse": {
+                                "Enchantments": [
+                                    {
+                                        "n": 16,
+                                        "l": 5
+                                    }
+                                ]
+                            }
+                        },
+                        "armour": {
+                            "type": "initial",
+                            "itemType": ""
+                        },
+                        "pants": {
+                            "type": "initial",
+                            "itemType": ""
+                        },
+                        "shoe": {
+                            "type": "initial",
+                            "itemType": ""
+                        },
+                        "hand": {
+                            "type": "initial",
+                            "itemType": ""
+                        }
+                    };
+                }
+            });
+        }
+        if (Config.EquipmentCleaning == undefined) {
+            Config.EquipmentCleaning = true;
+        }
+        UPEntityConfig = true;
+    }
+
+    if (Config.ProfileVersion == "1.1.4") {
+        Config.ProfileVersion = "1.1.5";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                let fragmentsArtifactStonesPast = EntityNbtJson[key][position].trophy.fragmentsArtifactStones;
+                let newJson = {
+                    "state": fragmentsArtifactStonesPast.state,
+                    "data": [
+                        {
+                            "name": fragmentsArtifactStonesPast.name,
+                            "number": fragmentsArtifactStonesPast.number,
+                            "probability": fragmentsArtifactStonesPast.probability
+                        }
+                    ]
+                }
+                EntityNbtJson[key][position].trophy.fragmentsArtifactStones = newJson;
+            });
+        }
+        UPEntityConfig = true;
+    }
+
+    if (Config.ProfileVersion == "1.1.5") {
+        Config.ProfileVersion = "1.1.6";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].bloodreturning == undefined) {
+                    EntityNbtJson[key][position].bloodreturning = {
+                        "switch": false,
+                        "time": 10,
+                        "measure": 10
+                    }
+                    EntityNbtJson[key][position].flash = {
+                        "switch": false,
+                        "flashDistance": 6,
+                        "time": 20
+                    }
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
+
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
         File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
@@ -2589,6 +2313,87 @@ function FourProfileUpdate() {
     }, 1000 * 4);
 }
 
+/**
+ * 共享函数
+ */
+const SharingFunction = {
+    /**
+     * 共享函数，在指定位置生成实体.
+     * @param {Pos} pos 坐标对象
+     * @param {String} entityType 实体标准类型名
+     * @param {String} uname 配置唯一名
+     * @returns 实体唯一标识符
+     */
+    spawnToPlayer: function (pos, entityType, uname) {
+        if (EntityNbtJson[entityType] != undefined) {
+            let EntityDataJson = queryClass.UniqueNameGetEntityJson(uname, entityType);
+            if (EntityDataJson != {}) {
+                let entity = mc.spawnMob(entityType, pos);
+                if (entity != undefined) {
+                    setNewEntity(entity, EntityDataJson);
+                    setEquipment(entity, EntityDataJson);
+                    return entity.uniqueId;
+                }
+            }
+        }
+    },
+    /**
+     * 查询实体的所有配置文件
+     * @param {String} entityType 实体标准类型名
+     * @returns 实体的所有配置文件
+     */
+    getEntityAllData: function (entityType) {
+        return EntityNbtJson[entityType];
+    },
+    /**
+     * 获取实体的刷新概率
+     * @param {String} entityType 实体标准类型名
+     * @returns 实体的所有配置对应的刷新概率
+     */
+    getEntityAllProbability: function (entityType) {
+        let reData = {};
+        let enDataJson = EntityNbtJson[entityType];
+        if (enDataJson == undefined) {
+            return enDataJson;
+        } else {
+            enDataJson.forEach(enData => {
+                reData[enData.OriginalData.UniqueName] = enData.OtherAbility.SpawnProbability;
+            });
+
+            return Object.fromEntries(
+                Object.entries(reData).sort((a, b) => a[1] - b[1])
+            );
+        }
+    },
+    getNearbyBrushMonsterCage: function (pos) {
+        return queryClass.findNearestBlock(pos);
+    }
+}
+
+
+ll.export(SharingFunction.spawnToPlayer, "intensifyMonster", "spawn");
+ll.export(SharingFunction.getEntityAllData, "intensifyMonster", "getEntityAllData");
+ll.export(SharingFunction.getEntityAllProbability, "intensifyMonster", "getEntityAllProbability");
+ll.export(SharingFunction.getNearbyBrushMonsterCage, "intensifyMonster", "getNearbyBrushMonsterCage");
+
+/**
+ * 对应版本的代码
+ * 2.14.1
+ * 对指定玩家造成伤害.
+ */
+function playerHurt(xuid, hurt) {
+    let allEntity = mc.getAllEntities();
+    for (let i in allEntity) {
+        let entity = allEntity[i];
+        if (entity.isPlayer()) {
+            let player2 = entity.toPlayer();
+            if (xuid == player2.xuid) {
+                entity.hurt(hurt, 2);
+                break;
+            }
+        }
+    }
+}
 
 /** 
  * 002
@@ -2687,6 +2492,49 @@ function FourProfileUpdate() {
  * 新增根据生命召唤其他生物.
  * 可自定义死亡粒子距离生物高度.
  * 修改死亡粒子样式.
+ * 037
+ * 修复坐标提示小数过多的问题.
+ * 修复爆炸提示无法获取时间的问题.
+ * 修复添加实体时报错.
+ * 038
+ * 修复强制实体大小无效.
+ * 039
+ * 新增实体盔甲设置（会像原版一样击杀掉落，可在配置文件设置清理）.
+ * 040
+ * 强化石碎片支持多个掉落.
+ * 041
+ * 修复一个配置文件设置bug.
+ * 042
+ * 解决强化石碎片生成错误导致的报错并增加提示.
+ * 043
+ * 新增一个生成强化怪物的Api.
+ * 044
+ * 修改计分板为使用Api.
+ * 修复额外伤害和反伤无效的问题(更换实现方式，原Api暂时无效.)
+ * 修复远程伤害免疫的问题.
+ * 045
+ * 新增日志记录.
+ * 修复一个报错.
+ * 045-1
+ * 新增额外概率.
+ * 046
+ * 修复指令生成实体失败造成的报错.
+ * 047
+ * 新增3个插件api.
+ * 048
+ * 移除配置表单.
+ * 新增回血和闪现突脸.
+ * 049
+ * 修复给指定物品添加数据出错.
+ * 修复真伤无效的问题.
+ * 修复一个指令召唤强化生物重复修改属性的问题.
+ * 050
+ * 修改部分消息提示位置.
+ * 接入自己的经济核心.
+ * 051
+ * 修改强化怪刷新算法.
+ * 突脸对象不再选中创造和旁观模式的玩家.
+ * 
  * 
  * 待添加功能
  */
