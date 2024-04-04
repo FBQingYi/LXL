@@ -2,7 +2,7 @@
 const pluginName = "IntensifyMonster";
 const PluginsIntroduction = '强化你的怪物吧!';
 const pluginPath = "./plugins/IntensifyMonster/";
-const PluginsVersion = [0, 5, 1];
+const PluginsVersion = [0, 6, 1];
 const PluginsOtherInformation = { "插件作者": "清漪花开" };
 const EntityNbtJsonData = {
     "minecraft:zombie": [
@@ -16,7 +16,8 @@ const EntityNbtJsonData = {
                 "knockback_resistance": 6,//击退抗性
                 "scale": 2,//模型大小
                 "customName": "宝藏僵尸",//显示名称
-                "UniqueName": "zombie1"//唯一name，每个配置文件不可出现重复
+                "UniqueName": "zombie1",//唯一name，每个配置文件不可出现重复
+                "Persistent": true//不被刷掉
             },
             "OtherAbility": {//其他能力
                 "SpawnProbability": 100,//此配置生物刷新概率
@@ -553,46 +554,8 @@ i18n.load(pluginPath + "language/language.json", "en", {
     }
 });
 
-/**
- * 判断是否需要加载前置插件及语言文件.
- * 判断生成概率是否需要限制.
- */
-if (Config.DockingIntensify) {
-    if (ll.require("Intensify.js")) {
-        getReelNbt = ll.import("intensify", "reel");
-        getFragmentsNbt = ll.import("intensify", "fragments");
-    } else {
-        setTimeout(() => {
-            logger.error(i18n.get("Intensifyerr", ll.language));
-            Config.DockingIntensify = false;
-        }, 1000 * 5);
-    }
-}
-if (Config.DockingGives) {
-    if (ll.require("gives.js")) {
-        GetNewItemNbt = ll.import("NewItemNbt");
-    } else {
-        setTimeout(() => {
-            logger.error(i18n.get("giveserr", ll.language));
-            Config.DockingGives = false;
-        }, 1000 * 5);
-    }
-}
-if (Config.DockingIntensifySurvival) {
-    if (ll.require("IntensifySurvival.js")) {
-        AddTalentValue = ll.import("IntensifySurvival", "AddValue");
-    } else {
-        setTimeout(() => {
-            logger.error(i18n.get("IntensifySurvivalerr", ll.language));
-            Config.DockingIntensifySurvival = false;
-        }, 1000 * 5);
-    }
-}
-if (File.exists("./plugins/LIGHTMoney.js")) {
-    ll.require("LIGHTMoney.js");
-    LIGHTMoney = ll.import("LIGHTMoney");
-}
 FourProfileUpdate();
+
 
 /**
  * 实体转变事件监听.
@@ -799,7 +762,9 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
                         entityHurtEvent.ArmorBreaker(entityDataJson, player);
                     }
                     Hurt += entityDataJson.OtherAbility.Additionaldamage;
-                    player.tell(i18n.trl(player.langCode, "TrueInjuryMsg", Hurt), 5);
+                    if (Hurt > 0) {
+                        player.tell(i18n.trl(player.langCode, "TrueInjuryMsg", Hurt), 5);
+                    }
                     setTimeout(() => {
                         if (entityDataJson.BeFire.playerFire) {
                             player.setFire(entityDataJson.BeFire.FireTime, false);
@@ -849,7 +814,6 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
 mc.listen("onServerStarted", () => {
     let UniqueNameArray = queryClass.EntityUniqueNameArraySet();
     let Command = mc.newCommand("intensifymonster", i18n.get("cmdExplain", ll.language), PermType.GameMasters);
-    Command.setAlias("im");
     Command.setEnum("type", ["spawn"]);
     Command.setEnum("EntityUName", UniqueNameArray);
     Command.mandatory("mode", ParamType.Enum, "type");
@@ -885,6 +849,7 @@ mc.listen("onServerStarted", () => {
     if (Config.ParticleEffect) {
         particles.particleScheduledTasks();
     }
+    ExternalFunction();
     TimedRecurringTasks.Timer();
     TimedRecurringTasks.CleanTheCDPool();
 });
@@ -1526,6 +1491,9 @@ function setNewEntity(newEntity, NbtData) {
             newEntityNbt.setString("CustomName", `${NbtData.OriginalData.customName}`)
             newEntityNbt.setFloat("CustomNameVisible", 1);
         }
+        if (NbtData.OriginalData.Persistent) {
+            newEntityNbt.setByte("Persistent", 1);
+        }
         if (newEntityAttributes != undefined) {
             let newEntityAttributesListLength = newEntityAttributes.getSize();
             for (let i = 0; i < newEntityAttributesListLength; i++) {
@@ -1602,19 +1570,19 @@ function setEquipment(entity, NbtData) {
                 case "hand":
                     if (itemType != "") {
                         let enNbt = entity.getNbt();
+                        enNbt.setByte("canPickupItems", 1);
                         if (type == "initial") {
                             let item = mc.newItem(itemType, 1);
-                            let MainhandNbt = enNbt.getTag("Mainhand").setTag(0, setItemMark(item).getNbt());
-                            let NewNbt = enNbt.setTag("Mainhand", MainhandNbt);
-                            entity.setNbt(NewNbt);
+                            let newItemNbt = setItemMark(item).getNbt();
+                            let ItemInHandNewNbt = enNbt.setTag("ItemInHand", newItemNbt);
+                            entity.setNbt(ItemInHandNewNbt);
                         } else if (type == "gives") {
                             if (Config.DockingGives) {
                                 let item = mc.newItem(itemType, 1);
-                                let itemNewNbt = GetNewItemNbt(item, currentData.DisplayName, currentData.Curse, 1);
-                                let newItem = mc.newItem(itemNewNbt, 1);
-                                let MainhandNbt = enNbt.getTag("Mainhand").setTag(0, setItemMark(newItem).getNbt());
-                                let NewNbt = enNbt.setTag("Mainhand", MainhandNbt);
-                                entity.setNbt(NewNbt);
+                                let newItem = GetNewItemNbt(item, currentData.DisplayName, currentData.Curse, 1);
+                                let newItemNbt = setItemMark(newItem).getNbt();
+                                let ItemInHandNewNbt = enNbt.setTag("ItemInHand", newItemNbt);
+                                entity.setNbt(ItemInHandNewNbt);
                             } else {
                                 logger.error(i18n.get("givesErrTips", ll.language));
                             }
@@ -1629,8 +1597,7 @@ function setEquipment(entity, NbtData) {
                 } else if (type == "gives") {
                     if (Config.DockingGives) {
                         let item = mc.newItem(itemType, 1);
-                        let itemNewNbt = GetNewItemNbt(item, currentData.DisplayName, currentData.Curse, 1);
-                        let newItem = mc.newItem(itemNewNbt, 1);
+                        let newItem = GetNewItemNbt(item, currentData.DisplayName, currentData.Curse, 1);
                         enArmor.setItem(position, setItemMark(newItem));
                     } else {
                         logger.error(i18n.get("givesErrTips", ll.language));
@@ -1648,7 +1615,10 @@ function setEquipment(entity, NbtData) {
  * @returns 物品对象
  */
 function setItemMark(item) {
+
     let itemNbt = item.getNbt();
+    itemNbt.setByte("WasPickedUp", 1);
+
     if (itemNbt.getTag("tag") == undefined) {
         itemNbt.setTag("tag", new NbtCompound({
             "mark": new NbtInt(1)
@@ -2301,6 +2271,18 @@ function FourProfileUpdate() {
         UPEntityConfig = true;
     }
 
+    if (Config.ProfileVersion == "1.1.6") {
+        Config.ProfileVersion = "1.1.7";
+        for (let key in EntityNbtJson) {
+            EntityNbtJson[key].forEach((_EntityDataJson, position) => {
+                if (EntityNbtJson[key][position].OriginalData.Persistent == undefined) {
+                    EntityNbtJson[key][position].OriginalData.Persistent = false;
+                }
+            });
+        }
+        UPEntityConfig = true;
+    }
+
     if (UPEntityConfig) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(Config, null, "\t"));
         File.writeTo(pluginPath + "data/EntityData.json", JSON.stringify(EntityNbtJson, null, "\t"));
@@ -2370,6 +2352,48 @@ const SharingFunction = {
     }
 }
 
+/**
+ * 外部函数判断导入.
+ * 判断是否需要加载前置插件及语言文件.
+ * 判断生成概率是否需要限制.
+ */
+function ExternalFunction() {
+    let allPlugins = ll.listPlugins();
+    if (Config.DockingIntensify) {
+        if (allPlugins.includes("Intensify")) {
+            getReelNbt = ll.import("intensify", "reel");
+            getFragmentsNbt = ll.import("intensify", "fragments");
+        } else {
+            setTimeout(() => {
+                logger.error(i18n.get("Intensifyerr", ll.language));
+                Config.DockingIntensify = false;
+            }, 1000 * 5);
+        }
+    }
+    if (Config.DockingGives) {
+        if (allPlugins.includes("gives")) {
+            GetNewItemNbt = ll.import("NewItemNbt");
+        } else {
+            setTimeout(() => {
+                logger.error(i18n.get("giveserr", ll.language));
+                Config.DockingGives = false;
+            }, 1000 * 5);
+        }
+    }
+    if (Config.DockingIntensifySurvival) {
+        if (allPlugins.includes("IntensifySurvival")) {
+            AddTalentValue = ll.import("IntensifySurvival", "AddValue");
+        } else {
+            setTimeout(() => {
+                logger.error(i18n.get("IntensifySurvivalerr", ll.language));
+                Config.DockingIntensifySurvival = false;
+            }, 1000 * 5);
+        }
+    }
+    if (File.exists("./plugins/LIGHTMoney/LIGHTMoney.js")) {
+        LIGHTMoney = ll.import("LIGHTMoney");
+    }
+}
 
 ll.export(SharingFunction.spawnToPlayer, "intensifyMonster", "spawn");
 ll.export(SharingFunction.getEntityAllData, "intensifyMonster", "getEntityAllData");
@@ -2378,19 +2402,21 @@ ll.export(SharingFunction.getNearbyBrushMonsterCage, "intensifyMonster", "getNea
 
 /**
  * 对应版本的代码
- * 2.14.1
+ * llse2.14.1
+ * lse0.5.2
  * 对指定玩家造成伤害.
  */
 function playerHurt(xuid, hurt) {
-    let allEntity = mc.getAllEntities();
-    for (let i in allEntity) {
-        let entity = allEntity[i];
-        if (entity.isPlayer()) {
-            let player2 = entity.toPlayer();
-            if (xuid == player2.xuid) {
-                entity.hurt(hurt, 2);
-                break;
+    let allPlayer = mc.getOnlinePlayers();
+    for (let i in allPlayer) {
+        let player = allPlayer[i];
+        if (xuid == player.xuid) {
+            if (player.health - hurt <= 0) {
+                player.kill();
+            } else {
+                player.setHealth(player.health - hurt);
             }
+            break;
         }
     }
 }
@@ -2534,7 +2560,17 @@ function playerHurt(xuid, hurt) {
  * 051
  * 修改强化怪刷新算法.
  * 突脸对象不再选中创造和旁观模式的玩家.
- * 
+ * 052
+ * 新增生物不被移除配置.
+ * 052-1
+ * 修复真伤提示没判断的bug.
+ * 061
+ * 修复ll3中前置判断失效导致的无法导入共享函数.
+ * 修复ll3中设置主手物品出现的崩服现象.
+ * 修复ll3中对接gives出现的崩服现象.
+ * 修复ll3中额外伤害和真伤失效的情况.
+ * 对接gives需要gives版本大于等于0.3.1.
+ * 设置实体大小待lse对api进行修复后自行恢复.
  * 
  * 待添加功能
  */
