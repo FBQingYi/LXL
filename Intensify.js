@@ -1,7 +1,7 @@
 const pluginName = "Intensify";
 const pluginsIntroduction = '强化你的装备!';
 const pluginPath = "./plugins/Intensify/";
-const pluginsVersion = [1, 6, 1];
+const pluginsVersion = [1, 6, 3];
 const pluginsOtherInformation = { "插件作者": "清漪花开" };
 
 const soundList = ["random.anvil_use", "random.anvil_break", "random.anvil_land"];
@@ -17,7 +17,7 @@ const bootsItemArray = ["minecraft:leather_boots", "minecraft:chainmail_boots", 
 const toolItemArray = ["minecraft:wooden_axe", "minecraft:wooden_pickaxe", "minecraft:wooden_shovel", "minecraft:wooden_hoe", "minecraft:stone_pickaxe", "minecraft:stone_shovel", "minecraft:stone_axe", "minecraft:stone_hoe", "minecraft:iron_axe", "minecraft:iron_pickaxe", "minecraft:iron_shovel", "minecraft:iron_hoe", "minecraft:golden_axe", "minecraft:golden_pickaxe", "minecraft:golden_shovel", "minecraft:golden_hoe", "minecraft:diamond_axe", "minecraft:diamond_pickaxe", "minecraft:diamond_shovel", "minecraft:diamond_hoe", "minecraft:netherite_axe", "minecraft:netherite_pickaxe", "minecraft:netherite_shovel", "minecraft:netherite_hoe"];
 const longRangeWeaponArray = ["minecraft:bow"];
 const gemDataConfig = { "vampireGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "攻击时有几率触发吸血效果，根据等级不同触发几率恢复效果都不同。", "triggerProbability": [50, 60, 70, 80, 95], "CDTime": [10, 8, 6, 4, 2], "relatedData": [20, 30, 40, 50, 60], "successProbability": [8.5, 6.3, 4.2, 1.2, 0.5], "DropEntityList": ["minecraft:drowned"], "Guarantee": [100, 80, 60, 40, 10] }, "powerGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "攻击时有几率触发暴击效果，暴击将对被攻击者造成真实伤害。", "triggerProbability": [10, 20, 30, 50], "CDTime": [1200, 800, 400, 100], "relatedData": [1, 2, 4, 8], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"], "Guarantee": [100, 80, 60, 40] }, "explosiveGem": { "maxLevel": 4, "droppingProbability": 0.15, "describe": "使用弓箭攻击时有几率触发爆炸！", "triggerProbability": [10, 20, 60, 80], "CDTime": [120, 80, 40, 10], "relatedData": [1, 2, 3, 4], "successProbability": [10, 5, 1, 0.1], "DropEntityList": ["minecraft:creeper"], "Guarantee": [100, 80, 60, 40] }, "experienceGem": { "maxLevel": 5, "droppingProbability": 0.15, "describe": "获得额外的经验", "triggerProbability": [1, 10, 15, 20, 30], "CDTime": [10, 5, 3, 2, 1], "relatedData": [10, 20, 30, 40, 50], "successProbability": [10, 5, 2.5, 1, 0.1], "DropEntityList": ["minecraft:witch"], "Guarantee": [100, 80, 60, 40, 10] }, "durableGem": { "maxLevel": 1, "droppingProbability": 0.0001, "describe": "崛起吧,我的金套!", "successProbability": [100], "relatedData": [1], "DropEntityList": ["minecraft:wither", "minecraft:warden"], "Guarantee": [100] }, "transferGem": { "maxLevel": 1, "droppingProbability": 0, "describe": "迁移数据!", "successProbability": [100], "relatedData": [1], "DropEntityList": [], "Guarantee": [100] } };
-const reelDataConfig = { "maxLevel": 5, "blockList": { "minecraft:diamond_ore": 10, "minecraft:deepslate_diamond_ore": 10, "minecraft:emerald_ore": 10, "minecraft:deepslate_emerald_ore": 10, "minecraft:gold_ore": 10, "minecraft:deepslate_gold_ore": 10 }, "DataEachLevel": [{ "level": 1, "equipProbability": 8.5965, "toItemGuarantee": 20, "nextLevelProbability": 4.3654, "tonextLevelGuarantee": 50, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 0 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 0 }] }, { "level": 2, "equipProbability": 3.5875, "toItemGuarantee": 10, "nextLevelProbability": 2.5874, "tonextLevelGuarantee": 30, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 1 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 1 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 1 }] }, { "level": 3, "equipProbability": 2.86, "toItemGuarantee": 4, "nextLevelProbability": 1.85, "tonextLevelGuarantee": 19, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 2 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 2 }] }, { "level": 4, "equipProbability": 1.58, "toItemGuarantee": 2, "nextLevelProbability": 0.58, "tonextLevelGuarantee": 10, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 3 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 2 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 2 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 3 }] }, { "level": 5, "equipProbability": 0.5, "toItemGuarantee": 10, "nextLevelProbability": 0, "tonextLevelGuarantee": 1, "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }, { "buffName": "潮涌能量", "buffId": "conduit_power", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 4 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 4 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 9 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }, { "buffName": "缓降", "buffId": "slow_falling", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 4 }] }] };
+const reelDataConfig = { "maxLevel": 5, "blockList": { "minecraft:diamond_ore": 10, "minecraft:deepslate_diamond_ore": 10, "minecraft:emerald_ore": 10, "minecraft:deepslate_emerald_ore": 10, "minecraft:gold_ore": 10, "minecraft:deepslate_gold_ore": 10 }, "DataEachLevel": [{ "level": 1, "equipProbability": 8.5965, "toItemGuarantee": 20, "nextLevelProbability": 4.3654, "tonextLevelGuarantee": 50, "itemType": "minecraft:field_masoned_banner_pattern", "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 0 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 0 }] }, { "level": 2, "equipProbability": 3.5875, "toItemGuarantee": 10, "nextLevelProbability": 2.5874, "tonextLevelGuarantee": 30, "itemType": "minecraft:field_masoned_banner_pattern", "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 1 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 1 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 1 }] }, { "level": 3, "equipProbability": 2.86, "toItemGuarantee": 4, "nextLevelProbability": 1.85, "tonextLevelGuarantee": 19, "itemType": "minecraft:field_masoned_banner_pattern", "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 2 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 1 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 2 }] }, { "level": 4, "equipProbability": 1.58, "toItemGuarantee": 2, "nextLevelProbability": 0.58, "tonextLevelGuarantee": 10, "itemType": "minecraft:field_masoned_banner_pattern", "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 3 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 2 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 0 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 2 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 3 }] }, { "level": 5, "equipProbability": 0.5, "toItemGuarantee": 10, "nextLevelProbability": 0, "tonextLevelGuarantee": 1, "itemType": "minecraft:field_masoned_banner_pattern", "helmetBuff": [{ "buffName": "水下呼吸", "buffId": "water_breathing", "buffLevel": 0 }, { "buffName": "饱和", "buffId": "saturation", "buffLevel": 0 }, { "buffName": "夜视", "buffId": "night_vision", "buffLevel": 0 }, { "buffName": "隐身", "buffId": "invisibility", "buffLevel": 0 }, { "buffName": "潮涌能量", "buffId": "conduit_power", "buffLevel": 0 }], "chestplateBuff": [{ "buffName": "伤害吸收", "buffId": "absorption", "buffLevel": 4 }, { "buffName": "生命提升", "buffId": "health_boost", "buffLevel": 4 }, { "buffName": "抗性提升", "buffId": "resistance", "buffLevel": 1 }], "leggingsBuff": [{ "buffName": "跳跃提升", "buffId": "jump_boost", "buffLevel": 9 }, { "buffName": "村庄英雄", "buffId": "village_hero", "buffLevel": 0 }], "bootsBuff": [{ "buffName": "速度提升", "buffId": "speed", "buffLevel": 2 }, { "buffName": "防火", "buffId": "fire_resistance", "buffLevel": 0 }, { "buffName": "缓降", "buffId": "slow_falling", "buffLevel": 0 }], "toolBuff": [{ "buffName": "急迫", "buffId": "haste", "buffLevel": 3 }, { "buffName": "漂浮", "buffId": "levitation", "buffLevel": 2 }], "swordBuff": [{ "buffName": "力量", "buffId": "strength", "buffLevel": 4 }] }] };
 const buffIdCompare = { "speed": 1, "slowness": 2, "haste": 3, "mining_fatigue": 4, "strength": 5, "instant_health": 6, "instant_damage": 7, "jump_boost": 8, "nausea": 9, "regeneration": 10, "resistance": 11, "fire_resistance": 12, "water_breathing": 13, "invisibility": 14, "blindness": 15, "night_vision": 16, "hunger": 17, "weakness": 18, "poison": 19, "wither": 20, "health_boost": 21, "absorption": 22, "saturation": 23, "levitation": 24, "fatal_poison": 25, "conduit_power": 26, "slow_falling": 27, "bad_omen": 28, "village_hero": 29, "darkness": 30 };
 
 const initialConfig = {
@@ -29,12 +29,11 @@ const initialConfig = {
     "removeOldItems": false,//移除旧的强化物品（新下载，新档建议关闭）
     "accurateShielding": true,//屏蔽精准附魔物品
     "relatedItems": {
-        "reel": "minecraft:field_masoned_banner_pattern",//卷轴使用的标准物品类型名
         "gemStone": "minecraft:quartz",//宝石使用的标准物品类型名
         "godStoneDebris": "minecraft:disc_fragment_5",//强化石碎片使用的标准物品类型名
         "godStone": "minecraft:music_disc_11"//强化石使用的标准物品类型名
     },
-    "version": "0.0.3"
+    "version": "0.0.4"
 };
 const ItemRoute = {
     "helmetBuff": pluginPath + "data/itemData/helmetData.json",
@@ -110,7 +109,8 @@ let playerGemCountDown = {};
 let playerOnlineState = {};
 let playerTpSpc = {};//解决经验宝石和https://www.minebbs.com/resources/spc.5245/冲突.
 let opState = {}, godstoneArray = [], debrisArray = [];
-let ConfigGodStong, ConfigGodStongDebris, ConfigGemStong, ConfigReelItem, swordDataArray, helmetDataArray, chestplateDataArray, leggingsDataArray, bootsDataArray, toolDataArray, availableItemJson, longRangeDataArray;
+let reelAllArray = [];
+let ConfigGodStong, ConfigGodStongDebris, ConfigGemStong, swordDataArray, helmetDataArray, chestplateDataArray, leggingsDataArray, bootsDataArray, toolDataArray, availableItemJson, longRangeDataArray;
 
 let ConfigJson = JSON.parse(File.readFrom(pluginPath + "Config.json"));
 
@@ -354,7 +354,7 @@ function serverStartedEvent() {
     qingYi.playerSwitchHandheld();
     other.scheduledTasks();
     other.commandRegistration();
-    ConfigReelItem = ConfigJson.relatedItems.reel;
+    queryData.getReelAllItem();
     ConfigGemStong = ConfigJson.relatedItems.gemStone;
     ConfigGodStongDebris = ConfigJson.relatedItems.godStoneDebris;
     ConfigGodStong = ConfigJson.relatedItems.godStone;
@@ -813,7 +813,7 @@ const other = {
                     }
                 }
             }
-        } else if (item.type == ConfigReelItem) {
+        } else if (reelAllArray.includes(item.type)) {
             let itemNbt = item.getNbt();
             let tag = itemNbt.getTag("tag");
             if (tag != undefined) {
@@ -1132,7 +1132,7 @@ const gemSetData = {
                     if (NewEntity != undefined) {
                         NewEntity.hurt(criticalDamage, 2);
                     }
-                }, 500);
+                }, 550);
                 playerGemCountDown[xuid].powerGem = cdTime;
             }
         }
@@ -1893,7 +1893,7 @@ const generate = {
      * @returns 生成好的卷轴物品对象
      */
     setReelItem: function (lvl, player, amount, quality) {
-        let item = mc.newItem(ConfigReelItem, 1);
+        let item = mc.newItem(reelAllArray[lvl - 1], 1);
         let nbt1 = new NbtCompound({
             "Damage": new NbtInt(0),
             "RepairCost": new NbtInt(1),
@@ -2070,7 +2070,7 @@ const queryData = {
                         "quality": handItemNbtTagAddon.getTag("quality").toString(),
                         "itemType": item.type
                     };
-                } else if (item.type == ConfigReelItem) {
+                } else if (reelAllArray.includes(item.type)) {
                     initialData = { "boolean": true, "type": handItemNbtTagAddon.getTag("type").toString(), "reeltype": handItemNbtTagAddon.getTag("reeltype").toString(), "lvl": handItemNbtTagAddon.getTag("lvl").toString(), "itemType": item.type };
                 } else if (item.type == ConfigGodStongDebris) {
                     initialData = { "boolean": true, "type": handItemNbtTagAddon.getTag("type").toString(), "name": handItemNbtTagAddon.getTag("fragmentstype"), "itemType": item.type };
@@ -2366,6 +2366,12 @@ const queryData = {
             }
         }
         return Lore;
+    },
+    getReelAllItem: function () {
+        let reelArray = ReelConfig.DataEachLevel;
+        reelArray.forEach(reelData => {
+            reelAllArray.push(reelData.itemType);
+        });
     }
 }
 
@@ -2602,7 +2608,7 @@ mc.listen("onPlayerCmd", (player, cmd) => {
         if (item != undefined && item.name != "") {
             let nbt = item.getNbt();
             DebugMsg = `LL版本：${LLVision}\n插件版本：${pluginsVersion}\n手持物Nbt：\n${nbt.toString()}`;
-            //log(nbt.toString())
+            log(nbt.toString())
         } else {
             DebugMsg = `LL版本：${LLVision}\n插件版本：${pluginsVersion}\n手持物Nbt：无}`;
         }
@@ -2642,26 +2648,67 @@ mc.listen("onPlayerCmd", (player, cmd) => {
  * 共享函数
  */
 const shareFunction = {
+    /**
+     * 获取玩家cd数据
+     * @param {Player} player 玩家对象
+     * @returns 玩家的cd数据
+     */
     getPlayerCD: function (player) {
         return playerGemCountDown[player.xuid];
     },
+    /**
+     * 获取卷轴物品对象
+     * @param {Player} player 玩家对象
+     * @param {Int} lvl 卷轴等级
+     * @returns 生成好的物品对象
+     */
     getReelItem: function (player, lvl) {
         let reelItem = generate.setReelItem(lvl, player, 1, 0);
         return reelItem;
     },
+    /**
+     * 获取宝石物品对象
+     * @param {Player} player 玩家对象
+     * @param {string} gemName 宝石名称
+     * @param {int} quantity 宝石数量
+     * @returns 生成好的物品对象
+     */
     getGemItem: function (player, gemName, quantity) {
         let gemItem = generate.setGemItem(gemName, player, parseInt(quantity), 0);
         return gemItem;
     },
+    /**
+     * 获取宝石名称数组
+     * @returns 
+     */
     getGemName: function () {
         return ["vampiregem", "powergem", "durablegem", "explosiveGem", "experienceGem", "transferGem"];
     },
+    /**
+     * 获取神器石物品对象
+     * @param {Player} player 玩家对象
+     * @param {string} name 神器石名称
+     * @param {int} amount 数量
+     * @returns 生成好的物品对象
+     */
     getArtifactStoneItem: function (player, name, amount) {
         return generate.setArtifactStone(player, name, amount);
     },
+    /**
+     * 获取神器石碎片对象
+     * @param {Player} player 玩家对象
+     * @param {string} name 神器石碎片名称
+     * @param {int} amount 数量
+     * @returns 生成好的物品对象
+     */
     getFragmentsItem: function (player, name, amount) {
         return generate.setFragments(player, name, amount);
     },
+    /**
+     * 获取物品是否有耐久宝石数据
+     * @param {Item} item 物品对象
+     * @returns 布尔值
+     */
     getItemDurableGem: function (item) {
         let itemtemGemData = queryData.getItemGemData(item);
         if (itemtemGemData.gemState && itemtemGemData.durableGem != undefined) {
@@ -2669,6 +2716,15 @@ const shareFunction = {
         } else {
             return false;
         }
+    },
+    /**
+     * 获取物品的是否是强化物品
+     * @param {*} item 
+     * @returns 物品的相关数据JSON
+     */
+    getItemIntensifyData: function (item) {
+        let secondData = queryData.getItemIntensifyData(item);
+        return secondData;
     }
 }
 
@@ -2758,6 +2814,19 @@ function versionUpdateModifyProfile() {
         ReelUpConfig = true;
         Config = true;
     }
+
+    //163
+    if (ConfigJson.version == "0.0.3") {
+        ConfigJson.version = "0.0.4"
+        let reelArray = ReelConfig.DataEachLevel
+        for (let i = 0; i < reelArray.length; i++) {
+            ReelConfig.DataEachLevel[i].itemType = "minecraft:field_masoned_banner_pattern";
+        }
+        delete ConfigJson.relatedItems.reel;
+        ReelUpConfig = true;
+        Config = true;
+    }
+
     if (Config) {
         File.writeTo(pluginPath + "Config.json", JSON.stringify(ConfigJson, null, "\t"));
     }
@@ -2797,6 +2866,7 @@ ll.export(shareFunction.getReelItem, "intensify", "reel");
 ll.export(shareFunction.getFragmentsItem, "intensify", "fragments");
 ll.export(shareFunction.getArtifactStoneItem, "intensify", "artifactStone");
 ll.export(shareFunction.getItemDurableGem, "intensify", "getItemDurableGem");
+ll.export(shareFunction.getItemIntensifyData, "intensify", "getItemIntensifyData");
 
 /**
  * 监听使用情况.
@@ -2916,4 +2986,8 @@ ll.export(shareFunction.getItemDurableGem, "intensify", "getItemDurableGem");
  * 修复ll3中神器石导致的崩服.
  * 暴击宝石造成额外伤害推迟到半秒钟.（体验感下降，垃圾麻将啊！）
  * 移除吸血宝石的log内容.
+ * 162
+ * 新增一个查询物品强化数据的api.
+ * 163
+ * 卷轴物品支持不同等级不同物品.
  */

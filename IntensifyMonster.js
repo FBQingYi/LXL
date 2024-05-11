@@ -799,10 +799,10 @@ mc.listen("onMobHurt", (mob, source, _damage, cause) => {
             }
             if (player != undefined) {
                 setTimeout(() => {
-                    playerHurt(player.xuid, Hurt);
-                }, 50);
+                    player.hurt(Hurt,2);
+                    //playerHurt(player.xuid, Hurt);
+                }, 550);
             }
-
         }
     }
 })
